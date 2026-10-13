@@ -1,0 +1,99 @@
+﻿VettingSetup loaded:11 features, data at C:\JuliaProjects\Exoplanet vetting\data\koi_cumulative.csv
+threads: 8
+julia : ┌ Info: clean_koi
+At line:1 char:392
++ ... t vetting"; julia -t auto sweeps/cv_baselines.jl *> sweeps/logs/cv_ba ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (┌ Info: clean_koi:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+│   raw = 9564
+│   kept = 9201
+│   stars = 7927
+│   planets = 4619
+└   false_pos = 4582
+loaded: cv_logreg_r5s10.jld2
+[logreg] pooled OOF AUC 0.8668   vs MLP 0.9251   Δ -0.0583  CI [-0.0639, -0.0529]  p_null 0.000
+loaded: cv_evotree_default_r5s10.jld2
+[evotree_default] pooled OOF AUC 0.9306   vs MLP 0.9251   Δ +0.0056  CI [+0.0032, +0.0080]  p_null 0.000
+resuming grid: 24 configs already done
+grid 25/60 (max_depth = 8, min_weight = 10.0, L2 = 10.0, colsample = 0.5)  AUC 0.9317  logloss 0.3318  rounds  283  (47s)
+grid 26/60 (max_depth = 3, min_weight = 40.0, L2 = 10.0, colsample = 0.5)  AUC 0.9267  logloss 0.3446  rounds 1448  (34s)
+grid 27/60 (max_depth = 4, min_weight = 40.0, L2 = 10.0, colsample = 0.5)  AUC 0.9293  logloss 0.3380  rounds  860  (26s)
+grid 28/60 (max_depth = 5, min_weight = 40.0, L2 = 10.0, colsample = 0.5)  AUC 0.9303  logloss 0.3354  rounds  584  (22s)
+grid 29/60 (max_depth = 6, min_weight = 40.0, L2 = 10.0, colsample = 0.5)  AUC 0.9307  logloss 0.3343  rounds  404  (21s)
+grid 30/60 (max_depth = 8, min_weight = 40.0, L2 = 10.0, colsample = 0.5)  AUC 0.9312  logloss 0.3329  rounds  283  (21s)
+grid 31/60 (max_depth = 3, min_weight = 1.0, L2 = 1.0, colsample = 0.8)  AUC 0.9274  logloss 0.3437  rounds 1056  (26s)
+grid 32/60 (max_depth = 4, min_weight = 1.0, L2 = 1.0, colsample = 0.8)  AUC 0.9298  logloss 0.3373  rounds  598  (18s)
+grid 33/60 (max_depth = 5, min_weight = 1.0, L2 = 1.0, colsample = 0.8)  AUC 0.9307  logloss 0.3350  rounds  362  (17s)
+grid 34/60 (max_depth = 6, min_weight = 1.0, L2 = 1.0, colsample = 0.8)  AUC 0.9307  logloss 0.3347  rounds  240  (16s)
+grid 35/60 (max_depth = 8, min_weight = 1.0, L2 = 1.0, colsample = 0.8)  AUC 0.9313  logloss 0.3334  rounds  147  (19s)
+grid 36/60 (max_depth = 3, min_weight = 10.0, L2 = 1.0, colsample = 0.8)  AUC 0.9273  logloss 0.3439  rounds 1036  (22s)
+grid 37/60 (max_depth = 4, min_weight = 10.0, L2 = 1.0, colsample = 0.8)  AUC 0.9296  logloss 0.3378  rounds  544  (17s)
+grid 38/60 (max_depth = 5, min_weight = 10.0, L2 = 1.0, colsample = 0.8)  AUC 0.9307  logloss 0.3351  rounds  367  (14s)
+grid 39/60 (max_depth = 6, min_weight = 10.0, L2 = 1.0, colsample = 0.8)  AUC 0.9309  logloss 0.3342  rounds  246  (13s)
+grid 40/60 (max_depth = 8, min_weight = 10.0, L2 = 1.0, colsample = 0.8)  AUC 0.9311  logloss 0.3334  rounds  158  (15s)
+grid 41/60 (max_depth = 3, min_weight = 40.0, L2 = 1.0, colsample = 0.8)  AUC 0.9269  logloss 0.3447  rounds 1012  (26s)
+grid 42/60 (max_depth = 4, min_weight = 40.0, L2 = 1.0, colsample = 0.8)  AUC 0.9294  logloss 0.3382  rounds  564  (18s)
+grid 43/60 (max_depth = 5, min_weight = 40.0, L2 = 1.0, colsample = 0.8)  AUC 0.9301  logloss 0.3362  rounds  406  (16s)
+grid 44/60 (max_depth = 6, min_weight = 40.0, L2 = 1.0, colsample = 0.8)  AUC 0.9308  logloss 0.3343  rounds  302  (14s)
+grid 45/60 (max_depth = 8, min_weight = 40.0, L2 = 1.0, colsample = 0.8)  AUC 0.9312  logloss 0.3330  rounds  180  (16s)
+grid 46/60 (max_depth = 3, min_weight = 1.0, L2 = 10.0, colsample = 0.8)  AUC 0.9272  logloss 0.3438  rounds 1226  (35s)
+grid 47/60 (max_depth = 4, min_weight = 1.0, L2 = 10.0, colsample = 0.8)  AUC 0.9296  logloss 0.3374  rounds  736  (21s)
+grid 48/60 (max_depth = 5, min_weight = 1.0, L2 = 10.0, colsample = 0.8)  AUC 0.9307  logloss 0.3346  rounds  520  (22s)
+grid 49/60 (max_depth = 6, min_weight = 1.0, L2 = 10.0, colsample = 0.8)  AUC 0.9310  logloss 0.3336  rounds  371  (20s)
+grid 50/60 (max_depth = 8, min_weight = 1.0, L2 = 10.0, colsample = 0.8)  AUC 0.9317  logloss 0.3320  rounds  230  (24s)
+grid 51/60 (max_depth = 3, min_weight = 10.0, L2 = 10.0, colsample = 0.8)  AUC 0.9271  logloss 0.3439  rounds 1225  (38s)
+grid 52/60 (max_depth = 4, min_weight = 10.0, L2 = 10.0, colsample = 0.8)  AUC 0.9295  logloss 0.3374  rounds  749  (34s)
+grid 53/60 (max_depth = 5, min_weight = 10.0, L2 = 10.0, colsample = 0.8)  AUC 0.9306  logloss 0.3346  rounds  528  (20s)
+grid 54/60 (max_depth = 6, min_weight = 10.0, L2 = 10.0, colsample = 0.8)  AUC 0.9310  logloss 0.3335  rounds  356  (21s)
+grid 55/60 (max_depth = 8, min_weight = 10.0, L2 = 10.0, colsample = 0.8)  AUC 0.9318  logloss 0.3314  rounds  246  (31s)
+grid 56/60 (max_depth = 3, min_weight = 40.0, L2 = 10.0, colsample = 0.8)  AUC 0.9271  logloss 0.3440  rounds 1255  (50s)
+grid 57/60 (max_depth = 4, min_weight = 40.0, L2 = 10.0, colsample = 0.8)  AUC 0.9294  logloss 0.3377  rounds  750  (30s)
+grid 58/60 (max_depth = 5, min_weight = 40.0, L2 = 10.0, colsample = 0.8)  AUC 0.9305  logloss 0.3350  rounds  550  (22s)
+grid 59/60 (max_depth = 6, min_weight = 40.0, L2 = 10.0, colsample = 0.8)  AUC 0.9310  logloss 0.3336  rounds  390  (24s)
+grid 60/60 (max_depth = 8, min_weight = 40.0, L2 = 10.0, colsample = 0.8)  AUC 0.9316  logloss 0.3320  rounds  274  (24s)
+10×7 DataFrame
+ Row │ max_depth  min_weight  L2       colsample  roc_auc   logloss   median_rounds
+     │ Int64      Float64     Float64  Float64    Float64   Float64   Float64
+─────┼──────────────────────────────────────────────────────────────────────────────
+   1 │         8        10.0     10.0        0.8  0.931842  0.331416          246.5
+   2 │         8        10.0     10.0        0.5  0.931714  0.331845          283.0
+   3 │         8         1.0     10.0        0.8  0.931694  0.332             230.0
+   4 │         8         1.0     10.0        0.5  0.9316    0.3323            277.0
+   5 │         8        40.0     10.0        0.8  0.931563  0.331999          274.5
+   6 │         8         1.0      1.0        0.8  0.931259  0.333428          147.0
+   7 │         8        40.0      1.0        0.8  0.931241  0.333036          179.5
+   8 │         8        40.0     10.0        0.5  0.931229  0.332907          283.0
+   9 │         8         1.0      1.0        0.5  0.9311    0.3339            171.0
+  10 │         8        10.0      1.0        0.5  0.9311    0.3336            179.0
+MLP on tuning folds: AUC 0.9255  logloss 0.3456
+chosen tree config: (max_depth = 8, min_weight = 10.0, L2 = 10.0, colsample = 0.8)
+[evotree_tuned] repeat 1 fold 1 done  (0.1 min elapsed)
+[evotree_tuned] repeat 1 fold 2 done  (0.3 min elapsed)
+[evotree_tuned] repeat 1 fold 3 done  (0.4 min elapsed)
+[evotree_tuned] repeat 1 fold 4 done  (0.5 min elapsed)
+[evotree_tuned] repeat 1 fold 5 done  (0.6 min elapsed)
+[evotree_tuned] repeat 2 fold 1 done  (0.7 min elapsed)
+[evotree_tuned] repeat 2 fold 2 done  (0.8 min elapsed)
+[evotree_tuned] repeat 2 fold 3 done  (0.9 min elapsed)
+[evotree_tuned] repeat 2 fold 4 done  (1.0 min elapsed)
+[evotree_tuned] repeat 2 fold 5 done  (1.1 min elapsed)
+[evotree_tuned] repeat 3 fold 1 done  (1.2 min elapsed)
+[evotree_tuned] repeat 3 fold 2 done  (1.3 min elapsed)
+[evotree_tuned] repeat 3 fold 3 done  (1.4 min elapsed)
+[evotree_tuned] repeat 3 fold 4 done  (1.5 min elapsed)
+[evotree_tuned] repeat 3 fold 5 done  (1.6 min elapsed)
+[evotree_tuned] repeat 4 fold 1 done  (1.9 min elapsed)
+[evotree_tuned] repeat 4 fold 2 done  (2.1 min elapsed)
+[evotree_tuned] repeat 4 fold 3 done  (2.2 min elapsed)
+[evotree_tuned] repeat 4 fold 4 done  (2.3 min elapsed)
+[evotree_tuned] repeat 4 fold 5 done  (2.4 min elapsed)
+[evotree_tuned] repeat 5 fold 1 done  (2.6 min elapsed)
+[evotree_tuned] repeat 5 fold 2 done  (2.7 min elapsed)
+[evotree_tuned] repeat 5 fold 3 done  (2.8 min elapsed)
+[evotree_tuned] repeat 5 fold 4 done  (2.9 min elapsed)
+[evotree_tuned] repeat 5 fold 5 done  (3.1 min elapsed)
+saved: C:\JuliaProjects\Exoplanet vetting\sweeps\results\cv_evotree_tuned_r5s10.jld2
+[evotree_tuned] pooled OOF AUC 0.9320   vs MLP 0.9251   Δ +0.0069  CI [+0.0045, +0.0094]  p_null 0.000
+DONE
