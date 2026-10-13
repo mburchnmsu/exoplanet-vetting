@@ -16,3 +16,10 @@ The user works on two PCs. Keep the repo in sync without being asked:
 - If a pull or push conflicts, stop and tell the user. Don't force-push or resolve it silently.
 
 Keep this project separate from the zodi emulator project: different repos, different sessions.
+
+## Notify the user on major progress
+
+The user steers sessions from their phone and wants a push notification (PushNotification tool) when something big
+happens, even if they didn't ask in that session. Major means: a sweep or long run finishes or crashes, a new best model
+or a result that changes the plan, a notebook finished for the mentor, or a blocker that needs their decision.
+Not routine steps. One line, lead with the result, e.g. "Round 9 done: parallax bands fix ecliptic stripe, 4x worse elsewhere".
