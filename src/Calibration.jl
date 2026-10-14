@@ -11,6 +11,14 @@
 # Included automatically by VettingSetup.jl.
 # ==============================================================================
 
+"Score new KOIs with a frozen model from models/step5_frozen.jld2 (50/50 average of the seed-mean MLP and trees)."
+function frozen_predict(m, df::DataFrame)
+    X = transform_new(m["prep"], df)
+    p_mlp = mean(predict_proba(Flux.loadmodel!(build_mlp(size(X, 1)), st), X) for st in m["mlp_states"])
+    p_tree = mean(predict_proba(t, X) for t in m["trees"])
+    return Float64.((p_mlp .+ p_tree) ./ 2)
+end
+
 "[n_pool, repeats] seed-mean OOF score of each fold shuffle."
 repeat_scores(cv) = dropdims(mean(cv.oof; dims = 3); dims = 3)
 

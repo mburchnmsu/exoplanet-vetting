@@ -45,13 +45,6 @@ path = joinpath(PROJECT_DIR, "models", "step5_frozen.jld2")
 jldsave(path; frozen)
 println("saved: ", path)
 
-"Score new KOIs with a frozen model (50/50 average of the seed-mean MLP and trees)."
-function frozen_predict(m, df)
-    X = transform_new(m["prep"], df)
-    p_mlp = mean(predict_proba(Flux.loadmodel!(build_mlp(size(X, 1)), st), X) for st in m["mlp_states"])
-    p_tree = mean(predict_proba(t, X) for t in m["trees"])
-    return (p_mlp .+ p_tree) ./ 2
-end
 # sanity check on the pool itself (in-sample, so optimistic; only checks the round trip works)
 reload = JLD2.load(path)["frozen"]
 for (name, _) in specs

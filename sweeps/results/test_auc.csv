@@ -1,0 +1,10 @@
+model,subset,n,test_auc,test_ci,cv_expected
+catalog-only,DR25 KOIs (headline),796,0.9573,"[0.944, 0.970]",0.9542
+catalog-only,DR25 CONFIRMED vs FP,661,0.9745,"[0.964, 0.983]",0.9776
+catalog-only,supplemental KOIs,117,0.7242,"[0.634, 0.812]",0.6639
+catalog-only,all KOIs,913,0.9413,"[0.927, 0.956]",0.9339
+catalog + centroid,DR25 KOIs (headline),796,0.9883,"[0.982, 0.994]",0.9825
+catalog + centroid,DR25 CONFIRMED vs FP,661,0.9954,"[0.991, 0.999]",0.9942
+catalog + centroid,supplemental KOIs,117,0.7875,"[0.704, 0.864]",0.751
+catalog + centroid,all KOIs,913,0.9786,"[0.971, 0.986]",0.9692
+robovetter koi_score (reference),DR25 KOIs (headline),796,0.9794,—,NaN

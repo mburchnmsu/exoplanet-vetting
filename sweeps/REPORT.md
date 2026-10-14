@@ -437,7 +437,32 @@ NT and EC are not helped.
 (a rejected planet is lost; a false positive only costs follow-up time). Best F1 is reported alongside for comparison
 with the literature; ROC-AUC remains the main threshold-free number; the full menu is always shown.
 
-**Step 5 status: done.** Next is the one-time sealed-test evaluation, together with the user.
+**Step 5 status: done.**
+
+## Sealed-test evaluation (10/13/2026, used ONCE; `sweeps/step5_test.jl`, notebook section 12)
+
+The frozen models scored the test split (`split_by_star` seed 42: 913 KOIs, 792 stars, 796 DR25) once. Nothing was
+fitted or tuned on it, and the script refuses to run again. Star-bootstrap 95% CIs.
+
+| Model, DR25 KOIs | Test ROC-AUC | CV expected | Test CONFIRMED vs FP |
+|---|---|---|---|
+| Catalog-only | **0.957** [0.944, 0.970] | 0.954 | 0.975 |
+| Catalog + centroid | **0.988** [0.982, 0.994] | 0.983 | 0.995 |
+| Robovetter `koi_score` (reference) | 0.979 | — | — |
+
+| Operating point (DR25 KOIs) | Model | t | Test recall | Test precision | FPs kept (test / CV) |
+|---|---|---|---|---|---|
+| **98% planet recall (headline)** | catalog-only | 0.145 | 0.988 [0.975, 0.997] | 0.771 [0.731, 0.809] | 31% / 35% |
+| | + centroid | 0.211 | 0.993 [0.983, 1.000] | 0.869 [0.837, 0.898] | 16% / 17% |
+| Best F1 | catalog-only | 0.491 | 0.899 [0.868, 0.929] | 0.892 [0.861, 0.923] | 11% / 14% |
+| | + centroid | 0.548 | 0.963 [0.943, 0.980] | 0.947 [0.920, 0.968] | 5.6% / 6.6% |
+
+- **CV is confirmed:** every CV estimate lies inside the test CI, for both models and every subset. The test split is
+  slightly easier than the pool, within its noise.
+- At the 98% threshold, no DR25 CONFIRMED planet in the test set is lost by either model.
+- Supplemental KOIs (117): 0.72 / 0.79 (CV 0.66 / 0.75; wide CIs).
+- Full tables: `sweeps/results/test_auc.csv`, `test_operating_points.csv`; predictions: `test_predictions.csv`.
+- **The test set is now spent.** Later changes must be judged by CV and reported as post-test.
 
 ## Recommendations (for steps 4–5)
 

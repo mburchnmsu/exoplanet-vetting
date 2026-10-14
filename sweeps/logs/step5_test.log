@@ -1,0 +1,8 @@
+┌ Info: clean_koi
+│   raw = 9564
+│   kept = 9201
+│   stars = 7927
+│   planets = 4619
+└   false_pos = 4582
+VettingSetup loaded:11 features, data at C:\JuliaProjects\Exoplanet vetting\data\koi_cumulative.csv
+scored 913 test KOIs (792 stars; 796 DR25) -> C:\JuliaProjects\Exoplanet vetting\sweeps\results\test_predictions.csv

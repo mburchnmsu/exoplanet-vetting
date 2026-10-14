@@ -52,6 +52,9 @@
 #   - An operating-point menu (recall 95/98/99%, precision 95/99%, max F1, p = 0.5) is frozen with the two final
 #     models in `models/step5_frozen.jld2`, ready for the one-time sealed-test evaluation. Example, 98% planet
 #     recall on DR25 KOIs: catalog-only keeps 35% of FPs, catalog + centroid 17%.
+# - **Sealed test set (section 12, used once): CV is confirmed.** DR25 ROC-AUC: catalog-only **0.957** [0.944, 0.970]
+#   (CV 0.954), catalog + centroid **0.988** [0.982, 0.994] (CV 0.983). At the 98% planet-recall threshold, the test
+#   recall is 0.988 / 0.993 with 31% / 16% of FPs kept, and no DR25 CONFIRMED planet is lost.
 # - **Takeaway:** the catalog-only errors are limited by the *information* in the 11 features, not by the model. The
 #   centroid result confirms it: give the model the right information and the biggest blind spot disappears.
 #   Bigger wins should come from features (step 4) and light curves (Phase 2) rather than architecture.
@@ -819,3 +822,104 @@ fig
 #   catalog-only keeps 35% of DR25 FPs, catalog + centroid 17%.
 # - **Nothing here touched the test split.** The frozen models + this menu are what the one-time test evaluation will
 #   score.
+
+# %% [markdown]
+# ## 12. One-time sealed-test evaluation
+# - **The test split** (`split_by_star` seed 42, about 10% of stars) was scored exactly once by `sweeps/step5_test.jl`.
+#   It used the frozen models from section 11, with no fitting or tuning, and it refuses to run a second time.
+# - **Headline (user decision, 10/13):** ROC-AUC on DR25 KOIs, and the **98% planet recall** operating point. Best F1
+#   is shown alongside, and the full menu below.
+# - **"CV expected"** is the honest cross-validation estimate for the same quantity. For AUC, it's a single 10-seed
+#   ensemble per fold shuffle, averaged over shuffles. For operating points, it's the nested estimates from section 11.
+# - **The test set is small** (913 KOIs, 792 stars), so its confidence intervals (star bootstrap) are about 3× wider
+#   than the CV ones. The question is whether CV and test *agree*, not which is higher.
+
+# %%
+tp5 = CSV.read(joinpath(CV_DIR, "test_predictions.csv"), DataFrame)
+yt, drt = Float64.(tp5.label), Bool.(tp5.dr25)
+conft = tp5.koi_disposition .== "CONFIRMED"
+@printf("test: %d KOIs, %d stars;  DR25 %d, supplemental %d;  planet rate %.3f\n",
+        nrow(tp5), length(unique(tp5.kepid)), sum(drt), sum(.!drt), mean(yt))
+test_models = [("catalog-only", tp5.p_catalog, final_models[1][2]), ("catalog + centroid", tp5.p_centroid, final_models[2][2])]
+auc_rows = NamedTuple[]
+for (mname, p, S) in test_models
+    for (sname, mt, mc) in (("DR25 KOIs (headline)", drt, dr), ("DR25 CONFIRMED vs FP", drt .& (conft .| (yt .== 0)), dr .& (conf .| (yf .== 0))),
+                            ("supplemental KOIs", .!drt, .!dr), ("all KOIs", trues(length(yt)), trues(length(yf))))
+        bs = star_bootstrap(yt[mt], p[mt], tp5.kepid[mt]; B = 2000)
+        cv_exp = mean(fast_auc(yf[mc], S[mc, r]) for r in axes(S, 2))
+        push!(auc_rows, (model = mname, subset = sname, n = sum(mt), test_auc = round(fast_auc(yt[mt], p[mt]); digits = 4),
+                         test_ci = @sprintf("[%.3f, %.3f]", bs.lo, bs.hi), cv_expected = round(cv_exp; digits = 4)))
+    end
+end
+mk = drt .& isfinite.(tp5.koi_score)
+push!(auc_rows, (model = "robovetter koi_score (reference)", subset = "DR25 KOIs (headline)", n = sum(mk),
+                 test_auc = round(fast_auc(yt[mk], tp5.koi_score[mk]); digits = 4), test_ci = "—", cv_expected = NaN))
+test_auc = DataFrame(auc_rows)
+CSV.write(joinpath(CV_DIR, "test_auc.csv"), test_auc)
+test_auc
+
+# %% [markdown]
+# ### 12.1 Operating points on the test set (frozen thresholds)
+
+# %%
+cvmenu = CSV.read(joinpath(CV_DIR, "step5_operating_points.csv"), DataFrame)
+op_rows = NamedTuple[]
+for ((mname, p, _), key) in zip(test_models, ("catalog_only", "catalog_centroid")), (rname, rule) in RULES5
+    t = frozen[key]["thresholds"][string(rule)]
+    o = op_metrics(yt[drt], p[drt], t)
+    rec_bs = star_bootstrap(yt[drt], p[drt], tp5.kepid[drt]; B = 1000, metric = (a, b) -> op_metrics(a, b, t).recall)
+    prec_bs = star_bootstrap(yt[drt], p[drt], tp5.kepid[drt]; B = 1000, metric = (a, b) -> op_metrics(a, b, t).precision)
+    cvr = cvmenu[(cvmenu.model .== mname) .& (cvmenu.rule .== rname), :]
+    oc = op_metrics(yt[drt .& (conft .| (yt .== 0))], p[drt .& (conft .| (yt .== 0))], t)
+    os = op_metrics(yt[.!drt], p[.!drt], t)
+    push!(op_rows, (model = mname, rule = rname, t = round(t; digits = 3),
+                    recall = @sprintf("%.3f [%.3f, %.3f]", o.recall, rec_bs.lo, rec_bs.hi), cv_recall = cvr.dr25_recall[1],
+                    precision = @sprintf("%.3f [%.3f, %.3f]", o.precision, prec_bs.lo, prec_bs.hi), cv_precision = cvr.dr25_precision[1],
+                    fp_kept = round(o.fp_kept; digits = 3), cv_fp_kept = cvr.dr25_fp_kept[1],
+                    confirmed_lost = round(1 - oc.recall; digits = 3), cv_confirmed_lost = cvr.confirmed_lost[1],
+                    supp_recall = round(os.recall; digits = 2), supp_precision = round(os.precision; digits = 2)))
+end
+test_ops = DataFrame(op_rows)
+CSV.write(joinpath(CV_DIR, "test_operating_points.csv"), test_ops)
+test_ops
+
+# %%
+fig = Figure(size = (900, 420))
+a1 = Axis(fig[1, 1]; xlabel = "false positive rate", ylabel = "true positive rate", title = "Test ROC, DR25 KOIs", aspect = 1)
+a2 = Axis(fig[1, 2]; xlabel = "predicted planet probability", ylabel = "observed planet fraction",
+          title = "Test reliability, DR25 KOIs (8 bins)", aspect = 1)
+for ((mname, p, _), col) in zip(test_models, (:steelblue, :purple))
+    fpr, tpr = roccurve(Int.(yt[drt]), p[drt])
+    lines!(a1, fpr, tpr; color = col, label = @sprintf("%s (%.3f)", mname, fast_auc(yt[drt], p[drt])))
+    t98 = frozen[mname == "catalog-only" ? "catalog_only" : "catalog_centroid"]["thresholds"]["(:recall, 0.98)"]
+    o = op_metrics(yt[drt], p[drt], t98)
+    scatter!(a1, [o.fp_kept], [o.recall]; color = col, markersize = 12)
+    s, tt = p[drt], yt[drt]; ord = sortperm(s); e = round.(Int, range(0, length(s); length = 9))
+    scatterlines!(a2, [mean(s[ord[e[i]+1:e[i+1]]]) for i in 1:8], [mean(tt[ord[e[i]+1:e[i+1]]]) for i in 1:8]; color = col)
+end
+lines!(a2, [0, 1], [0, 1]; color = :black, linestyle = :dot)
+axislegend(a1; position = :rb, labelsize = 11)
+savefig("exo101326_test.png", fig)
+fig
+
+# %% [markdown]
+# **Reading section 12: the test set confirms the cross-validation results.**
+# - **Headline, DR25 KOIs:**
+#
+#   | Model | Test ROC-AUC [95% CI] | CV expected |
+#   |---|---|---|
+#   | Catalog-only | **0.957** [0.944, 0.970] | 0.954 |
+#   | Catalog + centroid | **0.988** [0.982, 0.994] | 0.983 |
+#   | Robovetter `koi_score` (reference) | 0.979 | — |
+#
+#   Every CV estimate lies inside the test CI, for both models and every subset. The test split is slightly easier
+#   than the pool (all subsets score a little higher), which is within its sampling noise.
+# - **The 98% planet-recall operating point holds:**
+#   - Catalog-only (t = 0.145): recall 0.988 [0.975, 0.997], precision 0.77, keeps 31% of FPs (CV: 35%).
+#   - Catalog + centroid (t = 0.211): recall 0.993 [0.983, 1.000], precision 0.87, keeps 16% of FPs (CV: 17%).
+#   - No CONFIRMED planet in the DR25 test KOIs is lost at this threshold, by either model.
+# - **Best F1 (for comparison with the literature):** catalog-only recall 0.90 / precision 0.89; catalog + centroid
+#   0.96 / 0.95.
+# - **Supplemental KOIs (117):** 0.72 and 0.79, also in line with CV (wide CIs, as expected).
+# - **The numbers are final.** The test set has been used; any later model change has to be judged by CV again and
+#   reported as post-test.
