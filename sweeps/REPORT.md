@@ -433,6 +433,10 @@ NT and EC are not helped.
   pool with a fixed inner early-stopping split), their preprocessing, and the menu thresholds. The test split was not
   touched.
 
+**Headline operating point (user decision, 10/13):** **98% planet recall**, because the model is a triage filter
+(a rejected planet is lost; a false positive only costs follow-up time). Best F1 is reported alongside for comparison
+with the literature; ROC-AUC remains the main threshold-free number; the full menu is always shown.
+
 **Step 5 status: done.** Next is the one-time sealed-test evaluation, together with the user.
 
 ## Recommendations (for steps 4–5)
