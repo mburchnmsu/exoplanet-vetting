@@ -215,7 +215,15 @@ function prepare_data(train, val, test; features = FEATURES, transform = :defaul
     return (Xtr = apply_scaler(s, Ptr), ytr = labels(train),
             Xva = tf(val), yva = labels(val),
             Xte = tf(test), yte = labels(test),
-            scaler = s, features = features, transform = transform, qref = qref)
+            scaler = s, features = features, transform = transform, qref = qref, med = med)
+end
+
+"Apply a prepare_data result's fitted preprocessing (logs, imputation, rank-gauss, scaler) to new KOIs."
+function transform_new(data, df::DataFrame)
+    X = feature_matrix(df; features = data.features, logs = transform_logs(data.transform))
+    X = [isfinite(X[i, j]) ? X[i, j] : data.med[i] for i in axes(X, 1), j in axes(X, 2)]
+    data.qref === nothing || (X = apply_quantile(data.qref, X))
+    return apply_scaler(data.scaler, X)
 end
 
 make_loader(X, y; batchsize = 128, shuffle = true, rng = Xoshiro(0)) =
@@ -390,5 +398,6 @@ include(joinpath(@__DIR__, "CrossValidation.jl"))
 include(joinpath(@__DIR__, "ErrorAnalysis.jl"))
 include(joinpath(@__DIR__, "Baselines.jl"))
 include(joinpath(@__DIR__, "Centroids.jl"))
+include(joinpath(@__DIR__, "Calibration.jl"))
 
 println("VettingSetup loaded:$(length(FEATURES)) features, data at $(KOI_PATH)")

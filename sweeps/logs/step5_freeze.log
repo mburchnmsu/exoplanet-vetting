@@ -1,0 +1,19 @@
+﻿VettingSetup loaded:11 features, data at C:\JuliaProjects\Exoplanet vetting\data\koi_cumulative.csv
+julia : ┌ Info: clean_koi
+At line:1 char:343
++ ... t vetting"; julia --project=. -t 4 sweeps/step5_freeze.jl *> sweeps/l ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (┌ Info: clean_koi:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+│   raw = 9564
+│   kept = 9201
+│   stars = 7927
+│   planets = 4619
+└   false_pos = 4582
+catalog_only: frozen in 3.0 min; thresholds Dict("(:recall, 0.99)" => 0.07507155187413446, "(:precision, 0.95)" => 0.7769738525152206, "(:prob, 0.5)" => 0.5, "(:recall, 0.95)" => 0.3086582224816084, "(:recall, 0.98)" => 0.1452698178589344, "(:precision, 0.99)" => 0.976300510764122, "(:maxf1,)" => 0.49125951975584026)
+catalog_centroid: frozen in 0.8 min; thresholds Dict("(:recall, 0.99)" => 0.09029872734099625, "(:precision, 0.95)" => 0.6136268988251686, "(:prob, 0.5)" => 0.5, "(:recall, 0.95)" => 0.4421014510095119, "(:recall, 0.98)" => 0.21077205166220664, "(:precision, 0.99)" => 0.9243412375450135, "(:maxf1,)" => 0.5480384767055512)
+saved: C:\JuliaProjects\Exoplanet vetting\models\step5_frozen.jld2
+catalog_only: in-sample pool AUC 0.9620 (DR25 0.9736), mean p 0.500
+catalog_centroid: in-sample pool AUC 0.9892 (DR25 0.9939), mean p 0.503
+DONE

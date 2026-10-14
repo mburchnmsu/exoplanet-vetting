@@ -385,6 +385,56 @@ NT and EC are not helped.
 - Next is step 5: calibration and threshold choice, for both the catalog-only and catalog + centroid models.
 - Then a single final evaluation on the sealed test split.
 
+## Step 5: calibration and operating points (10/13/2026, notebook section 11, `src/Calibration.jl`, `sweeps/step5_freeze.jl`)
+
+**Setup.**
+- Both final models: catalog-only and catalog + centroid (each = quantile MLP + tuned trees, 50/50 average).
+- Calibration uses each fold shuffle's 10-seed mean (the size of ensemble we ship), not the 50-model repeat-mean.
+- Everything is nested: calibrators and thresholds are fitted on the other folds and applied to the held-out fold.
+- Thresholds are chosen on DR25 KOIs, one threshold for all KOIs (provenance never sets a KOI's threshold).
+- User decisions: report a menu of operating points; open the sealed test set later, together.
+
+**Calibration: not needed.**
+
+| Model, DR25 KOIs | log-loss none / Platt / isotonic | ECE none / Platt / isotonic |
+|---|---|---|
+| Catalog-only | 0.275 / 0.275 / 0.277 | 0.018 / 0.014 / 0.012 |
+| Catalog + centroid | 0.170 / 0.170 / 0.172 | 0.014 / 0.010 / 0.008 |
+
+- A Platt fit on all OOF scores is almost the identity (a ≈ 1.04–1.05, b ≈ −0.02).
+- Calibrators shave ECE slightly but don't improve log-loss or Brier; isotonic is slightly worse and costs AUC via ties.
+- → **Frozen choice: no calibrator.** Scores read as planet probabilities on DR25-like KOIs.
+- **Supplemental KOIs are miscalibrated (ECE 0.05–0.08).** The cause is weak ranking, not a base-rate shift, and a fix
+  would need provenance as an input (ruled out). Their probabilities should be read as unreliable.
+
+**Operating-point menu (nested estimates on DR25 KOIs, mean of 5 fold shuffles; per 1,000 DR25 KOIs, 51% planets):**
+
+| Rule | Model | Frozen t | Recall | Precision | FPs kept | Planets lost /1000 | FPs kept /1000 | CONFIRMED lost |
+|---|---|---|---|---|---|---|---|---|
+| Recall 95% | catalog-only | 0.31 | 0.950 | 0.814 | 23% | 25 | 111 | 1.5% |
+| | + centroid | 0.44 | 0.950 | 0.913 | 10% | 26 | 47 | 1.1% |
+| Recall 98% | catalog-only | 0.15 | 0.980 | 0.745 | 35% | 10 | 172 | 0.4% |
+| | + centroid | 0.21 | 0.980 | 0.856 | 17% | 10 | 84 | 0.4% |
+| Recall 99% | catalog-only | 0.08 | 0.990 | 0.696 | 46% | 5 | 222 | 0.2% |
+| | + centroid | 0.09 | 0.990 | 0.807 | 25% | 5 | 122 | 0.2% |
+| Precision 95% | catalog-only | 0.78 | 0.741 | 0.949 | 4.2% | 133 | 20 | 13% |
+| | + centroid | 0.61 | 0.916 | 0.950 | 5.1% | 43 | 25 | 2.1% |
+| Precision 99% | catalog-only | 0.98 | 0.289 | 0.987 | 0.4% | 365 | 2 | 59% |
+| | + centroid | 0.92 | 0.730 | 0.989 | 0.9% | 138 | 4 | 12% |
+| Max F1 | catalog-only | 0.49 | 0.904 | 0.874 | 14% | 49 | 67 | 3.6% |
+| | + centroid | 0.55 | 0.930 | 0.937 | 6.6% | 36 | 32 | 1.8% |
+| p = 0.5 | catalog-only | 0.50 | 0.900 | 0.881 | 13% | 52 | 63 | 3.8% |
+| | + centroid | 0.50 | 0.941 | 0.927 | 7.9% | 30 | 38 | 1.4% |
+
+- Nested targets are hit exactly; threshold spread across fold shuffles ≤ 0.04.
+- Supplemental KOIs at the same thresholds: see `sweeps/results/step5_operating_points.csv` (e.g. max F1:
+  recall 0.53 / precision 0.56 catalog-only).
+- **Frozen:** `models/step5_frozen.jld2` holds both final models (10 MLP + 10 tree seeds each, trained on the whole
+  pool with a fixed inner early-stopping split), their preprocessing, and the menu thresholds. The test split was not
+  touched.
+
+**Step 5 status: done.** Next is the one-time sealed-test evaluation, together with the user.
+
 ## Recommendations (for steps 4–5)
 
 1. **Step 3:** done (see above).
@@ -427,3 +477,6 @@ NT and EC are not helped.
 | `sweeps/step4_scoping.jl` | Centroid models and DR25-only training runs |
 | `sweeps/results/cv_mlpq_centroid_r5s10.jld2`, `cv_evotree_centroid_r5s10.jld2` | Catalog + centroid models |
 | `sweeps/results/cv_mlpq_dr25train_r5s10.jld2`, `cv_evotree_dr25train_r5s10.jld2` | Trained on DR25 KOIs only |
+| `src/Calibration.jl` | Step 5: `repeat_scores`, Platt / isotonic calibrators, `nested_calibrate`, `pick_threshold`, `nested_calls`, `ece`, `brier` |
+| `sweeps/step5_freeze.jl` | Trains and saves the two final models + menu thresholds (`models/step5_frozen.jld2`) |
+| `sweeps/results/step5_operating_points.csv` | The operating-point menu, incl. supplemental-KOI columns |

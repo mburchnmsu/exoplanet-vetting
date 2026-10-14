@@ -46,6 +46,12 @@
 #     (CO-only FPs missed: 36% → 4%).
 #   - ⚠ This is partly circular: the robovetter's CO flag thresholds these same numbers.
 #   - Training on DR25 KOIs only gives no gain, so we keep training on all KOIs.
+# - **Step 5 (section 11): calibration and operating points.**
+#   - Both final models are already well calibrated on DR25 KOIs (Platt fit ≈ identity), so no calibrator is used.
+#   - Supplemental-KOI probabilities are unreliable, and only a provenance-based fix could help, which is ruled out.
+#   - An operating-point menu (recall 95/98/99%, precision 95/99%, max F1, p = 0.5) is frozen with the two final
+#     models in `models/step5_frozen.jld2`, ready for the one-time sealed-test evaluation. Example, 98% planet
+#     recall on DR25 KOIs: catalog-only keeps 35% of FPs, catalog + centroid 17%.
 # - **Takeaway:** the catalog-only errors are limited by the *information* in the 11 features, not by the model. The
 #   centroid result confirms it: give the model the right information and the biggest blind spot disappears.
 #   Bigger wins should come from features (step 4) and light curves (Phase 2) rather than architecture.
@@ -679,3 +685,137 @@ hl
 #   | Catalog-only MLP + trees | **0.955** [0.951, 0.960] |
 #   | Catalog + centroid | **0.983** [0.981, 0.985] |
 #   | Robovetter `koi_score` (reference) | 0.970 |
+
+# %% [markdown]
+# ## 11. Step 5: calibration and operating points
+# **Questions:** are the two final models' scores honest probabilities, and which decision thresholds are on offer?
+# - **Models:** catalog-only (quantile MLP + tuned trees, 50/50 average) and catalog + centroid (the same, with the
+#   7 centroid features). Both always reported side by side.
+# - **Per-repeat scores.** The model we would ship is ONE 10-seed ensemble, so calibration uses each fold shuffle's
+#   seed-mean separately. (The repeat-mean used for AUC above is a 50-model ensemble: smoother than anything shipped.)
+# - **Calibrators compared:** none, Platt (logistic on logit score) and isotonic.
+# - **Nested, so the numbers are honest:** for each held-out fold, the calibrator and every threshold are fitted on
+#   the *other* folds' out-of-fold scores, then applied to the held-out fold.
+# - **Thresholds are picked on DR25 KOIs** (the headline set), with one threshold for every KOI: provenance is never
+#   used to set a KOI's threshold. Supplemental KOIs are reported separately at the same threshold.
+# - **User decisions (10/13):** report a menu of operating points rather than one; open the sealed test set later,
+#   together. The frozen models are made by `sweeps/step5_freeze.jl` (`models/step5_frozen.jld2`).
+
+# %%
+yf = Float64.(y)
+conf = pool.koi_disposition .== "CONFIRMED"
+final_models = [("catalog-only", (repeat_scores(mq) .+ repeat_scores(tuned)) ./ 2),
+                ("catalog + centroid", (repeat_scores(mq_c) .+ repeat_scores(tr_c)) ./ 2)]
+folds5 = base.folds
+cal_subsets = [("DR25 KOIs", dr), ("supplemental KOIs", .!dr), ("all KOIs", trues(length(yf)))]
+cal_rows = NamedTuple[]
+for (mname, S) in final_models, meth in (:none, :platt, :isotonic)
+    P = nested_calibrate(S, folds5, yf, meth)
+    for (sname, m) in cal_subsets
+        avg(f) = mean(f(yf[m], P[m, r]) for r in axes(P, 2))
+        push!(cal_rows, (model = mname, calibrator = string(meth), subset = sname, logloss = round(avg(logloss); digits = 4),
+                         brier = round(avg(brier); digits = 4), ece = round(avg(ece); digits = 4),
+                         roc_auc = round(avg(fast_auc); digits = 4), mean_p = round(mean(P[m, :]); digits = 3),
+                         planet_rate = round(mean(yf[m]); digits = 3)))
+    end
+end
+for (mname, S) in final_models
+    c = fit_platt(vec(S), repeat(yf, size(S, 2)))
+    @printf("%s: Platt fit on all OOF scores: a = %.3f, b = %+.3f  (a = 1, b = 0 means already calibrated)\n", mname, c.a, c.b)
+end
+DataFrame(cal_rows)
+
+# %% [markdown]
+# Reliability per subset (uncalibrated, 15 equal-count bins, pooled over the 5 fold shuffles):
+
+# %%
+fig = Figure(size = (900, 440))
+for (j, (sname, m)) in enumerate(cal_subsets[1:2])
+    local ax = Axis(fig[1, j]; xlabel = "predicted planet probability", ylabel = j == 1 ? "observed planet fraction" : "",
+                    title = sname, aspect = 1)
+    for ((mname, S), col) in zip(final_models, (:steelblue, :purple))
+        s, t = vec(S[m, :]), repeat(yf[m], size(S, 2))
+        o = sortperm(s); e = round.(Int, range(0, length(s); length = 16))
+        scatterlines!(ax, [mean(s[o[e[i]+1:e[i+1]]]) for i in 1:15], [mean(t[o[e[i]+1:e[i+1]]]) for i in 1:15];
+                      color = col, label = mname)
+    end
+    lines!(ax, [0, 1], [0, 1]; color = :black, linestyle = :dot)
+    j == 1 && axislegend(ax; position = :lt)
+end
+savefig("exo101326_step5_reliability.png", fig)
+fig
+
+# %% [markdown]
+# ### 11.1 Operating-point menu
+# Each rule picks a threshold (call "planet" if score ≥ t). Rates are nested estimates (threshold chosen without the
+# held-out fold), averaged over the 5 fold shuffles. *Frozen t* is the threshold stored with the final model (median
+# over fold shuffles, chosen on all pool DR25 KOIs). Per-1000 columns: out of 1,000 DR25 KOIs with this pool's mix
+# (51% planets).
+
+# %%
+RULES5 = [("planet recall 95%", (:recall, 0.95)), ("planet recall 98%", (:recall, 0.98)),
+          ("planet recall 99%", (:recall, 0.99)), ("precision 95%", (:precision, 0.95)),
+          ("precision 99%", (:precision, 0.99)), ("max F1", (:maxf1,)), ("p = 0.5", (:prob, 0.5))]
+frozen = JLD2.load(joinpath(@__DIR__, "models", "step5_frozen.jld2"))["frozen"]
+menu = NamedTuple[]
+for ((mname, S), key) in zip(final_models, ("catalog_only", "catalog_centroid"))
+    for (rname, rule) in RULES5
+        nc = nested_calls(S, folds5, yf, dr, rule)
+        rate(m, f) = mean(f(op_metrics(yf[m], Float64.(nc.calls[m, r]), 0.5)) for r in axes(S, 2))
+        n_dr = sum(dr)
+        push!(menu, (model = mname, rule = rname, frozen_t = round(frozen[key]["thresholds"][string(rule)]; digits = 3),
+                     t_spread = round(std(nc.t); digits = 3),
+                     dr25_recall = round(rate(dr, o -> o.recall); digits = 3),
+                     dr25_precision = round(rate(dr, o -> o.precision); digits = 3),
+                     dr25_fp_kept = round(rate(dr, o -> o.fp_kept); digits = 3),
+                     planets_lost_per1000 = round(Int, 1000 * rate(dr, o -> o.fn) / n_dr),
+                     fps_kept_per1000 = round(Int, 1000 * rate(dr, o -> o.fp) / n_dr),
+                     confirmed_lost = round(rate(dr .& (conf .| (yf .== 0)), o -> 1 - o.recall); digits = 3),
+                     supp_recall = round(rate(.!dr, o -> o.recall); digits = 3),
+                     supp_precision = round(rate(.!dr, o -> o.precision); digits = 3)))
+    end
+end
+menu_df = DataFrame(menu)
+CSV.write(joinpath(CV_DIR, "step5_operating_points.csv"), menu_df)
+menu_df
+
+# %% [markdown]
+# The trade-off curve on DR25 KOIs (nested-free view: pooled uncalibrated scores of all 5 fold shuffles), with the
+# menu's frozen thresholds marked:
+
+# %%
+fig = Figure(size = (900, 420))
+for (j, ((mname, S), key)) in enumerate(zip(final_models, ("catalog_only", "catalog_centroid")))
+    local ax = Axis(fig[1, j]; xlabel = "FPs kept (fraction of DR25 FPs called planet)",
+                    ylabel = j == 1 ? "planet recall (DR25)" : "", title = mname, limits = (0, 0.6, 0.6, 1.0))
+    s, t = vec(S[dr, :]), repeat(yf[dr], size(S, 2))
+    ts = range(0, 1; length = 401)
+    lines!(ax, [mean(s[t .== 0] .>= u) for u in ts], [mean(s[t .== 1] .>= u) for u in ts]; color = :gray)
+    for ((rname, rule), col) in zip(RULES5, Makie.wong_colors())
+        u = frozen[key]["thresholds"][string(rule)]
+        scatter!(ax, [mean(s[t .== 0] .>= u)], [mean(s[t .== 1] .>= u)]; color = col, markersize = 12,
+                 label = @sprintf("%s (t = %.2f)", rname, u))
+    end
+    axislegend(ax; position = :rb, labelsize = 10)
+end
+savefig("exo101326_step5_menu.png", fig)
+fig
+
+# %% [markdown]
+# **Reading section 11:**
+# - **Both models are already well calibrated; no calibrator is needed.**
+#   - A Platt fit on all OOF scores is almost the identity (a ≈ 1.04–1.05, b ≈ −0.02).
+#   - DR25 KOIs: ECE 0.018 (catalog-only) and 0.014 (centroid) uncalibrated. Platt and isotonic shave ECE by
+#     < 0.006 but don't improve log-loss or Brier (isotonic makes log-loss slightly *worse* and costs a little AUC
+#     through ties).
+#   - Frozen choice: **no calibrator**. The scores can be read as planet probabilities on DR25-like KOIs.
+# - **Supplemental KOIs are miscalibrated (ECE 0.05–0.08), and calibration can't fix it.**
+#   - The cause is weak ranking (AUC 0.66 / 0.75), not a shifted base rate (mean p 0.45 vs rate 0.43).
+#   - Fixing it would need a provenance-specific calibrator, i.e. using provenance as an input. Ruled out by decision.
+#   - So supplemental-KOI probabilities should be read as **unreliable**, and the menu reports them separately.
+# - **The thresholds are stable and the nested targets are hit** (DR25 recall 0.950 / 0.980 / 0.990 as asked;
+#   threshold spread across fold shuffles ≤ 0.04).
+# - **Centroid features buy a much better trade-off at every operating point**, for example at 98% planet recall:
+#   catalog-only keeps 35% of DR25 FPs, catalog + centroid 17%.
+# - **Nothing here touched the test split.** The frozen models + this menu are what the one-time test evaluation will
+#   score.
