@@ -464,6 +464,24 @@ fitted or tuned on it, and the script refuses to run again. Star-bootstrap 95% C
 - Full tables: `sweeps/results/test_auc.csv`, `test_operating_points.csv`; predictions: `test_predictions.csv`.
 - **The test set is now spent.** Later changes must be judged by CV and reported as post-test.
 
+## Post-test: CONFIRMED-only training (10/13/2026, notebook section 13, `sweeps/labels_confirmed.jl`)
+
+Same final recipes and folds, but CANDIDATEs are dropped from training (6,598 of 8,288 KOIs); every KOI still gets an
+OOF score. CV only.
+
+| Paired Δ (CONFIRMED-only − train-all) | Catalog-only | Catalog + centroid |
+|---|---|---|
+| DR25 CONFIRMED vs FP | 0.978 → 0.982, **+0.0041** [+0.0027, +0.0055] | 0.9945 → 0.9958, **+0.0013** [+0.0005, +0.0020] |
+| DR25, CANDIDATE = planet (the task) | 0.955 → 0.941, **−0.0147** | 0.983 → 0.976, **−0.0071** |
+| Supplemental CONFIRMED vs FP | −0.018 [−0.048, +0.004] | +0.003 [−0.024, +0.030] |
+
+- DR25 CANDIDATEs below the 98%-of-CONFIRMED cut: 36% / 41% for the CONFIRMED-only models (train-all: 15% / 19%).
+- The CONFIRMED-only ranking of CANDIDATEs agrees better with `koi_score` (Spearman 0.24 → 0.32; 0.33 → 0.38).
+- Caveat: CONFIRMED planets are the *confirmable* ones (high SNR, multis), so a low score means "unlike confirmed
+  planets", not necessarily "FP".
+- **Not adopted.** The frozen train-all models stay the headline. CONFIRMED-only is a candidate secondary score for
+  follow-up priority.
+
 ## Recommendations (for steps 4–5)
 
 1. **Step 3:** done (see above).

@@ -55,6 +55,9 @@
 # - **Sealed test set (section 12, used once): CV is confirmed.** DR25 ROC-AUC: catalog-only **0.957** [0.944, 0.970]
 #   (CV 0.954), catalog + centroid **0.988** [0.982, 0.994] (CV 0.983). At the 98% planet-recall threshold, the test
 #   recall is 0.988 / 0.993 with 31% / 16% of FPs kept, and no DR25 CONFIRMED planet is lost.
+# - **Post-test (section 13): training on CONFIRMED vs FP only** sharpens CONFIRMED-vs-FP ranking a little (+0.004 /
+#   +0.001) but is worse at the real task with CANDIDATEs as planets (−0.015 / −0.007). It scores 36–41% of DR25
+#   CANDIDATEs as unlike confirmed planets. Not adopted; possibly useful as a secondary score for follow-up priority.
 # - **Takeaway:** the catalog-only errors are limited by the *information* in the 11 features, not by the model. The
 #   centroid result confirms it: give the model the right information and the biggest blind spot disappears.
 #   Bigger wins should come from features (step 4) and light curves (Phase 2) rather than architecture.
@@ -923,3 +926,81 @@ fig
 # - **Supplemental KOIs (117):** 0.72 and 0.79, also in line with CV (wide CIs, as expected).
 # - **The numbers are final.** The test set has been used; any later model change has to be judged by CV again and
 #   reported as post-test.
+
+# %% [markdown]
+# ## 13. Post-test experiment: train on CONFIRMED vs FP only, score CANDIDATEs
+# - **Why:** CANDIDATE is the noisiest label. In step 2, many "missed planets" were CANDIDATEs that look like FPs.
+#   Training only on CONFIRMED vs FALSE POSITIVE (6,598 of 8,288 pool KOIs) gives the model cleaner labels.
+#   CANDIDATEs are then scored as an application.
+# - **Setup:** the same final recipes (catalog-only and catalog + centroid, MLP + trees average), the same folds,
+#   5 × 10. CANDIDATEs are dropped from *training* only, so every KOI still gets an OOF score and the runs pair with
+#   the train-on-all references. Compute: `sweeps/labels_confirmed.jl`.
+# - ⚠ **This comes after the sealed test.** It is judged by CV only and does not change the frozen models or the test
+#   numbers.
+
+# %%
+cand = pool.koi_disposition .== "CANDIDATE"
+mq_cf, tr_cf = load_cv("cv_mlpq_conftrain_r5s10.jld2"), load_cv("cv_evotree_conftrain_r5s10.jld2")
+mq_cfc, tr_cfc = load_cv("cv_mlpq_centroid_conftrain_r5s10.jld2"), load_cv("cv_evotree_centroid_conftrain_r5s10.jld2")
+avg_cf, avg_cfc = avg_of(mq_cf, tr_cf), avg_of(mq_cfc, tr_cfc)
+cf_rows = NamedTuple[]
+for (mname, A, B) in (("catalog-only", avg_cf, avg4), ("catalog + centroid", avg_cfc, avg_c))
+    for (sname, m) in (("DR25 CONFIRMED vs FP", dr .& .!cand), ("DR25, CANDIDATE = planet", dr),
+                       ("supplemental CONFIRMED vs FP", .!dr .& .!cand))
+        c = cmp_on(A, B, m)
+        push!(cf_rows, (model = mname, scored_on = sname, n = sum(m), train_all = round(c.B; digits = 4),
+                        train_confirmed_only = round(c.A; digits = 4),
+                        delta = @sprintf("%+.4f [%+.4f, %+.4f]", c.delta, c.ci_lo, c.ci_hi)))
+    end
+end
+DataFrame(cf_rows)
+
+# %% [markdown]
+# ### 13.1 What the CANDIDATEs look like to each model
+# Thresholds: each model's own 98%-planet-recall cut, set on DR25 **CONFIRMED** planets (pooled OOF, descriptive).
+# "Look like FPs" = CANDIDATEs below that cut.
+
+# %%
+cand_rows = NamedTuple[]
+cand_scores = Dict{String, Vector{Float64}}()
+for (mname, cv) in (("catalog-only, train all", avg4), ("catalog-only, CONFIRMED-only", avg_cf),
+                    ("+ centroid, train all", avg_c), ("+ centroid, CONFIRMED-only", avg_cfc))
+    s = oof_scores(cv); cand_scores[mname] = s
+    t98 = pick_threshold(yf[dr .& .!cand], s[dr .& .!cand], (:recall, 0.98))
+    m = cand .& dr; mk2 = m .& isfinite.(ks)
+    push!(cand_rows, (model = mname, t98 = round(t98; digits = 3), dr25_candidates = sum(m),
+                      mean_score = round(mean(s[m]); digits = 3), below_0_5 = round(mean(s[m] .< 0.5); digits = 3),
+                      look_like_fps = round(mean(s[m] .< t98); digits = 3),
+                      fp_kept_at_t98 = round(mean(s[dr .& (yf .== 0)] .>= t98); digits = 3),
+                      spearman_vs_koi_score = round(corspearman(s[mk2], ks[mk2]); digits = 3)))
+end
+DataFrame(cand_rows)
+
+# %%
+fig = Figure(size = (900, 400))
+for (j, (ttl, k1, k2)) in enumerate((("catalog-only", "catalog-only, train all", "catalog-only, CONFIRMED-only"),
+                                     ("catalog + centroid", "+ centroid, train all", "+ centroid, CONFIRMED-only")))
+    local ax = Axis(fig[1, j]; xlabel = "planet score", ylabel = j == 1 ? "DR25 CANDIDATEs" : "", title = "CANDIDATE scores, $ttl")
+    hist!(ax, cand_scores[k1][cand .& dr]; bins = 0:0.05:1, color = (:gray, 0.5), label = "train on all")
+    hist!(ax, cand_scores[k2][cand .& dr]; bins = 0:0.05:1, color = (:darkorange, 0.45), label = "CONFIRMED-only")
+    j == 1 && axislegend(ax; position = :lt)
+end
+savefig("exo101326_confirmed_only.png", fig)
+fig
+
+# %% [markdown]
+# **Reading section 13:**
+# - **Cleaner labels give a cleaner CONFIRMED-vs-FP separation.** DR25 CONFIRMED vs FP: catalog-only 0.978 → **0.982**
+#   (+0.004 [+0.003, +0.006]); catalog + centroid 0.9945 → **0.9958** (+0.0013 [+0.0005, +0.0020]). Both are real.
+# - **But it's worse at the actual task**, where CANDIDATEs count as planets: DR25 0.955 → 0.941 (catalog-only) and
+#   0.983 → 0.976 (centroid). Supplemental KOIs: no clear change (CIs include 0).
+# - **The CONFIRMED-only models are much more sceptical of CANDIDATEs.**
+#   - DR25 CANDIDATEs' mean score falls from 0.69 to 0.41 (catalog-only) and from 0.78 to 0.49 (centroid).
+#   - 36–41% of DR25 CANDIDATEs fall below the cut that keeps 98% of CONFIRMED planets (train-all models: 15–19%).
+#   - Their ranking of CANDIDATEs agrees better with the robovetter's `koi_score` (Spearman 0.24 → 0.32; 0.33 → 0.38).
+# - **Caveat: "CONFIRMED" is a biased sample.** Confirmed planets are the *confirmable* ones: higher SNR, often in
+#   multi-planet systems (statistical validation). A CONFIRMED-only model partly learns "looks confirmable", so a low
+#   score for a CANDIDATE means "unlike the confirmed planets", not necessarily "false positive".
+# - **Decision-ready conclusion:** keep the frozen train-on-all models as the headline (they are what the test
+#   validated, and they do the stated task better). The CONFIRMED-only model is a possible *secondary* score for
+#   prioritising CANDIDATE follow-up, not a replacement.
