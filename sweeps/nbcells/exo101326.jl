@@ -14,7 +14,41 @@
 # **The test split is never used here.**
 #
 # ## Key results
-# KEY_RESULTS_PLACEHOLDER
+# - **Gradient-boosted trees beat the MLP, and the gain is real.** Tuned trees: pooled OOF ROC-AUC **0.9320** vs **0.9251**
+#   (Δ +0.0069, star-bootstrap 95% CI [+0.0045, +0.0094], far outside the 0.0005 training-noise null). They win on
+#   **25 of 25** held-out folds, and log-loss improves too (0.331 vs 0.346). Even untuned trees win (+0.0056, 23/25
+#   folds), so the conclusion doesn't depend on tuning. CONFIRMED vs FP: 0.973 vs 0.964.
+# - **Logistic regression is far behind** (0.867, Δ −0.058, worse on every fold): the MLP's nonlinearity is worth a lot,
+#   and trees capture the same structure a bit better.
+# - **Tuning matters little except tree depth:** 0.927 at depth 3 → 0.932 at depth 8; min_weight, L2 and colsample move
+#   AUC by ≲ 0.001. Depth 8 is the edge of the grid, so deeper trees are untested (likely ≲ 0.0005 more).
+# - **The trees fix none of the step-2 blind spots.** Centroid-offset FPs (37.5% missed vs 37.9%), not-transit-like and
+#   contamination FPs, FPs in 3+ KOI systems and supplemental KOIs (AUC ≈ 0.58 for Q1–Q16-only) are as bad as for the MLP.
+#   The gains are in the parts that were already decent: DR25 KOIs (0.953 vs 0.948), fewer CONFIRMED planets called FP
+#   (3.6% vs 4.8%) and ultra-short-period planets (59% called FP vs 70%).
+# - **The MLP and the trees mostly agree** (Spearman 0.967; different hard call on 6.5% of KOIs), and averaging them
+#   is no better than trees alone (Δ +0.0001, CI includes 0).
+# - **Tuning the MLP closes only ~20% of the gap (section 7).** The best of 14 variants (learning rate 3e-3, 600-epoch
+#   cap) reaches 0.9265: a real +0.0014 over the baseline, but still 0.0055 behind the trees. Width, depth, dropout,
+#   weight decay and batch size don't matter. The likely culprit is how the inputs are scaled, which is step 4 territory.
+# - **Step 4, part 1 (section 8): fixing the MLP's inputs closes the gap.**
+#   - A rank-gauss (quantile) transform of the features lifts the tuned MLP to **0.9330**: +0.008 over the original MLP,
+#     tied with the trees.
+#   - Averaging that MLP with the trees gives **0.9352**, a real gain over each alone. This is the new best.
+# - **Step 4, part 2 (section 9):**
+#   - `koi_count` is worth ~0.004 AUC as a pure multiplicity prior (ranking within each multiplicity group is unchanged
+#     without it). Keep it.
+#   - `koi_insol` is a rank copy of `koi_teq`, so it adds nothing.
+#   - Deeper trees (10, 12) give no gain.
+# - **Step 4, part 3 (section 10): centroid features and DR25 scoping.**
+#   - Headline metrics are now on DR25-detected KOIs. On those, catalog-only MLP + trees = **0.955**.
+#   - Adding 7 centroid features (a separate model, by decision) gives **0.983**, and closes the centroid-offset blind spot
+#     (CO-only FPs missed: 36% → 4%).
+#   - ⚠ This is partly circular: the robovetter's CO flag thresholds these same numbers.
+#   - Training on DR25 KOIs only gives no gain, so we keep training on all KOIs.
+# - **Takeaway:** the catalog-only errors are limited by the *information* in the 11 features, not by the model. The
+#   centroid result confirms it: give the model the right information and the biggest blind spot disappears.
+#   Bigger wins should come from features (step 4) and light curves (Phase 2) rather than architecture.
 
 # %%
 include(joinpath(@__DIR__, "src", "VettingSetup.jl"))
@@ -115,7 +149,7 @@ gridres, mlp_ref = g["gridres"], g["mlp_ref_auc"]
         mlp_ref, maximum(gridres.roc_auc), minimum(gridres.roc_auc))
 fig = Figure(size = (900, 380))
 for (j, cs) in enumerate((0.5, 0.8))
-    ax = Axis(fig[1, j]; xlabel = "max_depth", ylabel = j == 1 ? "pooled OOF ROC-AUC (tuning folds)" : "",
+    local ax = Axis(fig[1, j]; xlabel = "max_depth", ylabel = j == 1 ? "pooled OOF ROC-AUC (tuning folds)" : "",
               title = "colsample = $cs", xticks = [3, 4, 5, 6, 8])
     for (mw, l2, col, ls) in ((1.0, 1.0, :steelblue, :solid), (10.0, 1.0, :orange, :solid), (40.0, 1.0, :firebrick, :solid),
                               (1.0, 10.0, :steelblue, :dash), (10.0, 10.0, :orange, :dash), (40.0, 10.0, :firebrick, :dash))
@@ -198,7 +232,7 @@ c_avg_tree = compare_cv(avg, tuned, pool)
 fig = Figure(size = (900, 420))
 for (j, (lab, ttl)) in enumerate(((0, "False positives"), (1, "CONFIRMED + CANDIDATE")))
     m = y .== lab
-    ax = Axis(fig[1, j]; xlabel = "MLP OOF score", ylabel = j == 1 ? "tree OOF score" : "", title = ttl, aspect = 1)
+    local ax = Axis(fig[1, j]; xlabel = "MLP OOF score", ylabel = j == 1 ? "tree OOF score" : "", title = ttl, aspect = 1)
     h = fit(Histogram, (s_mlp[m], s_tree[m]), (0:0.05:1.0001, 0:0.05:1.0001))
     heatmap!(ax, 0.025:0.05:1, 0.025:0.05:1, log10.(h.weights .+ 1); colormap = :viridis)
     lines!(ax, [0, 1], [0, 1]; color = :white, linestyle = :dash)
@@ -237,4 +271,411 @@ println("wrote sweeps/results/oof_baselines_r5s10.csv  ($(nrow(oof_out)) rows)")
 
 # %% [markdown]
 # ## 6. Conclusions
-# CONCLUSIONS_PLACEHOLDER
+# 1. **Trees are the stronger tabular model:** +0.007 ROC-AUC and −0.015 log-loss vs the MLP, consistent on every fold,
+#    and just as well calibrated (section 5.1). The step-1 bar (0.0005) is cleared by more than 10×.
+# 2. **The gap is modest compared with the sampling uncertainty** of the pool itself (±0.006) and the sealed test set
+#    (±0.009): on the test split alone, the two models would be hard to tell apart.
+# 3. **Same blind spots for every model.** Centroid offsets, not-transit-like signals, contamination, multi-KOI FPs and
+#    supplemental KOIs are missed at the same rates by LR, MLP and trees. This points to missing *information*, which
+#    is what step 4 (features, supplemental-KOI scoping) and Phase 2 (light curves, centroids) address.
+# 4. **Caveat:** the trees were tuned on different fold shuffles of the same pool, so the tuned number is very slightly
+#    optimistic. The untuned trees (no tuning at all) already beat the MLP by +0.0056.
+#
+# **Decisions for the next session (not done here):**
+# - Which model to carry forward as the tabular reference for steps 4–5: trees, the MLP, or both?
+#   - Trees are cheaper (~0.3 s per model vs ~2 s) and better.
+#   - The MLP is the project's stated model and the natural base for the Phase-2 hybrid (catalog features + light-curve CNN).
+# - Whether to try closing the MLP gap first (e.g. wider layers, more epochs, since some runs hit the 200-epoch cap;
+#   see step 1), or go straight to step 4 features, which should help both.
+# - Optional: extend the tree grid to depth 10–12 (≈ 5 min).
+#
+# **Follow-up (same day, section 7):** we carry both models forward and tried to close the MLP gap by tuning. The best
+# MLP (learning rate 3e-3, 600-epoch cap) gains a real +0.0014 but is still 0.0055 behind the trees.
+#
+# Files: `sweeps/cv_baselines.jl`, `sweeps/cv_mlp_gap.jl` (compute), `sweeps/results/cv_logreg_r5s10.jld2`, `cv_evotree_default_r5s10.jld2`,
+# `cv_evotree_tuned_r5s10.jld2`, `evotree_grid.csv/.jld2`, `oof_baselines_r5s10.csv` (per-KOI scores of all models),
+# `src/Baselines.jl`, figures `figures/exo101326_*.png`.
+
+# %% [markdown]
+# ## 7. Follow-up: can tuning close the MLP gap?
+# Decision: carry **both** models forward, and first try to close the MLP's gap by tuning (`sweeps/cv_mlp_gap.jl`).
+#
+# **Screen:** 11 single changes plus 3 combinations, on the same tuning folds as the tree grid (2 fold shuffles × 3
+# seeds). Δ is paired against the unchanged MLP on those folds (0.9255); the best tree there scored 0.9318.
+# AdamW weight decay is lr-coupled (decay per step = lr × wd).
+
+# %%
+screen = CSV.read(joinpath(CV_DIR, "mlp_screen.csv"), DataFrame)
+select(screen, :variant, :roc_auc, :d_auc, :ci_lo, :ci_hi, :logloss, :median_epoch)
+
+# %%
+fig = Figure(size = (800, 420))
+ax = Axis(fig[1, 1]; xlabel = "pooled OOF ROC-AUC (tuning folds)", yticks = (1:nrow(screen), reverse(screen.variant)),
+          title = "MLP variants vs the best tree on the same folds")
+order = nrow(screen):-1:1
+scatter!(ax, screen.roc_auc, order; color = :steelblue, markersize = 10)
+rangebars!(ax, order, screen.roc_auc .- screen.d_auc .+ screen.ci_lo, screen.roc_auc .- screen.d_auc .+ screen.ci_hi;
+           direction = :x, color = (:steelblue, 0.5))
+vlines!(ax, [screen.roc_auc[screen.variant .== "base"][1]]; color = :gray, linestyle = :dash, label = "MLP baseline (0.9255)")
+vlines!(ax, [maximum(gridres.roc_auc)]; color = :darkgreen, linestyle = :dash, label = @sprintf("best tree (%.4f)", maximum(gridres.roc_auc)))
+axislegend(ax; position = :rb)
+savefig("exo101326_mlp_screen.png", fig)
+fig
+
+# %% [markdown]
+# Bars: paired 95% star-bootstrap CI of each variant's gain over the baseline, drawn around the variant's AUC.
+#
+# **Final check on the standard folds** (5 shuffles × 10 seeds, the step-1 protocol) for the best variant, `lr3_e600`
+# (learning rate 3e-3, epoch cap 600, patience 50):
+
+# %%
+mlp2 = load_cv("cv_mlp_lr3_e600_r5s10.jld2")
+@assert mlp2.folds == base.folds
+c_b = compare_cv(mlp2, base, pool; null = null_auc)
+c_t = compare_cv(mlp2, tuned, pool)
+c_l = compare_cv(mlp2, base, pool; null = null_ll, metric = logloss)
+@printf("tuned MLP: AUC %.4f, log-loss %.4f\n", c_b.A, c_l.A)
+@printf("  vs baseline MLP: Δ AUC %+.4f [%+.4f, %+.4f], p_null %.3f;  Δ log-loss %+.4f [%+.4f, %+.4f]\n",
+        c_b.delta, c_b.ci_lo, c_b.ci_hi, c_b.p_null, c_l.delta, c_l.ci_lo, c_l.ci_hi)
+@printf("  vs tuned trees:   Δ AUC %+.4f [%+.4f, %+.4f]  (gap closed: %.0f%%)\n",
+        c_t.delta, c_t.ci_lo, c_t.ci_hi, 100 * c_b.delta / (c_b.delta - c_t.delta))
+@printf("  median best epoch %.0f (baseline %.0f); runs stopping within patience of the cap: %.1f%%\n",
+        median(mlp2.results.best_epoch), median(base.results.best_epoch), 100 * mean(mlp2.results.best_epoch .>= 550))
+
+# %% [markdown]
+# **Reading this:**
+# - **Real but small gains.** A higher learning rate and a 600-epoch cap help, and the gain clears both step-1 checks.
+#   Neither change alone, nor more capacity (wider or 3 layers), nor dropout, weight decay or batch size moves the MLP
+#   more than ~0.001.
+# - **The tuned MLP closes only about a fifth of the gap** to the trees.
+# - **The gap is not about training or capacity.** The most likely cause is the **input representation**:
+#   - Trees only see the order of each feature's values, so skewed, heavy-tailed inputs don't bother them.
+#   - The MLP sees z-scored raw values, and only period, depth and prad are logged.
+#   - SNR, duration, teq, srad and koi_count are strongly skewed and are not logged.
+#   - Testing that (log SNR etc., or a quantile transform) is a feature-preprocessing change, which belongs in step 4.
+
+# %% [markdown]
+# ## 8. Step 4, part 1: input transforms for the MLP
+# Decision: adopt the tuned MLP (`lr3_e600`) as the new MLP reference, and test the input-representation explanation.
+# As the MLP saw them, several features were extremely skewed: impact (skew 23; values up to 100 against a typical
+# 0–1.3), stellar radius (22), duration (6), SNR (5), teq (4); some inputs sat 38σ from the mean. Two fixes, both
+# fit on the training part only (`prepare_data(...; transform)`):
+# - **`log_more`:** log10 also on duration, SNR (+1), teq, srad, koi_count and impact (+0.1).
+# - **`quantile`** (rank-gauss): each feature → its empirical CDF on the training part → standard-normal quantile.
+#   Immune to outliers; max |z| drops from 38 to 4.5.
+#
+# Trees are unaffected by either (they only use the order of values). Same standard folds, 5 shuffles × 10 seeds.
+
+# %%
+runs4 = [("MLP baseline (exo100926)", base),
+         ("MLP tuned (lr3_e600)", mlp2),
+         ("MLP tuned + log_more", load_cv("cv_mlp_lr3_e600_logmore_r5s10.jld2")),
+         ("MLP tuned + quantile", load_cv("cv_mlp_lr3_e600_quantile_r5s10.jld2")),
+         ("Trees, tuned", tuned)]
+for (_, cv) in runs4; @assert cv.folds == base.folds; end
+mq = runs4[4][2]
+rows4 = map(runs4) do (name, cv)
+    cb = compare_cv(cv, base, pool; null = null_auc)
+    cm = compare_cv(cv, mlp2, pool)
+    ct = compare_cv(cv, tuned, pool)
+    s = oof_scores(cv)
+    conf = pool.koi_disposition .!= "CANDIDATE"
+    (model = name, roc_auc = cb.A, logloss = logloss(y, s), roc_auc_conf = fast_auc(y[conf], s[conf]),
+     vs_baseline = @sprintf("%+.4f [%+.4f, %+.4f]", cb.delta, cb.ci_lo, cb.ci_hi),
+     vs_tuned_mlp = @sprintf("%+.4f [%+.4f, %+.4f]", cm.delta, cm.ci_lo, cm.ci_hi),
+     vs_trees = @sprintf("%+.4f [%+.4f, %+.4f]", ct.delta, ct.ci_lo, ct.ci_hi))
+end
+DataFrame(rows4)
+
+# %% [markdown]
+# ### 8.1 Blind spots and detection sources with the transformed MLP
+# Same groups as section 4 (% wrong at threshold 0.5), plus ROC-AUC by TCE source.
+
+# %%
+s_q = oof_scores(mq)
+blind4 = select(blind, :group, :n, "MLP (baseline)", "Trees, tuned")
+blind4[!, "MLP + quantile"] = [round(100 * err_rate(s_q, m, startswith(g, "FP")); digits = 1) for (g, m) in groups]
+src4 = select(src_tbl, :tce_source, :n, "MLP (baseline) AUC", "Trees, tuned AUC")
+src4[!, "MLP + quantile AUC"] = [fast_auc(y[a.tce_source .== t], s_q[a.tce_source .== t]) for t in src4.tce_source]
+println(src4)
+blind4
+
+# %% [markdown]
+# ### 8.2 Now that they are equally good: do the MLP and the trees combine?
+
+# %%
+avg4 = (oof = (mq.oof .+ tuned.oof) ./ 2, folds = base.folds, kepoi = base.kepoi)
+c4_q = compare_cv(avg4, mq, pool)
+c4_t = compare_cv(avg4, tuned, pool)
+@printf("Spearman(quantile MLP, trees) = %.3f;  different hard call on %.1f%% of KOIs\n",
+        corspearman(s_q, s_tree), 100 * mean((s_q .>= 0.5) .!= (s_tree .>= 0.5)))
+@printf("50/50 average: AUC %.4f, log-loss %.4f;  vs quantile MLP Δ %+.4f [%+.4f, %+.4f];  vs trees Δ %+.4f [%+.4f, %+.4f]\n",
+        c4_q.A, logloss(y, oof_scores(avg4)), c4_q.delta, c4_q.ci_lo, c4_q.ci_hi, c4_t.delta, c4_t.ci_lo, c4_t.ci_hi)
+fig = Figure(size = (900, 400))
+a1 = Axis(fig[1, 1]; xlabel = "false positive rate", ylabel = "true positive rate", title = "ROC (pooled OOF)", aspect = 1)
+a2 = Axis(fig[1, 2]; xlabel = "recall", ylabel = "precision", title = "Precision-recall", aspect = 1)
+for ((name, sc), col) in zip((("MLP baseline", s_mlp), ("MLP + quantile", s_q), ("Trees, tuned", s_tree),
+                              ("average", oof_scores(avg4))), (:gray, :steelblue, :darkgreen, :purple))
+    fpr, tpr = roccurve(Int.(y), sc); rec, prec = prcurve(Int.(y), sc)
+    lines!(a1, fpr, tpr; color = col, label = @sprintf("%s (%.4f)", name, fast_auc(y, sc)))
+    lines!(a2, rec, prec; color = col)
+end
+axislegend(a1; position = :rb, labelsize = 11)
+xlims!(a1, 0, 0.5); ylims!(a1, 0.5, 1.0); ylims!(a2, 0.6, 1.01)
+savefig("exo101326_transforms_roc.png", fig)
+fig
+
+# %% [markdown]
+# **Reading section 8:**
+# - **The input representation was the whole gap.**
+#   - The quantile-transformed MLP reaches **0.9330**: +0.008 over the original MLP, +0.0065 over the tuned MLP.
+#   - That's **level with the tuned trees** (Δ +0.0010, CI includes 0).
+#   - `log_more` gets almost as far (0.9326). The rest of the tuning (width, depth, dropout…) never mattered.
+# - **Blind spots shrink a little but remain** (threshold 0.5):
+#
+#   | Group | MLP baseline | Quantile MLP |
+#   |---|---|---|
+#   | Missed FPs overall | 16.1% | 14.3% |
+#   | NT-only FPs missed | 24.6% | 20.4% |
+#   | CO-only FPs missed | 37.9% | 35.1% |
+#   | FPs with 3+ KOIs missed | 79% | 74% |
+#   | Q1–Q16-only KOIs, AUC | 0.56 | 0.58 |
+#
+#   CANDIDATEs called FP rise slightly (31% → 33%), partly a threshold shift. Centroid offsets and supplemental KOIs
+#   are still the limit: an information problem, not a model problem.
+# - **Now the two models do combine.** The quantile MLP and the trees agree slightly more than before (Spearman 0.976),
+#   yet the 50/50 average reaches **0.9352**:
+#   - +0.0022 [+0.0011, +0.0032] over the quantile MLP;
+#   - +0.0032 [+0.0021, +0.0043] over the trees;
+#   - log-loss 0.324, the best so far.
+#
+#   With the original MLP, averaging added nothing. Once both models are equally good, their remaining errors are partly independent.
+# - **Recommendation for the rest of step 4:**
+#   - MLP reference: `transform = :quantile` + `lr3_e600`.
+#   - Keep the trees.
+#   - Report the MLP + trees average as the combined model.
+
+# %% [markdown]
+# ## 9. Step 4, part 2: `koi_count` ablation, `koi_insol`, deeper trees
+# Compute: `sweeps/step4_features.jl`. References: quantile MLP, tuned trees, and their average (section 8).
+#
+# **`koi_insol` (not run, on purpose):** on the pool, Spearman(`koi_insol`, `koi_teq`) = **1.0000**, because teq is computed
+# from insolation. Trees only use the order of values, and the quantile transform maps both to identical inputs, so
+# `koi_insol` adds exactly zero information to either reference model. It stays out.
+#
+# **`koi_count` ablation:** how much of the performance is the multiplicity prior ("a star with several KOIs is
+# probably a planetary system")? Both models retrained on the 10 other features, same folds.
+
+# %%
+mq_nc = load_cv("cv_mlpq_nocount_r5s10.jld2")
+tr_nc = load_cv("cv_evotree_nocount_r5s10.jld2")
+avg_nc = (oof = (mq_nc.oof .+ tr_nc.oof) ./ 2, folds = base.folds, kepoi = base.kepoi)
+abl = map([("MLP + quantile", mq, mq_nc), ("Trees, tuned", tuned, tr_nc), ("MLP + trees average", avg4, avg_nc)]) do (name, with, without)
+    c = compare_cv(without, with, pool)
+    cl = compare_cv(without, with, pool; metric = logloss)
+    (model = name, with_count = c.B, without_count = c.A, d_auc = @sprintf("%+.4f [%+.4f, %+.4f]", c.delta, c.ci_lo, c.ci_hi),
+     d_logloss = @sprintf("%+.4f [%+.4f, %+.4f]", cl.delta, cl.ci_lo, cl.ci_hi))
+end
+DataFrame(abl)
+
+# %% [markdown]
+# Where does the loss come from? Error rates (threshold 0.5) for the average model, with and without `koi_count`,
+# split by multiplicity:
+
+# %%
+s_av, s_av_nc = oof_scores(avg4), oof_scores(avg_nc)
+mult_groups = [("FP missed: koi_count = 1", fp .& (a.koi_count .== 1)),
+               ("FP missed: koi_count = 2", fp .& (a.koi_count .== 2)),
+               ("FP missed: koi_count ≥ 3", fp .& (a.koi_count .>= 3)),
+               ("planet called FP: koi_count = 1", (y .== 1) .& (a.koi_count .== 1)),
+               ("planet called FP: koi_count = 2", (y .== 1) .& (a.koi_count .== 2)),
+               ("planet called FP: koi_count ≥ 3", (y .== 1) .& (a.koi_count .>= 3))]
+DataFrame(group = first.(mult_groups), n = [sum(m) for (_, m) in mult_groups],
+          with_count = [round(100 * err_rate(s_av, m, startswith(g, "FP")); digits = 1) for (g, m) in mult_groups],
+          without_count = [round(100 * err_rate(s_av_nc, m, startswith(g, "FP")); digits = 1) for (g, m) in mult_groups])
+
+# %%
+multi_auc = DataFrame(koi_count = String[], n = Int[], planet_frac = Float64[], auc_with = Float64[], auc_without = Float64[])
+for (lab, m) in (("1", a.koi_count .== 1), ("2", a.koi_count .== 2), ("≥ 3", a.koi_count .>= 3))
+    push!(multi_auc, (lab, sum(m), mean(y[m]), fast_auc(y[m], s_av[m]), fast_auc(y[m], s_av_nc[m])))
+end
+multi_auc
+
+# %% [markdown]
+# **Deeper trees:** depth 8 was the edge of the step-3 grid. Screened on the same tuning folds (min_weight 10, L2 10,
+# colsample 0.8):
+
+# %%
+CSV.read(joinpath(CV_DIR, "evotree_depth_screen.csv"), DataFrame)
+
+# %% [markdown]
+# **Reading section 9:**
+# - **`koi_count` is worth ~0.004 ROC-AUC to every model** (MLP −0.0036, trees −0.0040, average −0.0037; all CIs
+#   exclude 0; log-loss worsens by ~0.009).
+# - **It is a pure prior: it works between groups, not within them.**
+#   - Within each multiplicity group, ranking quality is unchanged without it (AUC 0.912 vs 0.912 for single-KOI stars,
+#     0.921 vs 0.923 for 2, 0.908 vs 0.907 for 3+).
+#   - All it does is shift scores by group: multi-KOI systems are 81% (2 KOIs) and 95% (3+) planets, singles only 39%.
+#   - This matches the known multiplicity boost (false positives rarely come in multiples), and is a legitimate prior,
+#     not leakage.
+# - **The trade-off is visible at threshold 0.5** (average model, with → without `koi_count`):
+#
+#   | Group | With | Without |
+#   |---|---|---|
+#   | FPs missed, 3+ KOI systems | 77% | 51% |
+#   | FPs missed, 2-KOI systems | 37% | 27% |
+#   | Planets called FP, 2-KOI systems | 2.9% | 6.2% |
+#   | Planets called FP, 3+ KOI systems | 1.2% | 3.8% |
+#
+#   Since multi-KOI systems are mostly planets, the net effect is worse.
+# - **Recommendation: keep `koi_count`.** Remember that the model "trusts" multis by design: a false positive on a
+#   multi-planet star is the hardest case for the catalog-only model, and an obvious target for Phase 2.
+# - **`koi_insol`: stays out** (a rank copy of teq; zero new information).
+# - **Deeper trees: no gain.** Depth 10: +0.0001, depth 12: +0.0003 over depth 8 on the tuning folds, below the 0.0005
+#   bar. Depth 8 stays.
+
+# %% [markdown]
+# ## 10. Step 4, part 3: centroid features and supplemental-KOI scoping
+# **Decisions (10/13), from the recommendations:**
+# 1. **Centroid features are allowed, as a separate model.**
+#    - The "catalog + centroid" model sits next to the catalog-only reference; both are reported.
+#    - The 7 features (`src/Centroids.jl`): difference-image offsets from the out-of-transit centroid and from the
+#      KIC position, in arcsec and in σ, plus flux-weighted centroid motion (significance, source offset, in-transit shift).
+#    - Missing values (5–10%) get the training median. There are deliberately **no missing-value indicators**: missingness
+#      is informative (17% planets vs 52%) and total for no-TCE KOIs, so an indicator would smuggle in provenance.
+#    - **Caveat (circularity):** the robovetter's CO flag thresholds these same numbers, so gains on CO false positives
+#      partly re-learn its rule.
+# 2. **Supplemental KOIs stay in training.**
+#    - Headline metrics are now on **DR25-detected KOIs**; supplemental KOIs are reported separately.
+#    - Provenance is never a model input.
+#    - Tested here: is training on DR25 KOIs only any better for DR25 KOIs?
+#
+# Compute: `sweeps/step4_scoping.jl`. All runs use the standard folds, 5 × 10, paired.
+
+# %%
+dr = is_dr25(pool, df_raw)
+pool_c = add_centroid_features(pool, df_raw)
+has_cent = isfinite.(pool_c.cent_dicco_msky) .& isfinite.(pool_c.cent_fwm_stat_sig)
+avg_of(c1, c2) = (oof = (c1.oof .+ c2.oof) ./ 2, folds = c1.folds, kepoi = c1.kepoi)
+mq_c, tr_c = load_cv("cv_mlpq_centroid_r5s10.jld2"), load_cv("cv_evotree_centroid_r5s10.jld2")
+mq_d, tr_d = load_cv("cv_mlpq_dr25train_r5s10.jld2"), load_cv("cv_evotree_dr25train_r5s10.jld2")
+avg_c, avg_d = avg_of(mq_c, tr_c), avg_of(mq_d, tr_d)
+# paired comparison restricted to a subset of KOIs (bootstrap over the stars in the subset)
+sub(cv, m) = (oof = cv.oof[m, :, :], folds = cv.folds[m, :], kepoi = cv.kepoi[m])
+cmp_on(A, B, m) = compare_cv(sub(A, m), sub(B, m), pool[m, :]; B = 1000)
+subsets = [("all KOIs", trues(nrow(pool))), ("DR25 KOIs (headline)", dr), ("supplemental KOIs", .!dr),
+           ("KOIs with centroid data", has_cent)]
+@printf("DR25 KOIs: %d;  supplemental: %d;  with centroid data: %d (%.1f%% of DR25 KOIs)\n",
+        sum(dr), sum(.!dr), sum(has_cent), 100 * mean(has_cent[dr]))
+
+# %% [markdown]
+# ### 10.1 Catalog + centroid vs catalog-only
+# Δ = (catalog + centroid) − (catalog-only), paired star-bootstrap 95% CI, per subset.
+
+# %%
+cent_rows = NamedTuple[]
+for (mname, A, B) in (("MLP + quantile", mq_c, mq), ("Trees, tuned", tr_c, tuned), ("MLP + trees average", avg_c, avg4))
+    for (sname, m) in subsets
+        c = cmp_on(A, B, m)
+        push!(cent_rows, (model = mname, subset = sname, n = sum(m), catalog_only = c.B, with_centroid = c.A,
+                          delta = @sprintf("%+.4f [%+.4f, %+.4f]", c.delta, c.ci_lo, c.ci_hi)))
+    end
+end
+DataFrame(cent_rows)
+
+# %% [markdown]
+# Does it fix the centroid-offset blind spot? Error rates (threshold 0.5) for the average model:
+
+# %%
+s_c = oof_scores(avg_c)
+cent_groups = [groups; ("FP missed: CO and/or EC", fp .& ((a.koi_fpflag_co .== 1) .| (a.koi_fpflag_ec .== 1)))]
+DataFrame(group = first.(cent_groups), n = [sum(m) for (_, m) in cent_groups],
+          catalog_only = [round(100 * err_rate(s_av, m, startswith(g, "FP")); digits = 1) for (g, m) in cent_groups],
+          with_centroid = [round(100 * err_rate(s_c, m, startswith(g, "FP")); digits = 1) for (g, m) in cent_groups])
+
+# %%
+fig = Figure(size = (900, 400))
+for (j, (t, m)) in enumerate((("CO-only false positives (n = $(sum(fp .& (a.flag_pattern .== "CO"))))", fp .& (a.flag_pattern .== "CO")),
+                               ("Planets (CONFIRMED + CANDIDATE)", y .== 1)))
+    local ax = Axis(fig[1, j]; xlabel = "planet score (average model)", ylabel = j == 1 ? "KOIs" : "", title = t)
+    hist!(ax, s_av[m]; bins = 0:0.05:1, color = (:gray, 0.5), label = "catalog-only")
+    hist!(ax, s_c[m]; bins = 0:0.05:1, color = (:purple, 0.4), label = "catalog + centroid")
+    vlines!(ax, [0.5]; color = :black, linestyle = :dash)
+    j == 1 && axislegend(ax; position = :ct)
+end
+savefig("exo101326_centroid_scores.png", fig)
+fig
+
+# %% [markdown]
+# ### 10.2 Supplemental KOIs: train on all KOIs, or on DR25 KOIs only?
+# Scored on DR25 KOIs (the headline set) and on supplemental KOIs. Δ = (DR25-only training) − (training on all).
+
+# %%
+scope_rows = NamedTuple[]
+for (mname, A, B) in (("MLP + quantile", mq_d, mq), ("Trees, tuned", tr_d, tuned), ("MLP + trees average", avg_d, avg4))
+    for (sname, m) in subsets[2:3]
+        c = cmp_on(A, B, m)
+        push!(scope_rows, (model = mname, scored_on = sname, train_all = c.B, train_dr25_only = c.A,
+                           delta = @sprintf("%+.4f [%+.4f, %+.4f]", c.delta, c.ci_lo, c.ci_hi)))
+    end
+end
+DataFrame(scope_rows)
+
+# %% [markdown]
+# ### 10.3 New headline table: DR25-detected KOIs
+# Every model scored on the 7,199 DR25 KOIs of the pool (supplemental KOIs reported alongside). The robovetter's
+# `koi_score` is shown for reference only: it is partly circular with the labels and uses pixel-level tests.
+
+# %%
+ks = coalesce.(a.koi_score, NaN)
+headline_models = [("MLP baseline (exo100926)", base), ("MLP + quantile", mq), ("Trees, tuned", tuned),
+                   ("MLP + trees average", avg4), ("Average, catalog + centroid", avg_c)]
+hl = DataFrame(model = String[], dr25_roc_auc = Float64[], dr25_ci = String[], dr25_conf_vs_fp = Float64[], supplemental_roc_auc = Float64[])
+for (name, cv) in headline_models
+    s = oof_scores(cv)
+    bs = star_bootstrap(y[dr], s[dr], pool.kepid[dr]; B = 1000)
+    conf = dr .& (pool.koi_disposition .!= "CANDIDATE")
+    push!(hl, (name, fast_auc(y[dr], s[dr]), @sprintf("[%.4f, %.4f]", bs.lo, bs.hi), fast_auc(y[conf], s[conf]),
+               fast_auc(y[.!dr], s[.!dr])))
+end
+mk = dr .& isfinite.(ks)
+push!(hl, ("robovetter koi_score (reference)", fast_auc(y[mk], ks[mk]), "—",
+           fast_auc(y[mk .& (pool.koi_disposition .!= "CANDIDATE")], ks[mk .& (pool.koi_disposition .!= "CANDIDATE")]), NaN))
+hl
+
+# %% [markdown]
+# **Reading section 10:**
+# - **Centroid features are by far the biggest single gain so far.**
+#   - Average model on DR25 KOIs: 0.955 → **0.983** (Δ +0.028 [+0.024, +0.032]); all KOIs: 0.935 → 0.970.
+#   - Supplemental KOIs: 0.67 → 0.75.
+#   - **Not a missing-data artifact:** the gain is the same (+0.034) on KOIs that actually have centroid measurements.
+# - **The centroid-offset blind spot is essentially closed.**
+#
+#   | Average model, threshold 0.5 | Catalog-only | + centroid |
+#   |---|---|---|
+#   | CO-only FPs missed | 36% | **4.3%** |
+#   | CO/EC FPs missed | 19% | 5% |
+#   | All FPs missed | 15% | 10% |
+#   | CONFIRMED called FP | 3.6% | 1.4% |
+#   | Planets with P < 1.5 d called FP | 58% | 32% |
+#
+#   USP planets probably gain because clean centroids vouch for small, on-target signals.
+#   Not-transit-like and contamination FPs are not helped: NT 22% → 27%, EC 23% → 25%, partly a threshold shift.
+# - **⚠ Circularity: read 0.983 with care.**
+#   - The robovetter set the CO flag (and many FP dispositions) by thresholding these same centroid statistics.
+#   - Part of the gain is the model re-learning that rule, which is why it now even out-ranks the robovetter's own
+#     `koi_score` on DR25 KOIs (0.983 vs 0.970; koi_score was never built to maximise AUC).
+#   - **The catalog-only model (0.955 on DR25) remains the "independent" reference.** The centroid model is the
+#     "best use of available DV diagnostics" reference. Report both, always side by side.
+# - **Supplemental KOIs: keep training on everything.**
+#   - Training on DR25 KOIs only changes nothing for DR25 KOIs (Δ between −0.0002 and +0.0007, all CIs include 0).
+#   - It makes supplemental KOIs clearly worse (−0.03 to −0.04).
+#   - So the plan stands: train on all KOIs, headline on DR25 KOIs, report supplemental KOIs separately.
+# - **New headline numbers (DR25 KOIs, pooled OOF):**
+#
+#   | Model | ROC-AUC |
+#   |---|---|
+#   | Original MLP | 0.948 |
+#   | Catalog-only MLP + trees | **0.955** [0.951, 0.960] |
+#   | Catalog + centroid | **0.983** [0.981, 0.985] |
+#   | Robovetter `koi_score` (reference) | 0.970 |

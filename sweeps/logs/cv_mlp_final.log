@@ -1,0 +1,41 @@
+﻿VettingSetup loaded:11 features, data at C:\JuliaProjects\Exoplanet vetting\data\koi_cumulative.csv
+julia : ┌ Info: clean_koi
+At line:1 char:392
++ ... t vetting"; julia -t auto sweeps/cv_mlp_gap.jl final lr3_e600 *> swee ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (┌ Info: clean_koi:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+│   raw = 9564
+│   kept = 9201
+│   stars = 7927
+│   planets = 4619
+└   false_pos = 4582
+[lr3_e600] repeat 1 fold 1 done  (0.9 min elapsed)
+[lr3_e600] repeat 1 fold 2 done  (1.2 min elapsed)
+[lr3_e600] repeat 1 fold 3 done  (1.4 min elapsed)
+[lr3_e600] repeat 1 fold 4 done  (1.7 min elapsed)
+[lr3_e600] repeat 1 fold 5 done  (1.9 min elapsed)
+[lr3_e600] repeat 2 fold 1 done  (2.2 min elapsed)
+[lr3_e600] repeat 2 fold 2 done  (2.5 min elapsed)
+[lr3_e600] repeat 2 fold 3 done  (2.8 min elapsed)
+[lr3_e600] repeat 2 fold 4 done  (3.1 min elapsed)
+[lr3_e600] repeat 2 fold 5 done  (3.3 min elapsed)
+[lr3_e600] repeat 3 fold 1 done  (3.7 min elapsed)
+[lr3_e600] repeat 3 fold 2 done  (3.9 min elapsed)
+[lr3_e600] repeat 3 fold 3 done  (4.2 min elapsed)
+[lr3_e600] repeat 3 fold 4 done  (4.5 min elapsed)
+[lr3_e600] repeat 3 fold 5 done  (4.8 min elapsed)
+[lr3_e600] repeat 4 fold 1 done  (5.0 min elapsed)
+[lr3_e600] repeat 4 fold 2 done  (5.4 min elapsed)
+[lr3_e600] repeat 4 fold 3 done  (5.5 min elapsed)
+[lr3_e600] repeat 4 fold 4 done  (5.8 min elapsed)
+[lr3_e600] repeat 4 fold 5 done  (6.1 min elapsed)
+[lr3_e600] repeat 5 fold 1 done  (6.4 min elapsed)
+[lr3_e600] repeat 5 fold 2 done  (6.6 min elapsed)
+[lr3_e600] repeat 5 fold 3 done  (7.0 min elapsed)
+[lr3_e600] repeat 5 fold 4 done  (7.3 min elapsed)
+[lr3_e600] repeat 5 fold 5 done  (7.5 min elapsed)
+saved: C:\JuliaProjects\Exoplanet vetting\sweeps\results\cv_mlp_lr3_e600_r5s10.jld2
+[lr3_e600] AUC 0.9265 | vs MLP baseline Δ +0.0014 [+0.0009, +0.0019] p_null 0.000 | vs tuned trees Δ -0.0055 [-0.0080, -0.0032]
+DONE

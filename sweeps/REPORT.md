@@ -1,6 +1,7 @@
-# Kepler vetting: noise floor and error analysis of the baseline MLP
+# Kepler vetting: noise floor, error analysis and baselines
 
-*10/10/2026 · notebook `exo101026.ipynb` · compute `sweeps/cv_noise_floor.jl` · results in `sweeps/results/`*
+*Steps 1–2: 10/10/2026 · notebook `exo101026.ipynb` · compute `sweeps/cv_noise_floor.jl`*
+*Step 3: 10/13/2026 · notebook `exo101326.ipynb` · compute `sweeps/cv_baselines.jl` · results in `sweeps/results/`*
 
 ## Setup
 
@@ -186,9 +187,207 @@ Single-shuffle rates are a little higher than the 50-model ensemble rate for the
 
   These were partly a supplemental-KOI effect.
 
-## Recommendations (for steps 3–5, not done tonight)
+## Step 3: baselines (10/13/2026, notebook `exo101326.ipynb`)
 
-1. **Step 3:** logistic regression and gradient-boosted trees (EvoTrees.jl) through the CV protocol above.
+Same folds and protocol as the MLP baseline (5 fold shuffles × 10 seeds, `compare_cv`). Compute: `sweeps/cv_baselines.jl`.
+
+| Model | Pooled OOF ROC-AUC | Δ vs MLP [95% CI] | Log-loss | CONFIRMED vs FP | Folds beating MLP |
+|---|---|---|---|---|---|
+| MLP (baseline) | 0.9251 | — | 0.346 | 0.964 | — |
+| Logistic regression | 0.8668 | −0.058 [−0.064, −0.053] | 0.456 | 0.894 | 0 / 25 |
+| Trees (EvoTrees), untuned | 0.9306 | +0.0056 [+0.0032, +0.0080] | 0.336 | 0.973 | 23 / 25 |
+| **Trees, tuned** (depth 8, min_weight 10, L2 10, colsample 0.8) | **0.9320** | **+0.0069 [+0.0045, +0.0094]** | **0.331** | **0.973** | **25 / 25** |
+| MLP + tuned trees, 50/50 average | 0.9321 | +0.0070 (vs trees: +0.0001, CI includes 0) | — | — | — |
+
+- **Trees beat the MLP for real:** more than 10× the training-noise bar, on every fold, and on log-loss too.
+  - Untuned trees already win, so this does not depend on tuning.
+  - Tuning was scored on separate fold shuffles (`fold_seed0 = 5000`).
+- **The nonlinearity matters:** logistic regression is 0.058 behind.
+- **Tuning:** only tree depth matters (0.927 at depth 3 → 0.932 at depth 8). Depth 8 is the edge of the grid.
+- **No blind spot is fixed** (threshold 0.5):
+
+  | Group | MLP | Tuned trees |
+  |---|---|---|
+  | CO-only FPs missed | 37.9% | 37.5% |
+  | NT-only FPs missed | 24.6% | 26.0% |
+  | EC-only FPs missed | 23.4% | 22.5% |
+  | FPs with koi_count ≥ 3 missed | 79% | 79% |
+  | Q1–Q16-only KOIs, AUC | 0.56 | 0.58 |
+
+- **Where trees gain:**
+  - DR25 KOIs: AUC 0.953 vs 0.948
+  - CONFIRMED called FP: 3.6% vs 4.8%
+  - Planets with P < 1.5 d called FP: 59% vs 70%
+- **The two models mostly agree:** Spearman 0.967; they make a different hard call on 6.5% of KOIs. Averaging them adds nothing over trees alone.
+- **Calibration:** both are well calibrated (reliability plot in the notebook).
+- **What the models use:**
+  - Tree importance: prad > period > duration > koi_count > SNR.
+  - Biggest logistic-regression coefficients: teq (−), prad (−), koi_count (+).
+- **Conclusion:** the remaining errors are limited by the information in the 11 catalog features, not by the model class. Step 4 features and Phase 2 light curves should matter more than architecture.
+
+### Follow-up: closing the MLP gap by tuning (`sweeps/cv_mlp_gap.jl`, notebook section 7)
+
+Decision (10/13): carry **both** models forward, and first try to close the MLP's gap by tuning.
+
+- **Screen:** 11 single changes and 3 combinations, on the tree-tuning folds. The baseline MLP scores 0.9255 there; the best tree 0.9318.
+  - **Small real gains:** learning rate 3e-3 (+0.0009) and a 600-epoch cap with patience 50 (+0.0008).
+  - **No effect** (|Δ| ≤ 0.0007, CIs include 0): wider layers (128-64, 256-128), a third layer, dropout 0.1 / 0.3, batch 64.
+  - **Weight decay** (AdamW, wd 0.01 / 0.1) slightly hurts.
+- **Best: `lr3_e600`** (learning rate 3e-3, epoch cap 600, patience 50). On the standard folds (5 × 10):
+
+  | Comparison | Δ ROC-AUC [95% CI] |
+  |---|---|
+  | vs baseline MLP | **+0.0014** [+0.0009, +0.0019], p_null < 0.002 |
+  | vs tuned trees | −0.0055 [−0.0080, −0.0032] |
+
+  - Its ROC-AUC is **0.9265** and log-loss 0.343 (vs 0.346 for the baseline).
+  - It **closes ~20% of the gap**.
+  - No run reaches the new cap (median best epoch 59).
+- **Interpretation:** the gap isn't about training length or capacity. Likely cause: the **input representation**.
+  - Trees only see the order of each feature's values, so skewed inputs don't affect them.
+  - The MLP sees z-scored values, with only period, depth and prad logged; SNR, duration, teq, srad and koi_count are strongly skewed.
+  - Testing log or quantile transforms belongs to step 4.
+- Saved: `sweeps/results/mlp_screen/` and `mlp_screen.csv` (screen), `cv_mlp_lr3_e600_r5s10.jld2` (final).
+
+Decision (10/13): adopt `lr3_e600` as the MLP reference and test the input-representation explanation (step 4, part 1).
+
+## Step 4, part 1: input transforms (10/13/2026, notebook `exo101326.ipynb` section 8)
+
+**The problem:** as the MLP saw them, several features were extremely skewed.
+
+| Feature | Skew |
+|---|---|
+| impact | 23 (values up to 100 vs typical 0–1.3) |
+| srad | 22 |
+| duration | 6 |
+| SNR | 5 |
+| teq | 4 |
+
+Some z-scored inputs reached 38σ. Two fixes were added to `prepare_data(...; transform)` and `cv_run(...; transform)`, both fit on the training part only:
+
+- **`:log_more`:** also log10 duration, SNR (+1), teq, srad, koi_count, impact (+0.1). Max |z| 13.
+- **`:quantile`** (rank-gauss): empirical CDF on the training part → standard-normal quantile. Max |z| 4.5.
+
+Standard folds, 5 shuffles × 10 seeds (`sweeps/cv_mlp_gap.jl final ...`):
+
+| Model | ROC-AUC | Log-loss | CONF vs FP | Δ vs tuned MLP | Δ vs tuned trees |
+|---|---|---|---|---|---|
+| MLP tuned (`lr3_e600`) | 0.9265 | 0.343 | 0.965 | — | −0.0055 [−0.0080, −0.0032] |
+| MLP tuned + `log_more` | 0.9326 | 0.329 | 0.974 | +0.0062 [+0.0042, +0.0084] | +0.0006 [−0.0015, +0.0028] |
+| **MLP tuned + `quantile`** | **0.9330** | **0.328** | **0.974** | **+0.0065** [+0.0042, +0.0092] | +0.0010 [−0.0012, +0.0031] |
+| Trees, tuned | 0.9320 | 0.331 | 0.973 | +0.0055 | — |
+| **Quantile MLP + trees, 50/50 average** | **0.9352** | **0.324** | — | — | **+0.0032** [+0.0021, +0.0043] |
+
+- **The input representation was the whole MLP gap.**
+  - The quantile MLP is +0.008 over the original MLP and tied with the trees.
+  - Architecture tuning never mattered.
+- **The two models now combine:** the average is +0.0022 [+0.0011, +0.0032] over the quantile MLP, and the best result so far. With the original MLP, averaging added nothing.
+- **Blind spots shrink but remain** (threshold 0.5, original MLP → quantile MLP):
+
+  | Group | Original MLP | Quantile MLP |
+  |---|---|---|
+  | Missed FPs overall | 16.1% | 14.3% |
+  | NT-only FPs missed | 24.6% | 20.4% |
+  | CO-only FPs missed | 37.9% | 35.1% |
+  | FPs with 3+ KOIs missed | 79% | 74% |
+  | Q1–Q16-only KOIs, AUC | 0.56 | 0.58 |
+  | DR25 KOIs, AUC | 0.948 | 0.953 |
+
+**New references for the rest of step 4:**
+- MLP = `lr3_e600` + `transform = :quantile`;
+- trees = tuned EvoTrees;
+- combined model = their 50/50 average.
+
+## Step 4, part 2: `koi_count`, `koi_insol`, deeper trees (10/13/2026, notebook section 9, `sweeps/step4_features.jl`)
+
+**`koi_insol`: not run, on purpose.** Spearman(`koi_insol`, `koi_teq`) = 1.0000 on the pool, because teq is derived from insolation. Trees and the quantile MLP only see value order, so it adds exactly zero information. It stays out.
+
+**`koi_count` ablation** (standard folds, 5 × 10; Δ = without − with):
+
+| Model | With `koi_count` | Without | Δ ROC-AUC [95% CI] | Δ log-loss |
+|---|---|---|---|---|
+| MLP + quantile | 0.9330 | 0.9294 | −0.0036 [−0.0053, −0.0019] | +0.009 |
+| Trees, tuned | 0.9320 | 0.9280 | −0.0040 [−0.0057, −0.0022] | +0.010 |
+| MLP + trees average | 0.9352 | 0.9315 | −0.0037 [−0.0053, −0.0021] | +0.009 |
+
+- **It is a pure multiplicity prior.**
+  - Within each group (1 / 2 / 3+ KOIs), AUC is unchanged without it: 0.912 / 0.921 / 0.908 with, against 0.912 / 0.923 / 0.907 without.
+  - Its value comes entirely from shifting scores between groups: planet fraction is 39% for singles, 81% for 2-KOI systems and 95% for 3+.
+  - This matches the known multiplicity boost. It's legitimate, not leakage.
+- **Trade-off** (average model, threshold 0.5, with → without):
+  - FPs missed in 3+ systems: 77% → 51%
+  - Planets called FP in 2- and 3+ systems: 2.9% / 1.2% → 6.2% / 3.8%
+- **Decision: keep it.** FPs on multi-KOI stars stay the catalog model's hardest case (a Phase-2 target).
+
+**Deeper trees:** depth 10 (+0.0001) and 12 (+0.0003) over depth 8 on the tuning folds, below the 0.0005 bar. Depth 8 stays.
+
+## Step 4, part 3: centroid features and supplemental-KOI scoping (10/13/2026, notebook section 10, `sweeps/step4_scoping.jl`)
+
+**Decisions (user, 10/13):**
+- Centroid features are allowed, as a **separate "catalog + centroid" model** next to catalog-only.
+- Supplemental KOIs stay in training. **Headline metrics are on DR25-detected KOIs**; supplemental KOIs are reported separately.
+- Provenance is never a model input.
+
+**Centroid features** (`src/Centroids.jl`, 7 features):
+- From difference images: offsets from the out-of-transit centroid and from the KIC position, in arcsec and in σ.
+- From flux-weighted centroids: motion significance, source offset, and in-transit shift.
+- Missing values (5–10%) get the training median, with **no missing indicators**: missingness is informative (17% vs 52% planets) and total for no-TCE KOIs.
+
+| Average model (MLP + trees) | Catalog-only | + centroid | Δ [95% CI] |
+|---|---|---|---|
+| DR25 KOIs (headline) | 0.955 | **0.983** | +0.028 [+0.024, +0.032] |
+| All KOIs | 0.935 | 0.970 | +0.035 [+0.031, +0.039] |
+| Supplemental KOIs | 0.668 | 0.755 | +0.087 [+0.064, +0.111] |
+| KOIs with centroid data | 0.935 | 0.969 | +0.034 (so the gain is not a missing-data artifact) |
+
+The MLP and the trees separately show the same pattern (+0.028 and +0.029 on DR25).
+
+**Error rates, average model at threshold 0.5:**
+
+| Group | Catalog-only | + centroid |
+|---|---|---|
+| CO-only FPs missed | 36% | **4.3%** |
+| CO/EC FPs missed | 19% | 5% |
+| All FPs missed | 15% | 10% |
+| CONFIRMED called FP | 3.6% | 1.4% |
+| Planets with P < 1.5 d called FP | 58% | 32% |
+| NT-only FPs missed | 22% | 27% |
+| EC-only FPs missed | 23% | 25% |
+
+NT and EC are not helped.
+
+**⚠ Circularity:**
+- The robovetter set the CO flag by thresholding these same statistics, so part of the gain re-learns its rule.
+- The centroid model even out-ranks `koi_score` on DR25 (0.983 vs 0.970).
+- Keep the **catalog-only model as the independent reference** and always report the two side by side.
+
+**DR25-only training** (Δ = DR25-only − train-all):
+
+| Scored on | Δ ROC-AUC |
+|---|---|
+| DR25 KOIs | −0.0002 to +0.0007, all CIs include 0 |
+| Supplemental KOIs | −0.03 to −0.04, all CIs exclude 0 |
+
+→ **Keep training on all KOIs.**
+
+**Headline table, DR25-detected KOIs (7,199), pooled OOF ROC-AUC:**
+
+| Model | DR25 ROC-AUC [95% CI] | DR25 CONFIRMED vs FP | Supplemental |
+|---|---|---|---|
+| MLP baseline (exo100926) | 0.948 [0.943, 0.952] | 0.970 | 0.652 |
+| MLP + quantile | 0.953 | 0.977 | 0.666 |
+| Trees, tuned | 0.953 | 0.976 | 0.659 |
+| **Catalog-only: MLP + trees average** | **0.955** [0.951, 0.960] | 0.978 | 0.668 |
+| **Catalog + centroid: average** | **0.983** [0.981, 0.985] | 0.995 | 0.755 |
+| Robovetter `koi_score` (reference, partly circular) | 0.970 | 0.984 | — |
+
+**Step 4 status: done.**
+- Next is step 5: calibration and threshold choice, for both the catalog-only and catalog + centroid models.
+- Then a single final evaluation on the sealed test split.
+
+## Recommendations (for steps 4–5)
+
+1. **Step 3:** done (see above).
 2. **Step 4:**
    - `koi_count` ablation;
    - log-transform `koi_model_snr`;
@@ -213,3 +412,18 @@ Single-shuffle rates are a little higher than the 50-model ensemble rate for the
 | `sweeps/nbcells/exo101026.jl` | Source of the notebook (percent format) |
 | `sweeps/tools/run_nb.jl` | Headless notebook runner: `julia --project=. sweeps/tools/run_nb.jl <cells.jl> <out.ipynb>` |
 | `figures/exo101026_*.png` | All figures |
+| `src/Baselines.jl` | Step 3: `train_evotree` (EvoTrees, plugs into `cv_run(...; trainer = train_evotree)`), `tree_importance`, `logreg_coefs`; logistic regression = `train_model(...; hidden = ())` |
+| `sweeps/cv_baselines.jl` | Step 3 sweep (resumable): logistic regression, untuned and tuned trees, 60-setting tree grid |
+| `sweeps/results/cv_logreg_r5s10.jld2`, `cv_evotree_default_r5s10.jld2`, `cv_evotree_tuned_r5s10.jld2` | Step 3 CV runs (same folds as the baseline) |
+| `sweeps/results/evotree_grid.csv` / `.jld2` | Tree tuning grid results |
+| `sweeps/results/oof_baselines_r5s10.csv` | Per-KOI OOF scores for MLP, logistic regression and both tree models |
+| `figures/exo101326_*.png` | Step 3 and 4 figures |
+| `sweeps/cv_mlp_gap.jl` | MLP tuning screen and transforms (`screen` / `final` modes, resumable) |
+| `sweeps/step4_features.jl` | `koi_count` ablation and deeper-tree screen |
+| `sweeps/results/cv_mlp_lr3_e600*_r5s10.jld2` | Tuned MLP: plain, `log_more`, `quantile` (**quantile = MLP reference**) |
+| `sweeps/results/cv_mlpq_nocount_r5s10.jld2`, `cv_evotree_nocount_r5s10.jld2` | `koi_count` ablation runs |
+| `sweeps/results/mlp_screen/`, `mlp_screen.csv`, `evotree_depth_screen.csv` | Screening runs on the tuning folds |
+| `src/Centroids.jl` | `CENTROID_FEATURES`, `add_centroid_features`, `is_dr25` (row selection / reporting only) |
+| `sweeps/step4_scoping.jl` | Centroid models and DR25-only training runs |
+| `sweeps/results/cv_mlpq_centroid_r5s10.jld2`, `cv_evotree_centroid_r5s10.jld2` | Catalog + centroid models |
+| `sweeps/results/cv_mlpq_dr25train_r5s10.jld2`, `cv_evotree_dr25train_r5s10.jld2` | Trained on DR25 KOIs only |

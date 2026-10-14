@@ -74,7 +74,7 @@ Default is the MLP's `train_model`; Baselines.jl adds `train_evotree`.
 """
 function cv_run(pool::DataFrame; k = 5, repeats = 3, seeds = 1:10, features = FEATURES,
                 inner_val = 1 / 9, fold_seed0 = 1000, name = "cv", verbose = true,
-                trainer = train_model, train_kw...)
+                trainer = train_model, transform = :default, train_filter = nothing, train_kw...)
     seeds = collect(seeds)
     n = nrow(pool)
     oof = fill(NaN, n, repeats, length(seeds))
@@ -85,9 +85,12 @@ function cv_run(pool::DataFrame; k = 5, repeats = 3, seeds = 1:10, features = FE
         folds[:, r] = star_folds(pool; k, seed = fold_seed0 + r)
         for f in 1:k
             held = folds[:, r] .== f
-            fit_df, test_df = pool[.!held, :], pool[held, :]
+            # train_filter (Bool per pool row) restricts which KOIs are TRAINED on; folds and
+            # predictions still cover every pool KOI, so runs stay paired with the baseline
+            fit_rows = train_filter === nothing ? .!held : (.!held .& train_filter)
+            fit_df, test_df = pool[fit_rows, :], pool[held, :]
             tr, va = split_by_star(fit_df; at = (1 - inner_val,), seed = fold_seed0 + 100r + f)
-            data = prepare_data(tr, va, test_df; features)
+            data = prepare_data(tr, va, test_df; features, transform)
             for (si, s) in enumerate(seeds)
                 model, hist = trainer(data; seed = s, verbose = false, train_kw...)
                 p = Float64.(predict_proba(model, data.Xte))
@@ -100,7 +103,8 @@ function cv_run(pool::DataFrame; k = 5, repeats = 3, seeds = 1:10, features = FE
         end
     end
     config = Dict("k" => k, "repeats" => repeats, "seeds" => seeds, "features" => string.(features),
-                  "trainer" => string(nameof(trainer)),
+                  "trainer" => string(nameof(trainer)), "transform" => string(transform),
+                  "train_filter" => train_filter === nothing ? "none" : "$(sum(train_filter)) of $(length(train_filter)) KOIs",
                   "inner_val" => inner_val, "fold_seed0" => fold_seed0,
                   "train_kw" => Dict(string(kk) => v for (kk, v) in pairs(train_kw)))
     return (results = DataFrame(rows), oof = oof, folds = folds, config = config,
@@ -201,7 +205,7 @@ function compare_cv(cvA, cvB, pool::DataFrame; seeds = Colon(), B = 2000, metric
     rows_of = Dict(id => Int[] for id in ids)
     for (i, id) in enumerate(pool.kepid); push!(rows_of[id], i); end
     boot = map(1:B) do _
-        idx = reduce(vcat, (rows_of[id] for id in rand(rng, ids, length(ids))))
+        idx = reduce(vcat, [rows_of[id] for id in rand(rng, ids, length(ids))])   # a Vector, not a generator: one allocation instead of O(n²) copying
         metric(y[idx], sA[idx]) - metric(y[idx], sB[idx])
     end
     p_null = null === nothing ? missing : mean(abs.(null) .>= abs(Δ))
@@ -222,7 +226,7 @@ function star_bootstrap(y, p, kepid; B = 2000, metric = fast_auc, seed = 7)
     for (i, id) in enumerate(kepid); push!(rows_of[id], i); end
     vals = Vector{Float64}(undef, B)
     for b in 1:B
-        idx = reduce(vcat, (rows_of[id] for id in rand(rng, ids, length(ids))))
+        idx = reduce(vcat, [rows_of[id] for id in rand(rng, ids, length(ids))])
         vals[b] = metric(y[idx], p[idx])
     end
     return (mean = mean(vals), lo = quantile(vals, 0.025), hi = quantile(vals, 0.975), samples = vals)

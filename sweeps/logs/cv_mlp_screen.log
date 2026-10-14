@@ -1,0 +1,49 @@
+﻿julia : Precompiling packages...
+At line:1 char:392
++ ... t vetting"; julia -t auto sweeps/cv_mlp_gap.jl screen *> sweeps/logs/ ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Precompiling packages...:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  29279.5 ms  ✓ PrettyTables
+   2625.6 ms  ✓ EvalMetrics
+  64680.3 ms  ✓ CSV
+   1387.6 ms  ✓ CSV → CSVInlineStringsExt
+   1684.6 ms  ✓ CSV → CSVFilePathsBaseExt
+  71086.0 ms  ✓ DataFrames
+  6 dependencies successfully precompiled in 104 seconds. 386 already precompiled.
+VettingSetup loaded:11 features, data at C:\JuliaProjects\Exoplanet vetting\data\koi_cumulative.csv
+┌ Info: clean_koi
+│   raw = 9564
+│   kept = 9201
+│   stars = 7927
+│   planets = 4619
+└   false_pos = 4582
+screen base         AUC 0.9255  logloss 0.3456  median best epoch    99  max  192  (2.5 min)
+screen epochs600    AUC 0.9263  logloss 0.3440  median best epoch   116  max  372  (1.9 min)
+screen wide128      AUC 0.9255  logloss 0.3459  median best epoch    62  max  118  (2.2 min)
+screen wide256      AUC 0.9262  logloss 0.3447  median best epoch    49  max   90  (2.9 min)
+screen deep3        AUC 0.9261  logloss 0.3444  median best epoch    46  max  130  (1.9 min)
+screen drop0.1      AUC 0.9257  logloss 0.3453  median best epoch    84  max  191  (1.0 min)
+screen drop0.3      AUC 0.9254  logloss 0.3459  median best epoch   111  max  197  (1.2 min)
+screen lr3e-3       AUC 0.9264  logloss 0.3436  median best epoch    56  max  124  (0.7 min)
+screen wd0.01       AUC 0.9252  logloss 0.3465  median best epoch    94  max  177  (1.0 min)
+screen wd0.1        AUC 0.9250  logloss 0.3467  median best epoch   110  max  199  (1.1 min)
+screen batch64      AUC 0.9253  logloss 0.3460  median best epoch    65  max  154  (1.2 min)
+11×8 DataFrame
+ Row │ variant    roc_auc   d_auc         ci_lo         ci_hi         logloss  ⋯
+     │ String     Float64   Float64       Float64       Float64       Float64  ⋯
+─────┼──────────────────────────────────────────────────────────────────────────
+   1 │ lr3e-3     0.926391   0.00088689    0.000166599   0.0015774    0.34356  ⋯
+   2 │ epochs600  0.92626    0.000755516   0.000349698   0.00117275   0.344011
+   3 │ wide256    0.926158   0.000654074  -0.000163973   0.00142465   0.344734
+   4 │ deep3      0.926084   0.000579885  -0.000312309   0.0013927    0.344443
+   5 │ drop0.1    0.925685   0.000180843  -0.000304693   0.000676857  0.345262 ⋯
+   6 │ base       0.925504   0.0           0.0           0.0          0.345562
+   7 │ wide128    0.925456  -4.78676e-5   -0.000706328   0.000591437  0.345935
+   8 │ drop0.3    0.925362  -0.000141739  -0.000579334   0.000257966  0.345904
+   9 │ batch64    0.92532   -0.000184191  -0.000614664   0.000216029  0.346003 ⋯
+  10 │ wd0.01     0.925206  -0.00029827   -0.000585349  -4.86135e-7   0.3465
+  11 │ wd0.1      0.925033  -0.000471047  -0.000879837  -7.88742e-5   0.346661
+                                                               2 columns omitted
+DONE

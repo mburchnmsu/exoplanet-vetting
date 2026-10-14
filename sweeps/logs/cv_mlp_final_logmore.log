@@ -1,0 +1,41 @@
+﻿VettingSetup loaded:11 features, data at C:\JuliaProjects\Exoplanet vetting\data\koi_cumulative.csv
+julia : ┌ Info: clean_koi
+At line:1 char:392
++ ... t vetting"; julia -t auto sweeps/cv_mlp_gap.jl final lr3_e600_logmore ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (┌ Info: clean_koi:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+│   raw = 9564
+│   kept = 9201
+│   stars = 7927
+│   planets = 4619
+└   false_pos = 4582
+[lr3_e600_logmore] repeat 1 fold 1 done  (0.8 min elapsed)
+[lr3_e600_logmore] repeat 1 fold 2 done  (1.1 min elapsed)
+[lr3_e600_logmore] repeat 1 fold 3 done  (1.3 min elapsed)
+[lr3_e600_logmore] repeat 1 fold 4 done  (1.4 min elapsed)
+[lr3_e600_logmore] repeat 1 fold 5 done  (1.7 min elapsed)
+[lr3_e600_logmore] repeat 2 fold 1 done  (1.9 min elapsed)
+[lr3_e600_logmore] repeat 2 fold 2 done  (2.1 min elapsed)
+[lr3_e600_logmore] repeat 2 fold 3 done  (2.3 min elapsed)
+[lr3_e600_logmore] repeat 2 fold 4 done  (2.6 min elapsed)
+[lr3_e600_logmore] repeat 2 fold 5 done  (2.8 min elapsed)
+[lr3_e600_logmore] repeat 3 fold 1 done  (3.0 min elapsed)
+[lr3_e600_logmore] repeat 3 fold 2 done  (3.2 min elapsed)
+[lr3_e600_logmore] repeat 3 fold 3 done  (3.5 min elapsed)
+[lr3_e600_logmore] repeat 3 fold 4 done  (3.7 min elapsed)
+[lr3_e600_logmore] repeat 3 fold 5 done  (3.9 min elapsed)
+[lr3_e600_logmore] repeat 4 fold 1 done  (4.0 min elapsed)
+[lr3_e600_logmore] repeat 4 fold 2 done  (4.2 min elapsed)
+[lr3_e600_logmore] repeat 4 fold 3 done  (4.3 min elapsed)
+[lr3_e600_logmore] repeat 4 fold 4 done  (4.4 min elapsed)
+[lr3_e600_logmore] repeat 4 fold 5 done  (4.6 min elapsed)
+[lr3_e600_logmore] repeat 5 fold 1 done  (4.8 min elapsed)
+[lr3_e600_logmore] repeat 5 fold 2 done  (5.1 min elapsed)
+[lr3_e600_logmore] repeat 5 fold 3 done  (5.3 min elapsed)
+[lr3_e600_logmore] repeat 5 fold 4 done  (5.5 min elapsed)
+[lr3_e600_logmore] repeat 5 fold 5 done  (5.6 min elapsed)
+saved: C:\JuliaProjects\Exoplanet vetting\sweeps\results\cv_mlp_lr3_e600_logmore_r5s10.jld2
+[lr3_e600_logmore] AUC 0.9326 | vs MLP baseline Δ +0.0076 [+0.0055, +0.0100] p_null 0.000 | vs tuned trees Δ +0.0006 [-0.0015, +0.0028]
+DONE

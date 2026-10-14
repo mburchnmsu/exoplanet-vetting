@@ -130,15 +130,60 @@ function describe_splits(train, val, test)
 end
 
 # --- Features -> matrices, scaling ---------------------------------------------
-"Feature matrix [n_features, n_obs] (Float32) with log transforms applied."
-function feature_matrix(df::DataFrame; features = FEATURES)
+"Feature matrix [n_features, n_obs] (Float32) with log10(x + eps) applied to the features in `logs`."
+function feature_matrix(df::DataFrame; features = FEATURES, logs = LOG_FEATURES)
     check_no_leakage(features)
     X = Matrix{Float64}(undef, length(features), nrow(df))
     for (i, f) in enumerate(features)
         x = Float64.(df[!, f])
-        X[i, :] = haskey(LOG_FEATURES, f) ? log10.(x .+ LOG_FEATURES[f]) : x
+        X[i, :] = haskey(logs, f) ? log10.(x .+ logs[f]) : x
     end
     return Float32.(X)
+end
+
+# Step 4 input-transform test. The MLP sees z-scored values, so heavily skewed
+# features (impact up to 100, srad up to 230, SNR up to 9000) squash most KOIs
+# into a narrow band. Trees are unaffected (they only use the order of values).
+#   :default   log10 on period/depth/prad only (the baseline)
+#   :log_more  also log10 on duration, SNR (+1, has zeros), teq, srad, koi_count, impact (+0.1, has zeros)
+#   :quantile  rank-gauss: each feature -> its empirical CDF on the training part -> standard-normal quantile
+const EXTRA_LOG = Dict(:koi_duration => 0.0, :koi_model_snr => 1.0, :koi_teq => 0.0, :koi_srad => 0.0,
+                       :koi_count => 0.0, :koi_impact => 0.1)
+transform_logs(transform) = transform == :log_more ? merge(LOG_FEATURES, EXTRA_LOG) : LOG_FEATURES
+
+"Standard-normal quantile (Acklam's rational approximation, |error| < 1.2e-9). No extra packages needed."
+function norm_quantile(p::Real)
+    a = (-3.969683028665376e1, 2.209460984245205e2, -2.759285104469687e2, 1.383577518672690e2, -3.066479806614716e1, 2.506628277459239)
+    b = (-5.447609879822406e1, 1.615858368580409e2, -1.556989798598866e2, 6.680131188771972e1, -1.328068155288572e1)
+    c = (-7.784894002430293e-3, -3.223964580411365e-1, -2.400758277161838, -2.549732539343734, 4.374664141464968, 2.938163982698783)
+    d = (7.784695709041462e-3, 3.224671290700398e-1, 2.445134137142996, 3.754408661907416)
+    plow = 0.02425
+    if p < plow
+        q = sqrt(-2log(p))
+        return (((((c[1]q + c[2])q + c[3])q + c[4])q + c[5])q + c[6]) / ((((d[1]q + d[2])q + d[3])q + d[4])q + 1)
+    elseif p <= 1 - plow
+        q = p - 0.5; r = q^2
+        return (((((a[1]r + a[2])r + a[3])r + a[4])r + a[5])r + a[6])q / (((((b[1]r + b[2])r + b[3])r + b[4])r + b[5])r + 1)
+    else
+        return -norm_quantile(1 - p)
+    end
+end
+
+"Fit rank-gauss references: the sorted training values of each feature (row of X)."
+fit_quantile(X::AbstractMatrix) = [sort(Float64.(X[i, :])) for i in axes(X, 1)]
+
+"Map each value to the normal quantile of its mid-rank in the training reference (ties and unseen values handled)."
+function apply_quantile(qref, X::AbstractMatrix)
+    Y = similar(X, Float32)
+    for i in axes(X, 1)
+        v = qref[i]; n = length(v)
+        for j in axes(X, 2)
+            x = X[i, j]
+            u = (searchsortedfirst(v, x) - 1 + searchsortedlast(v, x)) / (2n)   # mid-rank CDF in [0, 1]
+            Y[i, j] = norm_quantile(clamp(u, 0.5 / n, 1 - 0.5 / n))
+        end
+    end
+    return Y
 end
 
 labels(df::DataFrame) = Float32.(df.label)
@@ -148,18 +193,29 @@ fit_scaler(X::AbstractMatrix) = (μ = mean(X; dims = 2), σ = std(X; dims = 2) .
 apply_scaler(s, X::AbstractMatrix) = (X .- s.μ) ./ s.σ
 
 """
-    prepare_data(train, val, test; features = FEATURES)
+    prepare_data(train, val, test; features = FEATURES, transform = :default)
 
-Build scaled matrices for all three splits, with the scaler fit on `train` only.
+Build scaled matrices for all three splits, with the scaler (and, for
+`transform = :quantile`, the rank-gauss reference) fit on `train` only.
 Returns a NamedTuple with Xtr/ytr/Xva/yva/Xte/yte and the scaler.
 """
-function prepare_data(train, val, test; features = FEATURES)
-    Xtr = feature_matrix(train; features)
-    s = fit_scaler(Xtr)
-    return (Xtr = apply_scaler(s, Xtr), ytr = labels(train),
-            Xva = apply_scaler(s, feature_matrix(val; features)), yva = labels(val),
-            Xte = apply_scaler(s, feature_matrix(test; features)), yte = labels(test),
-            scaler = s, features = features)
+function prepare_data(train, val, test; features = FEATURES, transform = :default)
+    transform in (:default, :log_more, :quantile) || error("unknown transform $transform")
+    logs = transform_logs(transform)
+    Xtr = feature_matrix(train; features, logs)
+    # Missing / non-finite values (only centroid features have any) -> training median of that feature
+    med = [let v = filter(isfinite, Xtr[i, :]); isempty(v) ? 0f0 : median(v) end for i in axes(Xtr, 1)]
+    impute(X) = any(!isfinite, X) ? [isfinite(X[i, j]) ? X[i, j] : med[i] for i in axes(X, 1), j in axes(X, 2)] : X
+    Xtr = impute(Xtr)
+    qref = transform == :quantile ? fit_quantile(Xtr) : nothing       # fit on the training part only
+    pre(X) = qref === nothing ? impute(X) : apply_quantile(qref, impute(X))
+    Ptr = pre(Xtr)
+    s = fit_scaler(Ptr)
+    tf(df) = apply_scaler(s, pre(feature_matrix(df; features, logs)))
+    return (Xtr = apply_scaler(s, Ptr), ytr = labels(train),
+            Xva = tf(val), yva = labels(val),
+            Xte = tf(test), yte = labels(test),
+            scaler = s, features = features, transform = transform, qref = qref)
 end
 
 make_loader(X, y; batchsize = 128, shuffle = true, rng = Xoshiro(0)) =
@@ -168,16 +224,18 @@ make_loader(X, y; batchsize = 128, shuffle = true, rng = Xoshiro(0)) =
 # --- Model & loss ---------------------------------------------------------------
 """
 MLP that outputs a raw logit (no sigmoid; the loss and predict apply it).
+Dropout follows the first hidden layer only (so `hidden = (64, 32)` is exactly
+the original baseline layout). Any number of hidden layers is allowed;
 `hidden = ()` gives plain logistic regression: a single Dense(n_features => 1).
 """
 function build_mlp(n_features; hidden = (64, 32), dropout = 0.2, act = relu)
     isempty(hidden) && return Chain(Dense(n_features => 1))
-    return Chain(
-        Dense(n_features => hidden[1], act),
-        Dropout(dropout),
-        Dense(hidden[1] => hidden[2], act),
-        Dense(hidden[2] => 1),
-    )
+    layers = Any[Dense(n_features => hidden[1], act), Dropout(dropout)]
+    for i in 2:length(hidden)
+        push!(layers, Dense(hidden[i-1] => hidden[i], act))
+    end
+    push!(layers, Dense(hidden[end] => 1))
+    return Chain(layers...)
 end
 
 """
@@ -200,17 +258,18 @@ end
 # --- Training ---------------------------------------------------------------------
 """
     train_model(data; epochs = 200, lr = 1e-3, batchsize = 128, pos_weight = 1,
-                patience = 25, seed = 1, hidden = (64, 32), dropout = 0.2)
+                patience = 25, seed = 1, hidden = (64, 32), dropout = 0.2, wd = 0)
 
 Adam + mini-batches, tracking train/val loss each epoch. Keeps the weights with
 the best validation loss (early stopping after `patience` epochs without
 improvement). Returns `(model, history)`.
 """
 function train_model(data; epochs = 200, lr = 1e-3, batchsize = 128, pos_weight = 1f0,
-                     patience = 25, seed = 1, hidden = (64, 32), dropout = 0.2, verbose = true)
+                     patience = 25, seed = 1, hidden = (64, 32), dropout = 0.2, wd = 0.0, verbose = true)
     Random.seed!(seed)
     model = build_mlp(size(data.Xtr, 1); hidden, dropout)
-    opt = Flux.setup(Optimisers.Adam(lr), model)
+    # wd > 0: decoupled weight decay (AdamW); wd = 0 is plain Adam, as in the baseline
+    opt = Flux.setup(wd > 0 ? Optimisers.AdamW(lr, (0.9, 0.999), wd) : Optimisers.Adam(lr), model)
     loader = make_loader(data.Xtr, data.ytr; batchsize, rng = Xoshiro(seed))
     pw = Float32(pos_weight)
     lossf(m, X, y) = weighted_logitbce(m(X), y; pos_weight = pw)
@@ -330,5 +389,6 @@ end
 include(joinpath(@__DIR__, "CrossValidation.jl"))
 include(joinpath(@__DIR__, "ErrorAnalysis.jl"))
 include(joinpath(@__DIR__, "Baselines.jl"))
+include(joinpath(@__DIR__, "Centroids.jl"))
 
 println("VettingSetup loaded:$(length(FEATURES)) features, data at $(KOI_PATH)")

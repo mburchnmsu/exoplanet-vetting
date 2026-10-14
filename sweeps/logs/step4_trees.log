@@ -1,0 +1,45 @@
+﻿VettingSetup loaded:11 features, data at C:\JuliaProjects\Exoplanet vetting\data\koi_cumulative.csv
+julia : ┌ Info: clean_koi
+At line:1 char:392
++ ... t vetting"; julia -t auto sweeps/step4_features.jl nocount_trees deep ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (┌ Info: clean_koi:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+│   raw = 9564
+│   kept = 9201
+│   stars = 7927
+│   planets = 4619
+└   false_pos = 4582
+[evotree_nocount] repeat 1 fold 1 done  (0.1 min elapsed)
+[evotree_nocount] repeat 1 fold 2 done  (0.2 min elapsed)
+[evotree_nocount] repeat 1 fold 3 done  (0.2 min elapsed)
+[evotree_nocount] repeat 1 fold 4 done  (0.3 min elapsed)
+[evotree_nocount] repeat 1 fold 5 done  (0.3 min elapsed)
+[evotree_nocount] repeat 2 fold 1 done  (0.3 min elapsed)
+[evotree_nocount] repeat 2 fold 2 done  (0.4 min elapsed)
+[evotree_nocount] repeat 2 fold 3 done  (0.4 min elapsed)
+[evotree_nocount] repeat 2 fold 4 done  (0.5 min elapsed)
+[evotree_nocount] repeat 2 fold 5 done  (0.5 min elapsed)
+[evotree_nocount] repeat 3 fold 1 done  (0.5 min elapsed)
+[evotree_nocount] repeat 3 fold 2 done  (0.6 min elapsed)
+[evotree_nocount] repeat 3 fold 3 done  (0.6 min elapsed)
+[evotree_nocount] repeat 3 fold 4 done  (0.6 min elapsed)
+[evotree_nocount] repeat 3 fold 5 done  (0.7 min elapsed)
+[evotree_nocount] repeat 4 fold 1 done  (0.7 min elapsed)
+[evotree_nocount] repeat 4 fold 2 done  (0.7 min elapsed)
+[evotree_nocount] repeat 4 fold 3 done  (0.8 min elapsed)
+[evotree_nocount] repeat 4 fold 4 done  (0.8 min elapsed)
+[evotree_nocount] repeat 4 fold 5 done  (0.9 min elapsed)
+[evotree_nocount] repeat 5 fold 1 done  (0.9 min elapsed)
+[evotree_nocount] repeat 5 fold 2 done  (0.9 min elapsed)
+[evotree_nocount] repeat 5 fold 3 done  (1.0 min elapsed)
+[evotree_nocount] repeat 5 fold 4 done  (1.0 min elapsed)
+[evotree_nocount] repeat 5 fold 5 done  (1.1 min elapsed)
+saved: C:\JuliaProjects\Exoplanet vetting\sweeps\results\cv_evotree_nocount_r5s10.jld2
+saved: C:\JuliaProjects\Exoplanet vetting\sweeps\results\mlp_screen\treescreen_depth10.jld2
+tree depth 10 (tuning folds): AUC 0.9319  logloss 0.3312  rounds 194
+saved: C:\JuliaProjects\Exoplanet vetting\sweeps\results\mlp_screen\treescreen_depth12.jld2
+tree depth 12 (tuning folds): AUC 0.9321  logloss 0.3309  rounds 178
+no depth beats depth 8 by > 0.0005 on the tuning folds: depth 8 stays
+DONE

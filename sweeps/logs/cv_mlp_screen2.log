@@ -1,0 +1,36 @@
+﻿VettingSetup loaded:11 features, data at C:\JuliaProjects\Exoplanet vetting\data\koi_cumulative.csv
+julia : ┌ Info: clean_koi
+At line:1 char:392
++ ... t vetting"; julia -t auto sweeps/cv_mlp_gap.jl screen lr3_e600 lr3_e6 ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (┌ Info: clean_koi:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+│   raw = 9564
+│   kept = 9201
+│   stars = 7927
+│   planets = 4619
+└   false_pos = 4582
+screen lr3_e600     AUC 0.9270  logloss 0.3421  median best epoch    60  max  151  (1.8 min)
+screen lr3_e600_wide AUC 0.9266  logloss 0.3439  median best epoch    30  max   65  (3.0 min)
+screen lr3_e600_deep3 AUC 0.9266  logloss 0.3435  median best epoch    26  max   63  (1.8 min)
+14×8 DataFrame
+ Row │ variant         roc_auc   d_auc         ci_lo         ci_hi         log ⋯
+     │ String          Float64   Float64       Float64       Float64       Flo ⋯
+─────┼──────────────────────────────────────────────────────────────────────────
+   1 │ lr3_e600        0.926995   0.00149077    0.0006965     0.00226094   0.3 ⋯
+   2 │ lr3_e600_wide   0.926625   0.00112052    1.21304e-5    0.00213145   0.3
+   3 │ lr3_e600_deep3  0.926554   0.00104983    1.2821e-5     0.00199391   0.3
+   4 │ lr3e-3          0.926391   0.00088689    0.000166599   0.0015774    0.3
+   5 │ epochs600       0.92626    0.000755516   0.000349698   0.00117275   0.3 ⋯
+   6 │ wide256         0.926158   0.000654074  -0.000163973   0.00142465   0.3
+   7 │ deep3           0.926084   0.000579885  -0.000312309   0.0013927    0.3
+   8 │ drop0.1         0.925685   0.000180843  -0.000304693   0.000676857  0.3
+   9 │ base            0.925504   0.0           0.0           0.0          0.3 ⋯
+  10 │ wide128         0.925456  -4.78676e-5   -0.000706328   0.000591437  0.3
+  11 │ drop0.3         0.925362  -0.000141739  -0.000579334   0.000257966  0.3
+  12 │ batch64         0.92532   -0.000184191  -0.000614664   0.000216029  0.3
+  13 │ wd0.01          0.925206  -0.00029827   -0.000585349  -4.86135e-7   0.3 ⋯
+  14 │ wd0.1           0.925033  -0.000471047  -0.000879837  -7.88742e-5   0.3
+                                                               3 columns omitted
+DONE
