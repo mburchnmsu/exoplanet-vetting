@@ -189,7 +189,7 @@ These are computed by our own pipeline, so they are independent of the robovette
 | **M5 Final** | Ensemble, calibration, operating-point menu, freeze | All of §1's criteria checked |
 | **M6 Test** | One-time test scoring; write-up next to Phase 1 | — |
 
-Notebooks keep the usual naming (`exoMMDDYY.ipynb` in the project root), one per working day, with M0–M2 likely in
+Notebooks keep the usual naming (`exoMMDDYY.ipynb` in `notebooks/`), one per working day, with M0–M2 likely in
 the first.
 
 ## 9. Risks and how to handle them

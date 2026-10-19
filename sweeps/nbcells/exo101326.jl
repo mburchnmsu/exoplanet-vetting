@@ -63,7 +63,7 @@
 #   Bigger wins should come from features (step 4) and light curves (Phase 2) rather than architecture.
 
 # %%
-include(joinpath(@__DIR__, "src", "VettingSetup.jl"))
+include(joinpath(@__DIR__, "..", "src", "VettingSetup.jl"))
 df_raw = load_koi()
 df = clean_koi(df_raw)
 pool, _ = cv_pool(df)
@@ -718,10 +718,10 @@ cal_rows = NamedTuple[]
 for (mname, S) in final_models, meth in (:none, :platt, :isotonic)
     P = nested_calibrate(S, folds5, yf, meth)
     for (sname, m) in cal_subsets
-        avg(f) = mean(f(yf[m], P[m, r]) for r in axes(P, 2))
-        push!(cal_rows, (model = mname, calibrator = string(meth), subset = sname, logloss = round(avg(logloss); digits = 4),
-                         brier = round(avg(brier); digits = 4), ece = round(avg(ece); digits = 4),
-                         roc_auc = round(avg(fast_auc); digits = 4), mean_p = round(mean(P[m, :]); digits = 3),
+        mean_r(f) = mean(f(yf[m], P[m, r]) for r in axes(P, 2))     # metric averaged over fold shuffles
+        push!(cal_rows, (model = mname, calibrator = string(meth), subset = sname, logloss = round(mean_r(logloss); digits = 4),
+                         brier = round(mean_r(brier); digits = 4), ece = round(mean_r(ece); digits = 4),
+                         roc_auc = round(mean_r(fast_auc); digits = 4), mean_p = round(mean(P[m, :]); digits = 3),
                          planet_rate = round(mean(yf[m]); digits = 3)))
     end
 end
@@ -762,7 +762,7 @@ fig
 RULES5 = [("planet recall 95%", (:recall, 0.95)), ("planet recall 98%", (:recall, 0.98)),
           ("planet recall 99%", (:recall, 0.99)), ("precision 95%", (:precision, 0.95)),
           ("precision 99%", (:precision, 0.99)), ("max F1", (:maxf1,)), ("p = 0.5", (:prob, 0.5))]
-frozen = JLD2.load(joinpath(@__DIR__, "models", "step5_frozen.jld2"))["frozen"]
+frozen = JLD2.load(joinpath(@__DIR__, "..", "models", "step5_frozen.jld2"))["frozen"]
 menu = NamedTuple[]
 for ((mname, S), key) in zip(final_models, ("catalog_only", "catalog_centroid"))
     for (rname, rule) in RULES5

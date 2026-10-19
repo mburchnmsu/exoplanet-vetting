@@ -1,5 +1,5 @@
 # Exoplanet vetting status
-Updated: 2026-10-18 21:31, DESKTOP-BBASC81
+Updated: 2026-10-18 22:03, DESKTOP-BBASC81
 
 ## Headline
 Phase 1 (catalog-feature classifier) is finished and tested once on the sealed test set, which confirmed the
@@ -28,9 +28,7 @@ Post-test experiment (CV only): training on CONFIRMED vs FP only is worse at the
 adopted.
 
 ## Running now
-A Jupyter re-run of `notebooks/exo101326.ipynb` (started about 21:28, expected by about 21:45). It checks the notebooks
-still work after moving them into `notebooks/`; the outputs go to a scratch copy. The other two dated notebooks and
-the new `ExoOnboarding.ipynb` already pass.
+Nothing.
 
 ## Waiting on user
 - Phase 2 decisions D1–D7 in `PHASE2_PLAN.md`: which machine, raw vs cached light-curve storage, features-first vs
@@ -38,7 +36,6 @@ the new `ExoOnboarding.ipynb` already pass.
   recommendation.
 
 ## Next up
-1. Push the notebooks reorganisation (`notebooks/` + README) and `ExoOnboarding.ipynb` (tonight).
-2. Phase 2, M0 pilot: download ~50 stars' light curves, build the cache, detrending and folded views, then measure
+1. Phase 2, M0 pilot: download ~50 stars' light curves, build the cache, detrending and folded views, then measure
    the real download size and time.
-3. M1: full overnight light-curve download at low priority.
+2. M1: full overnight light-curve download at low priority.

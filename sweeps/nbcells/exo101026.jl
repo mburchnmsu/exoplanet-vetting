@@ -39,7 +39,7 @@
 #   mostly a supplemental-KOI effect.
 
 # %%
-include(joinpath(@__DIR__, "src", "VettingSetup.jl"))
+include(joinpath(@__DIR__, "..", "src", "VettingSetup.jl"))
 df_raw = load_koi()
 df = clean_koi(df_raw)
 pool, _ = cv_pool(df)                        # train+val of the main split; test stays sealed

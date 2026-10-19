@@ -507,7 +507,7 @@ OOF score. CV only.
 | `sweeps/results/single_split_runs.jld2` | Notebook-style runs |
 | `sweeps/results/oof_baseline_r5s10.csv` | Per-KOI OOF score, score std, disposition, flags |
 | `sweeps/nbcells/exo101026.jl` | Source of the notebook (percent format) |
-| `sweeps/tools/run_nb.jl` | Headless notebook runner: `julia --project=. sweeps/tools/run_nb.jl <cells.jl> <out.ipynb>` |
+| `sweeps/tools/run_nb.jl` | Headless notebook runner: `julia --project=. sweeps/tools/run_nb.jl sweeps/nbcells/<name>.jl notebooks/<name>.ipynb` (all dated notebooks live in `notebooks/`) |
 | `figures/exo101026_*.png` | All figures |
 | `src/Baselines.jl` | Step 3: `train_evotree` (EvoTrees, plugs into `cv_run(...; trainer = train_evotree)`), `tree_importance`, `logreg_coefs`; logistic regression = `train_model(...; hidden = ())` |
 | `sweeps/cv_baselines.jl` | Step 3 sweep (resumable): logistic regression, untuned and tuned trees, 60-setting tree grid |

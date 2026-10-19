@@ -2,6 +2,9 @@
 #
 #   julia sweeps/tools/run_nb.jl <cells.jl> <out.ipynb>            (build + execute)
 #   julia sweeps/tools/run_nb.jl <cells.jl> <out.ipynb> --no-run   (build only, no outputs)
+# Notebooks live in notebooks/, e.g.
+#   julia --project=. sweeps/tools/run_nb.jl sweeps/nbcells/exo101326.jl notebooks/exo101326.ipynb
+# so setup cells reach the code with joinpath(@__DIR__, "..", "src", ...).
 #
 # Cell markers in the .jl file:
 #   # %% [markdown]      following lines are markdown, each prefixed with "# "
