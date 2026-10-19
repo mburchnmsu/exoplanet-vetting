@@ -34,10 +34,11 @@ Views look right (EBs V-shaped, planets U-shaped; centroid shift ~0.05 mpix plan
 ## Running now
 Nothing. Phase 2 M1 (`sweeps/p2_download.jl`) was stopped by Claude Code at ~13:05 on 10/19 because the PC ran low
 on memory (Zodi and Solar jobs also running), not because of an error. 437 of 7,927 stars were cached, 0 errors.
-It resumes from there; waiting for the user to say when to restart.
+Per the user, it stays paused until tonight (nothing starts before 17:20). A check at ~20:07 will restart it as the
+overnight low-priority job once the afternoon jobs are done and enough memory is free.
 
 ## Waiting on user
-- When to restart the M1 download (killed for low memory; ~2.3 h left; light on memory itself).
+Nothing. (M1 restart is scheduled for tonight, per the user.)
 
 ## Next up
 1. M1 check: ≥ 98% of KOIs have data; list failures.
