@@ -1,7 +1,7 @@
 # Phase 2 plan: adding Kepler light curves to the vetting model
 
-*Drafted 10/13/2026, after Phase 1 was finished and tested. Nothing here has been run yet. Items marked
-**DECISION** need the user's call before that stage starts; each has a recommendation.*
+*Drafted 10/13/2026, after Phase 1 was finished and tested. **10/19/2026: the user approved all seven
+recommendations (D1–D7) as written below; M0 started the same day.***
 
 ## 1. Goal and what counts as success
 
@@ -38,7 +38,7 @@ For orientation only: published light-curve vetters (AstroNet, Shallue & Vanderb
 et al. 2022) report AUCs around 0.99. But they classify TCEs (including many obvious non-transits), with different
 labels, so their numbers are **not** comparable to ours.
 
-## 2. Decisions needed (with recommendations)
+## 2. Decisions (all recommendations approved 10/19/2026)
 
 | # | **DECISION** | Recommendation | Why |
 |---|---|---|---|

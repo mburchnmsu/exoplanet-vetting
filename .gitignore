@@ -1,2 +1,6 @@
 # Editor / Jupyter scratch
 .ipynb_checkpoints/
+
+# Phase 2 light-curve cache, raw downloads and view caches (GBs, regenerable)
+data/lightcurves/
+data/views_*.jld2

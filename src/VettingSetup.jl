@@ -399,5 +399,8 @@ include(joinpath(@__DIR__, "ErrorAnalysis.jl"))
 include(joinpath(@__DIR__, "Baselines.jl"))
 include(joinpath(@__DIR__, "Centroids.jl"))
 include(joinpath(@__DIR__, "Calibration.jl"))
+include(joinpath(@__DIR__, "LightCurves.jl"))       # Phase 2
+include(joinpath(@__DIR__, "Detrend.jl"))
+include(joinpath(@__DIR__, "Views.jl"))
 
 println("VettingSetup loaded:$(length(FEATURES)) features, data at $(KOI_PATH)")
