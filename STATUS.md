@@ -1,10 +1,10 @@
 ﻿# Exoplanet vetting status
-Updated: 2026-10-19 12:43, DESKTOP-BBASC81
+Updated: 2026-10-19 13:05, DESKTOP-BBASC81
 
 ## Headline
 Phase 1 (catalog-feature classifier) is finished and tested once on the sealed test set, which confirmed the
-cross-validation numbers. Phase 2 (adding Kepler light curves, `PHASE2_PLAN.md`) is approved and its M0 pilot is
-running.
+cross-validation numbers. Phase 2 (adding Kepler light curves, `PHASE2_PLAN.md`): the M0 pilot passed its gate, and
+the full light-curve download (M1) is running.
 
 ## Best model
 Two frozen models (`models/step5_frozen.jld2`). Each is a 50/50 average of a rank-gauss-input MLP (64-32, 10 seeds) and
@@ -27,16 +27,18 @@ Sealed test, scored once on 10/13 (796 DR25 KOIs; star-bootstrap 95% CI), next t
 Post-test experiment (CV only): training on CONFIRMED vs FP only is worse at the task (−0.015 / −0.007 AUC). Not
 adopted.
 
+Phase 2 M0 pilot (10/19, 49 pool stars, 71 KOIs, notebook `exo101926.ipynb`): 49/49 downloaded, no errors. Measured
+~1 s download + ~1.4 s detrend/views per star → full set ~2.3 h download, 55 GB raw streamed to a ~15 GB cache.
+Views look right (EBs V-shaped, planets U-shaped; centroid shift ~0.05 mpix planets vs ~0.8 mpix CO/SS FPs).
+
 ## Running now
-Phase 2 M0 pilot (`sweeps/p2_pilot.jl`, started 10/19, low priority, 2 threads): downloading 49 pool stars' Kepler
-light curves from MAST, building the compact cache, detrending and folded views, and timing each step. Expected to
-take well under an hour.
+Phase 2 M1 (`sweeps/p2_download.jl`, started 10/19 12:58, below-normal priority, 2 threads, network-bound):
+downloading all 7,927 stars' light curves into the cache. Expected finish ~15:45. Resumable if killed.
 
 ## Waiting on user
 Nothing. D1–D7 approved 10/19 (all recommendations).
 
 ## Next up
-1. M0: notebook of raw vs detrended light curves and views for example KOIs; check the gate (pipeline works, views
-   look right, size/time estimate).
-2. M1: full light-curve download of all 7,927 stars, overnight at low priority, resumable.
-3. M2: views + QA for all KOIs; M3: Phase 2a light-curve features with the existing CV protocol.
+1. M1 check: ≥ 98% of KOIs have data; list failures.
+2. M2: detrend + views + QA for all KOIs (average view per class on the pool, TTV and no-transit QA flags).
+3. M3: Phase 2a light-curve features with the existing CV protocol, compared with Phase 1.

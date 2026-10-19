@@ -39,14 +39,19 @@ end
 local_centres(dur) = range(-LOCAL_SPAN * dur, LOCAL_SPAN * dur; length = N_LOCAL)
 local_view(phase, y, dur) = bin_median(phase, y, local_centres(dur), LOCAL_WIDTH * dur)
 
-"Phase of the deepest off-transit dip (box of one duration), or NaN if the orbit is too short to have one."
+"""
+Phase of the deepest off-transit dip (box of one duration), or NaN if the orbit is too short to have one.
+Boxes start ≥ 3 durations from the transit (P/4 for short orbits), because the catalog duration often
+underestimates V-shaped EB eclipses and the primary's wings would otherwise be picked up.
+"""
 function secondary_phase(phase, f, P, dur)
-    P < 4 * dur && return NaN
+    P < 2 * dur && return NaN
+    excl = min(3 * dur, P / 4)
     o = sortperm(phase); ph = phase[o]; ff = f[o]
     ph2 = [ph .- P; ph; ph .+ P]; f2 = [ff; ff; ff]             # wrap around the orbit
     best, bestc = Inf, NaN
     for c in range(-P / 2, P / 2; step = dur / 4)
-        abs(c) < 1.5 * dur && continue
+        abs(c) < excl && continue
         a = searchsortedfirst(ph2, c - dur / 2); b = searchsortedlast(ph2, c + dur / 2)
         b - a < 3 && continue
         m = mean(@view f2[a:b])

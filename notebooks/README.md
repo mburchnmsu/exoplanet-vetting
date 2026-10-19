@@ -9,3 +9,6 @@ Dated notebooks (`exoMMDDYY.ipynb`), oldest first. Setup cells load the code wit
 - `exo100926.ipynb` (10/09/2026): the original tabular MLP baseline. Star-grouped split, training history, validation ROC/PR and confusion matrix, and test-set metrics.
 - `exo101026.ipynb` (10/10/2026): steps 1–2. Noise floor of the CV protocol (fold/seed spread, null differences) and error analysis (robovetter flags, binned errors, supplemental KOIs, `koi_score` comparison).
 - `exo101326.ipynb` (10/13/2026): steps 3–5 and the test. Baselines (logistic regression, trees), MLP tuning, input transforms, feature tests, centroid model and DR25 scoping, calibration and the operating-point menu, the one-time sealed-test evaluation, and the post-test CONFIRMED-only experiment.
+- `exo101926.ipynb` (10/19/2026): Phase 2 M0 pilot. 49 pool stars' light curves: download size/time and the
+  extrapolation to all stars, raw vs detrended light curves, global/local/odd-even/secondary views per class,
+  average views, centroid shifts, QA columns, and the M0 findings.

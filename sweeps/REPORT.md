@@ -482,6 +482,25 @@ OOF score. CV only.
 - **Not adopted.** The frozen train-all models stay the headline. CONFIRMED-only is a candidate secondary score for
   follow-up priority.
 
+## Phase 2, M0 pilot: light curves (10/19/2026, notebook `exo101926.ipynb`, `sweeps/p2_pilot.jl`)
+
+The user approved D1–D7 of `PHASE2_PLAN.md` as recommended. New code: `src/LightCurves.jl` (MAST download, compact
+per-star cache), `src/Detrend.jl` (quality mask 175, per-quarter normalisation, all KOIs' transits masked, sliding
+Tukey biweight, upward-only clipping), `src/Views.jl` (global 2001 bins, local/odd/even/secondary/centroid 201 bins
+over ±2 durations, scaled to the local view's depth).
+
+- **Pilot:** 49 pool stars across all classes, 71 KOIs; 49/49 downloaded, no errors, median 17 quarters.
+- **Cost, extrapolated to 7,927 stars:** download ~2.3 h (~1 s per star), 55 GB raw streamed into a ~15 GB cache;
+  detrend + views ~3 h in one process. Cheaper than the plan's 4–10 h guess; the cache is larger than the 5–10 GB
+  guess because it keeps flux errors and both centroid columns.
+- **Views look right:** EB averages are V-shaped, planets U-shaped; in-transit centroid shifts are ~0.04–0.06 mpix
+  for planets / NT FPs vs ~0.8–0.9 mpix for CO / SS FPs.
+- **Caveats for M2:** TTVs smear the folded transit (Kepler-9 b), so the scatter of per-transit times should become a
+  QA feature; catalog durations underestimate wide EB eclipses (the secondary search now starts ≥ 3 durations out,
+  after the first version picked up primary wings); the deepest off-transit dip is always somewhat negative, so
+  features must use its significance; one KOI had no observed transit.
+- **Gate passed;** M1 (full download) started the same day at below-normal priority.
+
 ## Recommendations (for steps 4–5)
 
 1. **Step 3:** done (see above).
@@ -527,3 +546,7 @@ OOF score. CV only.
 | `src/Calibration.jl` | Step 5: `repeat_scores`, Platt / isotonic calibrators, `nested_calibrate`, `pick_threshold`, `nested_calls`, `ece`, `brier` |
 | `sweeps/step5_freeze.jl` | Trains and saves the two final models + menu thresholds (`models/step5_frozen.jld2`) |
 | `sweeps/results/step5_operating_points.csv` | The operating-point menu, incl. supplemental-KOI columns |
+| `src/LightCurves.jl`, `src/Detrend.jl`, `src/Views.jl` | Phase 2: download + cache, detrending, views |
+| `sweeps/p2_pilot.jl`, `sweeps/p2_download.jl` | Phase 2 M0 pilot and M1 full download (resumable; manifest in `data/lightcurves/`) |
+| `sweeps/results/p2_pilot_stars.csv`, `p2_pilot_timing.csv` | Pilot stars and measured size/time |
+| `data/lightcurves/` | Light-curve cache, manifest, pilot views (git-ignored) |
