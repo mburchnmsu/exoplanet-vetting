@@ -32,11 +32,12 @@ Phase 2 M0 pilot (10/19, 49 pool stars, 71 KOIs, notebook `exo101926.ipynb`): 49
 Views look right (EBs V-shaped, planets U-shaped; centroid shift ~0.05 mpix planets vs ~0.8 mpix CO/SS FPs).
 
 ## Running now
-Phase 2 M1 (`sweeps/p2_download.jl`, started 10/19 12:58, below-normal priority, 2 threads, network-bound):
-downloading all 7,927 stars' light curves into the cache. Expected finish ~15:45. Resumable if killed.
+Nothing. Phase 2 M1 (`sweeps/p2_download.jl`) was stopped by Claude Code at ~13:05 on 10/19 because the PC ran low
+on memory (Zodi and Solar jobs also running), not because of an error. 437 of 7,927 stars were cached, 0 errors.
+It resumes from there; waiting for the user to say when to restart.
 
 ## Waiting on user
-Nothing. D1–D7 approved 10/19 (all recommendations).
+- When to restart the M1 download (killed for low memory; ~2.3 h left; light on memory itself).
 
 ## Next up
 1. M1 check: ≥ 98% of KOIs have data; list failures.
