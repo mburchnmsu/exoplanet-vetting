@@ -16,15 +16,15 @@ planet recall.
   [0.982, 0.994]. At 98% recall: precision 0.87, 16% of false positives kept.
 
 ## Latest results
-Sealed test, scored once on 10/13 (796 DR25 KOIs; star-bootstrap 95% CI), next to 5-fold CV (5 shuffles Ã— 10 seeds):
+Sealed test, scored once on 10/13 (796 DR25 KOIs; star-bootstrap 95% CI), next to 5-fold CV (5 shuffles × 10 seeds):
 
 | Model | Test ROC-AUC | CV ROC-AUC | Test recall / precision at the 98% threshold |
 |---|---|---|---|
 | Catalog-only | 0.957 | 0.954 | 0.988 / 0.771 |
 | Catalog + centroid | 0.988 | 0.983 | 0.993 / 0.869 |
-| Kepler `koi_score` (reference) | 0.979 | â€” | â€” |
+| Kepler `koi_score` (reference) | 0.979 | — | — |
 
-Post-test experiment (CV only): training on CONFIRMED vs FP only is worse at the task (âˆ’0.015 / âˆ’0.007 AUC). Not
+Post-test experiment (CV only): training on CONFIRMED vs FP only is worse at the task (−0.015 / −0.007 AUC). Not
 adopted.
 
 ## Running now
@@ -33,7 +33,7 @@ light curves from MAST, building the compact cache, detrending and folded views,
 take well under an hour.
 
 ## Waiting on user
-Nothing. D1â€“D7 approved 10/19 (all recommendations).
+Nothing. D1–D7 approved 10/19 (all recommendations).
 
 ## Next up
 1. M0: notebook of raw vs detrended light curves and views for example KOIs; check the gate (pipeline works, views
