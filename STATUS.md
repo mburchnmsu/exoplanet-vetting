@@ -32,12 +32,14 @@ Phase 2 M0 pilot (10/19, 49 pool stars, 71 KOIs, notebook `exo101926.ipynb`): 49
 Views look right (EBs V-shaped, planets U-shaped; centroid shift ~0.05 mpix planets vs ~0.8 mpix CO/SS FPs).
 
 ## Running now
-Phase 2 M1 (`sweeps/p2_download.jl`), restarted 10/19 21:06 as the overnight job (below-normal priority, 2 threads,
-network-bound; 9.2 GB free and other projects' jobs idle at restart). Resumed from 437 of 7,927 stars cached
-(paused earlier for low memory). Expected finish ~23:30. Resumable if killed.
+Nothing. Phase 2 M1 (`sweeps/p2_download.jl`) restarted at 21:06 but was stopped again by Claude Code within minutes
+because the PC ran low on memory: two other Julia jobs (~2.5 GB each) started at about the same time, and memory
+compression was at ~6 GB. Not an error. 524 of 7,927 stars are cached, 0 errors; it resumes from there.
 
 ## Waiting on user
-Nothing.
+- How to run M1 tonight: Claude Code stops its own background jobs whenever the whole PC is low on memory, even if
+  the download itself is small. Options: restart it once the other jobs finish, or launch it from a normal terminal
+  (not through Claude Code), or start Claude Code with `CLAUDE_CODE_DISABLE_BG_SHELL_PRESSURE_REAP=1`.
 
 ## Next up
 1. M1 check: ≥ 98% of KOIs have data; list failures.
