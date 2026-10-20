@@ -32,15 +32,12 @@ Phase 2 M0 pilot (10/19, 49 pool stars, 71 KOIs, notebook `exo101926.ipynb`): 49
 Views look right (EBs V-shaped, planets U-shaped; centroid shift ~0.05 mpix planets vs ~0.8 mpix CO/SS FPs).
 
 ## Running now
-Nothing. Phase 2 M1 (`sweeps/p2_download.jl`) restarted at 21:06 but was stopped again by Claude Code within minutes
-because the PC ran low on memory: two other Julia jobs (~2.5 GB each) started at about the same time, and memory
-compression was at ~6 GB. Not an error. 524 of 7,927 stars are cached, 0 errors; it resumes from there.
-Per the user (10/19 evening): Zodi is the only project running tonight. M1 stays paused at 524/7,927; no restart
-checks are scheduled.
+Phase 2 M1 (`sweeps/p2_download.jl`), resumed 10/20 15:04 at the user's go-ahead (below-normal priority, 2 threads,
+network-bound; 15 GB free, no other active Julia jobs). Resumed from 524 of 7,927 stars cached (it had been stopped
+twice on 10/19 for PC-wide low memory). Expected finish ~17:20. Solar waits for it.
 
 ## Waiting on user
-- When to restart M1 (~2.2 h left; resumable). Note: Claude Code stops its own background jobs whenever the whole
-  PC is low on memory, so a restart works best when the other projects are idle, or launched from a normal terminal.
+Nothing.
 
 ## Next up
 1. M1 check: ≥ 98% of KOIs have data; list failures.
