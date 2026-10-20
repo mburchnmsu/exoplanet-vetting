@@ -1,10 +1,10 @@
 ﻿# Exoplanet vetting status
-Updated: 2026-10-19 13:05, DESKTOP-BBASC81
+Updated: 2026-10-20 16:55, DESKTOP-BBASC81
 
 ## Headline
 Phase 1 (catalog-feature classifier) is finished and tested once on the sealed test set, which confirmed the
-cross-validation numbers. Phase 2 (adding Kepler light curves, `PHASE2_PLAN.md`): the M0 pilot passed its gate, and
-the full light-curve download (M1) is running.
+cross-validation numbers. Phase 2 (adding Kepler light curves, `PHASE2_PLAN.md`): M0 pilot and M1 download done;
+every star's light curves are cached. Next is M2 (views + QA for all KOIs).
 
 ## Best model
 Two frozen models (`models/step5_frozen.jld2`). Each is a 50/50 average of a rank-gauss-input MLP (64-32, 10 seeds) and
@@ -31,15 +31,16 @@ Phase 2 M0 pilot (10/19, 49 pool stars, 71 KOIs, notebook `exo101926.ipynb`): 49
 ~1 s download + ~1.4 s detrend/views per star → full set ~2.3 h download, 55 GB raw streamed to a ~15 GB cache.
 Views look right (EBs V-shaped, planets U-shaped; centroid shift ~0.05 mpix planets vs ~0.8 mpix CO/SS FPs).
 
+Phase 2 M1 download, finished 10/20 16:50: **7,927 / 7,927 stars cached, 0 errors** (gate ≥ 98% of KOIs: passed,
+100%). 53 GB raw streamed into a 14.3 GB cache. Median 17 quarters per star; 160 stars have < 4 quarters (QA
+group for M2).
+
 ## Running now
-Phase 2 M1 (`sweeps/p2_download.jl`), resumed 10/20 15:04 at the user's go-ahead (below-normal priority, 2 threads,
-network-bound; 15 GB free, no other active Julia jobs). Resumed from 524 of 7,927 stars cached (it had been stopped
-twice on 10/19 for PC-wide low memory). Expected finish ~17:20. Solar waits for it.
+Nothing.
 
 ## Waiting on user
 Nothing.
 
 ## Next up
-1. M1 check: ≥ 98% of KOIs have data; list failures.
-2. M2: detrend + views + QA for all KOIs (average view per class on the pool, TTV and no-transit QA flags).
-3. M3: Phase 2a light-curve features with the existing CV protocol, compared with Phase 1.
+1. M2: detrend + views + QA for all KOIs (average view per class on the pool, TTV and no-transit QA flags).
+2. M3: Phase 2a light-curve features with the existing CV protocol, compared with Phase 1.
