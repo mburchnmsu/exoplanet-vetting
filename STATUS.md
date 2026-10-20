@@ -32,13 +32,12 @@ Phase 2 M0 pilot (10/19, 49 pool stars, 71 KOIs, notebook `exo101926.ipynb`): 49
 Views look right (EBs V-shaped, planets U-shaped; centroid shift ~0.05 mpix planets vs ~0.8 mpix CO/SS FPs).
 
 ## Running now
-Nothing. Phase 2 M1 (`sweeps/p2_download.jl`) was stopped by Claude Code at ~13:05 on 10/19 because the PC ran low
-on memory (Zodi and Solar jobs also running), not because of an error. 437 of 7,927 stars were cached, 0 errors.
-Per the user, it stays paused until tonight (nothing starts before 17:20). A check at ~20:07 will restart it as the
-overnight low-priority job once the afternoon jobs are done and enough memory is free.
+Phase 2 M1 (`sweeps/p2_download.jl`), restarted 10/19 21:06 as the overnight job (below-normal priority, 2 threads,
+network-bound; 9.2 GB free and other projects' jobs idle at restart). Resumed from 437 of 7,927 stars cached
+(paused earlier for low memory). Expected finish ~23:30. Resumable if killed.
 
 ## Waiting on user
-Nothing. (M1 restart is scheduled for tonight, per the user.)
+Nothing.
 
 ## Next up
 1. M1 check: ≥ 98% of KOIs have data; list failures.
