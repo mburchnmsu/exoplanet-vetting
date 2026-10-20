@@ -35,11 +35,12 @@ Views look right (EBs V-shaped, planets U-shaped; centroid shift ~0.05 mpix plan
 Nothing. Phase 2 M1 (`sweeps/p2_download.jl`) restarted at 21:06 but was stopped again by Claude Code within minutes
 because the PC ran low on memory: two other Julia jobs (~2.5 GB each) started at about the same time, and memory
 compression was at ~6 GB. Not an error. 524 of 7,927 stars are cached, 0 errors; it resumes from there.
+Per the user (10/19 evening): Zodi is the only project running tonight. M1 stays paused at 524/7,927; no restart
+checks are scheduled.
 
 ## Waiting on user
-- How to run M1 tonight: Claude Code stops its own background jobs whenever the whole PC is low on memory, even if
-  the download itself is small. Options: restart it once the other jobs finish, or launch it from a normal terminal
-  (not through Claude Code), or start Claude Code with `CLAUDE_CODE_DISABLE_BG_SHELL_PRESSURE_REAP=1`.
+- When to restart M1 (~2.2 h left; resumable). Note: Claude Code stops its own background jobs whenever the whole
+  PC is low on memory, so a restart works best when the other projects are idle, or launched from a normal terminal.
 
 ## Next up
 1. M1 check: ≥ 98% of KOIs have data; list failures.
