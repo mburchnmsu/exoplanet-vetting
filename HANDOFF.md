@@ -48,6 +48,12 @@ with zero sizes.
   `CLAUDE.md`). Send a push notification on major progress. Dated notebooks go flat in `notebooks/` with the
   `notebooks/README.md` index (sources in `sweeps/nbcells/`). In notebooks the user edited, change only path lines.
   Ask the user before acting on open design decisions. Keep this project separate from zodi and solar.
+- **Push early and often on the laptop (user rule, 10/21; the laptop is old and could fail):** commit and push after
+  every milestone (setup done, M1 done, each M2/M3 step, each notable result), at the end of every work session, and
+  before starting any multi-hour run, with `STATUS.md` current in each push. Whenever you create anything big or
+  important that is git-ignored or too large for git (e.g. M2 view shards, trained CNN weights, anything that can't be
+  regenerated in a few hours), tell the user and the hub session so it can be backed up. The light-curve cache is
+  already covered: the Thinkpad keeps a full copy at `C:\JuliaProjects\Exoplanet vetting\data\lightcurves`.
 
 ## 5. Adjustments for 8 GB RAM
 - **Claude Code stops its own background jobs when the whole machine is low on memory** (this happened twice on
