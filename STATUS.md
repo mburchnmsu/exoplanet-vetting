@@ -1,10 +1,10 @@
 ﻿# Exoplanet vetting status
-Updated: 2026-10-20 16:55, DESKTOP-BBASC81
+Updated: 2026-10-21, DESKTOP-BBASC81 (last update from the desktop)
 
 ## Headline
-Phase 1 (catalog-feature classifier) is finished and tested once on the sealed test set, which confirmed the
-cross-validation numbers. Phase 2 (adding Kepler light curves, `PHASE2_PLAN.md`): M0 pilot and M1 download done;
-every star's light curves are cached. Next is M2 (views + QA for all KOIs).
+**Moving to the user's 8 GB laptop (10/21);** a new laptop session takes over, starting from `HANDOFF.md`. No new
+jobs run on the desktop. Phase 1 is finished and tested once. Phase 2 (`PHASE2_PLAN.md`): M0 pilot and M1 download
+are done, and every star's light curves are cached. Next is M2 (views + QA for all KOIs).
 
 ## Best model
 Two frozen models (`models/step5_frozen.jld2`). Each is a 50/50 average of a rank-gauss-input MLP (64-32, 10 seeds) and
@@ -36,11 +36,13 @@ Phase 2 M1 download, finished 10/20 16:50: **7,927 / 7,927 stars cached, 0 error
 group for M2).
 
 ## Running now
-Nothing.
+Nothing (and nothing new will start on the desktop).
 
 ## Waiting on user
-Nothing.
+- Laptop setup: copy `data/lightcurves/` (14.3 GB cache + manifest + pilot views) from the desktop (recommended), or
+  re-run the download there (~2.3 h, resumable). Setup steps are in `HANDOFF.md`.
 
 ## Next up
-1. M2: detrend + views + QA for all KOIs (average view per class on the pool, TTV and no-transit QA flags).
-2. M3: Phase 2a light-curve features with the existing CV protocol, compared with Phase 1.
+1. Laptop: setup + smoke test (`HANDOFF.md` §2), light-curve cache in place.
+2. M2: detrend + views + QA for all KOIs (average view per class on the pool, TTV and no-transit QA flags).
+3. M3: Phase 2a light-curve features with the existing CV protocol, compared with Phase 1.
