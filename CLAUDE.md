@@ -16,6 +16,13 @@ The user works on two PCs. Keep the repo in sync without being asked:
 - Start of a session: `git pull --ff-only` (a hook may already have done it).
 - End of a session, or when the user signs off: commit the session's changes with a clear message and `git push`.
 - If a pull or push conflicts, stop and tell the user. Don't force-push or resolve it silently.
+- Push early and often (the laptop is old and could fail): commit and push after every milestone (setup done, M1 done,
+  each M2/M3 step, each notable result), at the end of every work session, and before starting any multi-hour run,
+  with `STATUS.md` current in each push.
+- Whenever you create anything big or important that is git-ignored or too large for git (e.g. M2 view shards, trained
+  CNN weights, anything that can't be regenerated in a few hours), tell the user and the hub session so it can be backed
+  up. The light-curve cache is already covered: the Thinkpad keeps a full copy at
+  `C:\JuliaProjects\Exoplanet vetting\data\lightcurves`.
 
 Keep this project separate from the zodi emulator project: different repos, different sessions.
 
