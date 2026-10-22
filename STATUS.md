@@ -1,10 +1,11 @@
 ﻿# Exoplanet vetting status
-Updated: 2026-10-21, DESKTOP-BBASC81 (last update from the desktop)
+Updated: 2026-10-21 20:45, Intel (8 GB laptop)
 
 ## Headline
-**Moving to the user's 8 GB laptop (10/21);** a new laptop session takes over, starting from `HANDOFF.md`. No new
-jobs run on the desktop. Phase 1 is finished and tested once. Phase 2 (`PHASE2_PLAN.md`): M0 pilot and M1 download
-are done, and every star's light curves are cached. Next is M2 (views + QA for all KOIs).
+**Setup on the Intel laptop (8 GB) in progress (10/21).** Repo cloned; Julia 1.12.7 pinned to the repo folder with
+`juliaup override` (Manifest resolved on 1.12.6; laptop default is 1.13). Precompile is ~351 packages in, with the heavy
+ones (Flux, CairoMakie) left: Claude Code stopped it twice for low memory. Smoke test not run yet. Phase 1 finished and
+tested once; Phase 2 M0 + M1 done on the desktop, and the laptop re-downloads M1 (no cache copied).
 
 ## Best model
 Two frozen models (`models/step5_frozen.jld2`). Each is a 50/50 average of a rank-gauss-input MLP (64-32, 10 seeds) and
@@ -36,13 +37,18 @@ Phase 2 M1 download, finished 10/20 16:50: **7,927 / 7,927 stars cached, 0 error
 group for M2).
 
 ## Running now
-Nothing (and nothing new will start on the desktop).
+Nothing on the Intel laptop. Safe to restart.
 
 ## Waiting on user
-- Laptop setup: copy `data/lightcurves/` (14.3 GB cache + manifest + pilot views) from the desktop (recommended), or
-  re-run the download there (~2.3 h, resumable). Setup steps are in `HANDOFF.md`.
+- Finish the precompile outside Claude Code's low-memory killer: either run the smoke test in a plain PowerShell window
+  with `$env:JULIA_NUM_PRECOMPILE_TASKS = 1` (`HANDOFF.md` §2 step 4; should print `(9201, 15)`), or start Claude Code
+  with `$env:CLAUDE_CODE_DISABLE_BG_SHELL_PRESSURE_REAP = 1` set beforehand.
 
 ## Next up
-1. Laptop: setup + smoke test (`HANDOFF.md` §2), light-curve cache in place.
-2. M2: detrend + views + QA for all KOIs (average view per class on the pool, TTV and no-transit QA flags).
-3. M3: Phase 2a light-curve features with the existing CV protocol, compared with Phase 1.
+Resume after a restart:
+1. Start Claude Code with `$env:CLAUDE_CODE_DISABLE_BG_SHELL_PRESSURE_REAP = 1` set first (needed for the long runs).
+2. In the repo, `julia --version` should say 1.12.7 (the juliaup override persists). Finish the precompile + smoke test
+   with `JULIA_NUM_PRECOMPILE_TASKS=1`; packages compiled so far are kept in `~/.julia/compiled/v1.12`.
+3. Push the setup milestone, then start M1: `julia --project=. -t 2 sweeps/p2_download.jl` (all 7,927 stars, ~2.3 h,
+   resumable, < 1 GB RAM). Tell the hub when it starts and finishes.
+4. M2: detrend + views + QA for all KOIs. 5. M3: Phase 2a light-curve features with the existing CV protocol.
