@@ -3,6 +3,10 @@
 Written on the desktop (DESKTOP-BBASC81) when the project moved to the user's second laptop (8 GB RAM, 1 TB disk).
 Read this, then `CLAUDE.md`, `STATUS.md`, `PHASE2_PLAN.md` and `sweeps/REPORT.md`.
 
+**Update 2026-10-22: the laptop setup was abandoned and the project moved back to the main PC (Thinkpad).** The
+precompile on the 8 GB "Intel" laptop was stopped for low memory three times; M1 was never re-run there. The notes
+below are kept for reference.
+
 ## 1. State at handoff
 - Phase 1 is finished and frozen (`models/step5_frozen.jld2`). The sealed test split was used once (10/13) and is spent.
 - Phase 2: D1–D7 approved (10/19). M0 pilot passed (`notebooks/exo101926.ipynb`). M1 download finished 10/20:

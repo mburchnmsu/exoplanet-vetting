@@ -1,11 +1,10 @@
 ﻿# Exoplanet vetting status
-Updated: 2026-10-21 20:45, Intel (8 GB laptop)
+Updated: 2026-10-22, Intel (8 GB laptop)
 
 ## Headline
-**Setup on the Intel laptop (8 GB) in progress (10/21).** Repo cloned; Julia 1.12.7 pinned to the repo folder with
-`juliaup override` (Manifest resolved on 1.12.6; laptop default is 1.13). Precompile is ~351 packages in, with the heavy
-ones (Flux, CairoMakie) left: Claude Code stopped it twice for low memory. Smoke test not run yet. Phase 1 finished and
-tested once; Phase 2 M0 + M1 done on the desktop, and the laptop re-downloads M1 (no cache copied).
+**Project moved back to the main PC (Thinkpad) on 10/22; the Intel laptop setup was abandoned** (precompile stopped
+for low memory three times, even with 1 precompile task). Phase 1 finished and tested once; Phase 2 M0 + M1 done (the
+Thinkpad holds the full light-curve cache). Next is M2 on the Thinkpad.
 
 ## Best model
 Two frozen models (`models/step5_frozen.jld2`). Each is a 50/50 average of a rank-gauss-input MLP (64-32, 10 seeds) and
@@ -37,18 +36,12 @@ Phase 2 M1 download, finished 10/20 16:50: **7,927 / 7,927 stars cached, 0 error
 group for M2).
 
 ## Running now
-Nothing on the Intel laptop. Safe to restart.
+Nothing. The Intel laptop session has stood down.
 
 ## Waiting on user
-- Finish the precompile outside Claude Code's low-memory killer: either run the smoke test in a plain PowerShell window
-  with `$env:JULIA_NUM_PRECOMPILE_TASKS = 1` (`HANDOFF.md` §2 step 4; should print `(9201, 15)`), or start Claude Code
-  with `$env:CLAUDE_CODE_DISABLE_BG_SHELL_PRESSURE_REAP = 1` set beforehand.
+Nothing.
 
 ## Next up
-Resume after a restart:
-1. Start Claude Code with `$env:CLAUDE_CODE_DISABLE_BG_SHELL_PRESSURE_REAP = 1` set first (needed for the long runs).
-2. In the repo, `julia --version` should say 1.12.7 (the juliaup override persists). Finish the precompile + smoke test
-   with `JULIA_NUM_PRECOMPILE_TASKS=1`; packages compiled so far are kept in `~/.julia/compiled/v1.12`.
-3. Push the setup milestone, then start M1: `julia --project=. -t 2 sweeps/p2_download.jl` (all 7,927 stars, ~2.3 h,
-   resumable, < 1 GB RAM). Tell the hub when it starts and finishes.
-4. M2: detrend + views + QA for all KOIs. 5. M3: Phase 2a light-curve features with the existing CV protocol.
+On the Thinkpad (cache at `C:\JuliaProjects\Exoplanet vetting\data\lightcurves`, M1 already done):
+1. M2: detrend + views + QA for all KOIs.
+2. M3: Phase 2a light-curve features with the existing CV protocol.
