@@ -1,10 +1,10 @@
 ﻿# Exoplanet vetting status
-Updated: 2026-10-22, Intel (8 GB laptop)
+Updated: 2026-10-22 18:58, DESKTOP-BBASC81 (Thinkpad)
 
 ## Headline
-**Project moved back to the main PC (Thinkpad) on 10/22; the Intel laptop setup was abandoned** (precompile stopped
-for low memory three times, even with 1 precompile task). Phase 1 finished and tested once; Phase 2 M0 + M1 done (the
-Thinkpad holds the full light-curve cache). Next is M2 on the Thinkpad.
+**Exoplanet is back on the Thinkpad (10/22), and this session is in charge again;** the Intel laptop setup was
+abandoned (precompile stopped for low memory three times). Phase 1 is finished and tested once. Phase 2 M0 + M1 are
+done: the local light-curve cache is intact (7,927 stars, 14.3 GB). Next is M2, once the user gives the go-ahead.
 
 ## Best model
 Two frozen models (`models/step5_frozen.jld2`). Each is a 50/50 average of a rank-gauss-input MLP (64-32, 10 seeds) and
@@ -36,10 +36,10 @@ Phase 2 M1 download, finished 10/20 16:50: **7,927 / 7,927 stars cached, 0 error
 group for M2).
 
 ## Running now
-Nothing. The Intel laptop session has stood down.
+Nothing. No heavy exoplanet jobs while Zodi's long overnight run is on this PC.
 
 ## Waiting on user
-Nothing.
+- Go-ahead and timing for M2 (detrend + views + QA for all KOIs; ~3 h single process, light on memory).
 
 ## Next up
 On the Thinkpad (cache at `C:\JuliaProjects\Exoplanet vetting\data\lightcurves`, M1 already done):
