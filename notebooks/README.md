@@ -12,3 +12,6 @@ Dated notebooks (`exoMMDDYY.ipynb`), oldest first. Setup cells load the code wit
 - `exo101926.ipynb` (10/19/2026): Phase 2 M0 pilot. 49 pool stars' light curves: download size/time and the
   extrapolation to all stars, raw vs detrended light curves, global/local/odd-even/secondary views per class,
   average views, centroid shifts, QA columns, and the M0 findings.
+- `exo102426.ipynb` (10/24/2026): Phase 2 M2. Views for all 9,271 KOIs: coverage, label-free QA flags (observed
+  transits, depth ratio, timing scatter vs per-transit SNR), median views per class on the pool (local, secondary,
+  global, odd − even, centroid, planets by duration), and the M2 gate.

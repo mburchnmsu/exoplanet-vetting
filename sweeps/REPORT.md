@@ -501,6 +501,19 @@ over ±2 durations, scaled to the local view's depth).
   features must use its significance; one KOI had no observed transit.
 - **Gate passed;** M1 (full download) started the same day at below-normal priority.
 
+## Phase 2, M1 + M2: download and views for all KOIs (10/20–10/24/2026, notebook `exo102426.ipynb`)
+
+- **M1** (`sweeps/p2_download.jl`): 7,927 / 7,927 stars, 0 errors, 53 GB raw → 14.3 GB cache (paused twice on
+  10/19 for PC-wide low memory, finished 10/20).
+- **M2** (`sweeps/p2_build.jl`, 1.4 h with 2 threads): views + QA for 9,271 KOIs (all 9,201 cleaned KOIs), 0 errors
+  after a masking fallback for one KOI whose catalog duration exceeds its period. Outputs `data/views_all.jld2`
+  (git-ignored) and `sweeps/results/p2_qa.csv`.
+- **QA (label-free):** 20 KOIs < 2 observed transits; 291 (3.1%) depth > 2× off the catalog; 222 (2.4%) large timing
+  scatter at per-transit SNR ≥ 7 (catches Kepler-9 b's TTVs).
+- **Gate passed:** planets U-shaped, EBs V-shaped and narrower; no artifacts in the global views; long-duration
+  planets fold like short ones. Secondary and odd/even signals are real but noise-dominated in class medians, so the
+  M3 features must be significances.
+
 ## Recommendations (for steps 4–5)
 
 1. **Step 3:** done (see above).
@@ -549,4 +562,5 @@ over ±2 durations, scaled to the local view's depth).
 | `src/LightCurves.jl`, `src/Detrend.jl`, `src/Views.jl` | Phase 2: download + cache, detrending, views |
 | `sweeps/p2_pilot.jl`, `sweeps/p2_download.jl` | Phase 2 M0 pilot and M1 full download (resumable; manifest in `data/lightcurves/`) |
 | `sweeps/results/p2_pilot_stars.csv`, `p2_pilot_timing.csv` | Pilot stars and measured size/time |
-| `data/lightcurves/` | Light-curve cache, manifest, pilot views (git-ignored) |
+| `data/lightcurves/` | Light-curve cache, manifest, pilot views, M2 view shards (git-ignored) |
+| `sweeps/p2_build.jl`, `data/views_all.jld2`, `sweeps/results/p2_qa.csv` | M2 build, all views (git-ignored), QA table |

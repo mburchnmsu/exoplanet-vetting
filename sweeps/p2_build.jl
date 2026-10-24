@@ -77,14 +77,17 @@ jldsave(joinpath(DATA_DIR, "views_all.jld2"); names = names_, kepid = [v.kepid f
 
 qa = DataFrame([:kepid => [v.kepid for v in views]; :kepoi_name => names_;
                 [k => [getfield(v, k) for v in views] for k in QA_KEYS]])
-cat = df_raw[:, [:kepoi_name, :koi_depth]]
+cat = df_raw[:, [:kepoi_name, :koi_depth, :koi_duration]]
 qa = leftjoin(qa, cat; on = :kepoi_name, order = :left)
 qa.depth_ppm = 1e6 .* qa.depth
-qa.depth_ratio = qa.depth_ppm ./ qa.koi_depth
+qa.depth_ratio = coalesce.(qa.depth_ppm ./ qa.koi_depth, NaN)
+# per-transit SNR from the CATALOG depth (our own depth is noise-dominated for the weakest signals); 0.02043 d = 1 cadence
+qa.snr1 = coalesce.(1e-6 .* qa.koi_depth ./ qa.sigma .* sqrt.(qa.koi_duration ./ 24 ./ 0.02043), NaN)
+select!(qa, Not(:koi_duration))
 qa.qa_few_transits = qa.n_transits .< 2
 qa.qa_empty = qa.empty_local .> 0.5
 qa.qa_depth_mismatch = coalesce.((qa.depth_ratio .< 0.5) .| (qa.depth_ratio .> 2), false)
-qa.qa_timing = coalesce.(qa.timing_scatter .> 0.25, false)
+qa.qa_timing = (qa.snr1 .>= 7) .& (qa.timing_scatter .> 0.25)    # only where single transits are clearly detected
 CSV.write(joinpath(CV_DIR, "p2_qa.csv"), qa)
 isempty(errs) || CSV.write(joinpath(CV_DIR, "p2_build_errors.csv"), DataFrame(errs))
 @printf("\nM2 build: %d KOIs with views on %d stars, %d star errors. QA flags: few transits %d, empty %d, depth mismatch %d, timing %d\n",

@@ -4,8 +4,8 @@ Updated: 2026-10-24 01:40, DESKTOP-BBASC81 (Thinkpad)
 ## Headline
 **Exoplanet is back on the Thinkpad (10/22), and this session is in charge again;** the Intel laptop setup was
 abandoned (precompile stopped for low memory three times). Phase 1 is finished and tested once. Phase 2 M0 + M1 are
-done: the local light-curve cache is intact (7,927 stars, 14.3 GB). M2 views + QA are built for every KOI; the M2
-QA notebook (average views per class, pool only) is next.
+done: the local light-curve cache is intact (7,927 stars, 14.3 GB). M2 views + QA are built for every KOI and passed
+the gate. Next is M3 (Phase 2a light-curve features), waiting on the user's go.
 
 ## Best model
 Two frozen models (`models/step5_frozen.jld2`). Each is a 50/50 average of a rank-gauss-input MLP (64-32, 10 seeds) and
@@ -39,17 +39,18 @@ group for M2).
 Phase 2 M2 build, finished 10/24 03:10 (1.4 h, alongside Zodi): **views + QA for 9,271 KOIs on all 7,927 stars, 0
 errors** (one star with nonsense catalog ephemerides, duration > period, needed a masking fallback). Views:
 `data/views_all.jld2` (119 MB, git-ignored, rebuildable in ~1.5 h). QA table: `sweeps/results/p2_qa.csv`. QA flags:
-20 KOIs with < 2 observed transits, 291 with measured depth > 2× off the catalog. The timing-scatter flag is too
-loose as built (3,095); it is being refined in the M2 QA notebook.
+20 KOIs with < 2 observed transits, 291 (3.1%) with depth > 2× off the catalog, 222 (2.4%) with large transit-timing
+scatter (catches Kepler-9 b). **M2 gate passed** (notebook `exo102426.ipynb`): planets U-shaped, EBs V-shaped, no
+artifacts; secondary and odd/even signals are noise-dominated in class medians, so M3 features must be significances.
 
 ## Running now
 Nothing.
 
 ## Waiting on user
-Nothing.
+- Go-ahead and timing for M3 (Phase 2a): compute ~10 light-curve features with uncertainties from the cache
+  (~1–1.5 h, 2 threads, ~2 GB), then trees + quantile MLP CV for both families (~1–2 h per family, as in Phase 1).
 
 ## Next up
-On the Thinkpad (cache at `C:\JuliaProjects\Exoplanet vetting\data\lightcurves`, M1 already done):
-1. M2 QA notebook (light): average views per class on the pool, QA flags; check the M2 gate (EB average shows a
-   secondary, planet average U-shaped, no systematic artifacts).
-2. M3: Phase 2a light-curve features with the existing CV protocol (needs the user's go; light-to-moderate CPU).
+1. M3: Phase 2a light-curve features (odd/even σ, secondary σ, V-shape, single-event dominance, timing scatter,
+   coverage; centroid significance for the "+ centroid" family only) with the existing CV protocol, paired vs Phase 1.
+2. M4: CNN timing gate and screens.
