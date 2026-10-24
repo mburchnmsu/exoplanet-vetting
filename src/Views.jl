@@ -61,6 +61,32 @@ function secondary_phase(phase, f, P, dur)
 end
 
 """
+    per_transit(t, f, e) -> (offsets, depths)
+
+For every observed transit with enough points within ±1.5 durations: the time offset (in durations) of the
+deepest one-duration box within ±0.5 durations of the predicted centre, and the mean flux in that box (depth > 0
+means a dip). Used for QA: timing scatter (TTVs or a wrong ephemeris) and single-event dominance.
+"""
+function per_transit(t, f, e; min_pts = 5)
+    epoch = round.(Int, (t .- e.t0) ./ e.period)
+    ph = t .- (e.t0 .+ epoch .* e.period)
+    offs = Float64[]; deps = Float64[]
+    for n in unique(epoch[abs.(ph) .< e.dur / 2])
+        s = (epoch .== n) .& (abs.(ph) .< 1.5 * e.dur)
+        x = ph[s]; y = f[s]
+        best, bo = Inf, NaN
+        for c in range(-0.5 * e.dur, 0.5 * e.dur; length = 21)
+            w = abs.(x .- c) .< e.dur / 2
+            count(w) >= min_pts || continue
+            m = mean(y[w])
+            m < best && ((best, bo) = (m, c))
+        end
+        isfinite(best) && (push!(offs, bo / e.dur); push!(deps, -best))
+    end
+    return offs, deps
+end
+
+"""
     koi_views(d, e, others) -> NamedTuple
 
 All views for KOI ephemeris `e` from detrended light curve `d`, with the
@@ -94,10 +120,14 @@ function koi_views(d, e, others)
     vsec = isnan(sph) ? zeros(N_LOCAL) : first(local_view(fold_phase.(t, e.period, e.t0 + sph), f, e.dur))
     cen(c) = (ok = isfinite.(c); v = first(local_view(ph[ok], c[ok], e.dur));
               v .- median(v[abs.(local_centres(e.dur)) .> e.dur / 2 * 1.5]))
+    offs, deps = per_transit(t, f, e)
+    mdep = isempty(deps) ? NaN : mean(deps)
     return (name = e.name, global_view = glo ./ scale, local_view = loc ./ scale, odd = vodd ./ scale,
             even = veven ./ scale, secondary = vsec ./ scale, cen1 = cen(d.cen1[keep]), cen2 = cen(d.cen2[keep]),
             depth = scale, sec_phase = sph / e.period, n_transits, empty_local = emp_local,
-            empty_global = emp_global, sigma = d.sigma)
+            empty_global = emp_global, sigma = d.sigma,
+            timing_scatter = length(offs) >= 3 ? 1.4826 * median(abs.(offs .- median(offs))) : NaN,
+            max_single_ratio = length(deps) >= 2 && mdep > 0 ? maximum(deps) / mdep : NaN)
 end
 
 "Detrend a star once and build views for each of its KOIs (names in `names`; all if empty)."
