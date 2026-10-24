@@ -86,6 +86,9 @@ function detrend_lc(lc, ephs; factor = 1.5, clip = 3.0)
         raw[s] ./= median(raw[s])
     end
     intr = isempty(ephs) ? falses(length(t)) : reduce(.|, (in_transit(t, e; factor) for e in ephs))
+    if count(.!intr) < 0.2 * length(t)        # nonsense ephemerides (e.g. duration > period): cap each mask at P/4
+        intr = reduce(.|, (abs.(fold_phase.(t, e.period, e.t0)) .< min(factor * e.dur / 2, e.period / 4)) for e in ephs)
+    end
     window = max(0.5, 3 * maximum(e.dur for e in ephs; init = 0.0))
     trend = fill(NaN, length(t)); ct1 = fill(NaN, length(t)); ct2 = fill(NaN, length(t))
     for s in segments(t, q)

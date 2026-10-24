@@ -71,12 +71,12 @@ for i in 1:nsh
     d = JLD2.load(shard_path(i))
     append!(views, d["views"]); append!(errs, d["errs"])
 end
-names_ = [v.name for v in views]
-mats = Dict(string(k) => reduce(hcat, [getfield(v, k) for v in views]) for k in VIEW_KEYS)
+names_ = [String(v.name) for v in views]
+mats = Dict(k => reduce(hcat, [getfield(v, k) for v in views]) for k in VIEW_KEYS)
 jldsave(joinpath(DATA_DIR, "views_all.jld2"); names = names_, kepid = [v.kepid for v in views], mats...)
 
-qa = DataFrame(kepid = [v.kepid for v in views], kepoi_name = names_,
-               (k => [getfield(v, k) for v in views] for k in QA_KEYS)...)
+qa = DataFrame([:kepid => [v.kepid for v in views]; :kepoi_name => names_;
+                [k => [getfield(v, k) for v in views] for k in QA_KEYS]])
 cat = df_raw[:, [:kepoi_name, :koi_depth]]
 qa = leftjoin(qa, cat; on = :kepoi_name, order = :left)
 qa.depth_ppm = 1e6 .* qa.depth

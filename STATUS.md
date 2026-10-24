@@ -4,7 +4,8 @@ Updated: 2026-10-24 01:40, DESKTOP-BBASC81 (Thinkpad)
 ## Headline
 **Exoplanet is back on the Thinkpad (10/22), and this session is in charge again;** the Intel laptop setup was
 abandoned (precompile stopped for low memory three times). Phase 1 is finished and tested once. Phase 2 M0 + M1 are
-done: the local light-curve cache is intact (7,927 stars, 14.3 GB). M2 (views + QA for all KOIs) is running.
+done: the local light-curve cache is intact (7,927 stars, 14.3 GB). M2 views + QA are built for every KOI; the M2
+QA notebook (average views per class, pool only) is next.
 
 ## Best model
 Two frozen models (`models/step5_frozen.jld2`). Each is a 50/50 average of a rank-gauss-input MLP (64-32, 10 seeds) and
@@ -35,14 +36,20 @@ Phase 2 M1 download, finished 10/20 16:50: **7,927 / 7,927 stars cached, 0 error
 100%). 53 GB raw streamed into a 14.3 GB cache. Median 17 quarters per star; 160 stars have < 4 quarters (QA
 group for M2).
 
+Phase 2 M2 build, finished 10/24 03:10 (1.4 h, alongside Zodi): **views + QA for 9,271 KOIs on all 7,927 stars, 0
+errors** (one star with nonsense catalog ephemerides, duration > period, needed a masking fallback). Views:
+`data/views_all.jld2` (119 MB, git-ignored, rebuildable in ~1.5 h). QA table: `sweeps/results/p2_qa.csv`. QA flags:
+20 KOIs with < 2 observed transits, 291 with measured depth > 2× off the catalog. The timing-scatter flag is too
+loose as built (3,095); it is being refined in the M2 QA notebook.
+
 ## Running now
-Phase 2 M2 (`sweeps/p2_build.jl`), started 10/24 01:39 on the hub's go: detrend + views + QA for all 7,927 stars.
-Below-normal priority, 2 threads, ~2 GB RAM, alongside Zodi's round 34. Expected ~1.7–2 h; resumable (250-star shards).
+Nothing.
 
 ## Waiting on user
 Nothing.
 
 ## Next up
 On the Thinkpad (cache at `C:\JuliaProjects\Exoplanet vetting\data\lightcurves`, M1 already done):
-1. M2: detrend + views + QA for all KOIs.
-2. M3: Phase 2a light-curve features with the existing CV protocol.
+1. M2 QA notebook (light): average views per class on the pool, QA flags; check the M2 gate (EB average shows a
+   secondary, planet average U-shaped, no systematic artifacts).
+2. M3: Phase 2a light-curve features with the existing CV protocol (needs the user's go; light-to-moderate CPU).
