@@ -1,0 +1,148 @@
+﻿VettingSetup loaded:11 features, data at C:\JuliaProjects\Exoplanet vetting\data\koi_cumulative.csv
+cmd : ┌ Info: clean_koi
+At line:1 char:343
++ ... t vetting"; cmd /c "start /b /wait /belownormal julia --project=. -t  ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (┌ Info: clean_koi:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+│   raw = 9564
+│   kept = 9201
+│   stars = 7927
+│   planets = 4619
+└   false_pos = 4582
+01:42  shard 1/32: 276 KOIs, 0 star errors; 0.05 h elapsed, ~1.6 h left
+01:45  shard 2/32: 298 KOIs, 0 star errors; 0.10 h elapsed, ~1.4 h left
+01:47  shard 3/32: 292 KOIs, 0 star errors; 0.14 h elapsed, ~1.3 h left
+01:50  shard 4/32: 285 KOIs, 0 star errors; 0.18 h elapsed, ~1.3 h left
+01:53  shard 5/32: 291 KOIs, 0 star errors; 0.23 h elapsed, ~1.2 h left
+01:55  shard 6/32: 286 KOIs, 0 star errors; 0.26 h elapsed, ~1.1 h left
+01:58  shard 7/32: 279 KOIs, 1 star errors; 0.31 h elapsed, ~1.1 h left
+02:01  shard 8/32: 308 KOIs, 0 star errors; 0.36 h elapsed, ~1.1 h left
+02:03  shard 9/32: 286 KOIs, 0 star errors; 0.40 h elapsed, ~1.0 h left
+02:06  shard 10/32: 297 KOIs, 0 star errors; 0.45 h elapsed, ~1.0 h left
+02:09  shard 11/32: 281 KOIs, 0 star errors; 0.49 h elapsed, ~0.9 h left
+02:11  shard 12/32: 304 KOIs, 0 star errors; 0.54 h elapsed, ~0.9 h left
+02:14  shard 13/32: 294 KOIs, 0 star errors; 0.58 h elapsed, ~0.8 h left
+02:16  shard 14/32: 292 KOIs, 0 star errors; 0.62 h elapsed, ~0.8 h left
+02:19  shard 15/32: 297 KOIs, 0 star errors; 0.66 h elapsed, ~0.8 h left
+02:22  shard 16/32: 286 KOIs, 0 star errors; 0.71 h elapsed, ~0.7 h left
+02:24  shard 17/32: 295 KOIs, 0 star errors; 0.76 h elapsed, ~0.7 h left
+02:27  shard 18/32: 290 KOIs, 0 star errors; 0.80 h elapsed, ~0.6 h left
+02:30  shard 19/32: 297 KOIs, 0 star errors; 0.85 h elapsed, ~0.6 h left
+02:33  shard 20/32: 285 KOIs, 0 star errors; 0.90 h elapsed, ~0.5 h left
+02:36  shard 21/32: 303 KOIs, 0 star errors; 0.94 h elapsed, ~0.5 h left
+02:39  shard 22/32: 281 KOIs, 0 star errors; 0.99 h elapsed, ~0.5 h left
+02:41  shard 23/32: 290 KOIs, 0 star errors; 1.03 h elapsed, ~0.4 h left
+02:43  shard 24/32: 288 KOIs, 0 star errors; 1.07 h elapsed, ~0.4 h left
+02:46  shard 25/32: 304 KOIs, 0 star errors; 1.11 h elapsed, ~0.3 h left
+02:49  shard 26/32: 297 KOIs, 0 star errors; 1.16 h elapsed, ~0.3 h left
+02:51  shard 27/32: 293 KOIs, 0 star errors; 1.20 h elapsed, ~0.2 h left
+02:53  shard 28/32: 303 KOIs, 0 star errors; 1.24 h elapsed, ~0.2 h left
+02:56  shard 29/32: 296 KOIs, 0 star errors; 1.28 h elapsed, ~0.1 h left
+02:58  shard 30/32: 298 KOIs, 0 star errors; 1.32 h elapsed, ~0.1 h left
+03:01  shard 31/32: 293 KOIs, 0 star errors; 1.36 h elapsed, ~0.0 h left
+03:03  shard 32/32: 205 KOIs, 0 star errors; 1.40 h elapsed, ~0.0 h left
+ERROR: LoadError: TypeError: in typeassert, expected Symbol, got a value of type String
+Stacktrace:
+ [1] merge(a::@NamedTuple{names::Vector{DataStrings.DataString}, kepid::Vector{Int64}}, itr::Dict{String, 
+Matrix{Float32}})
+   @ Base .\namedtuple.jl:369
+ [2] top-level scope
+   @ C:\JuliaProjects\Exoplanet vetting\sweeps\p2_build.jl:76
+ [3] include(mod::Module, _path::String)
+   @ Base .\Base.jl:306
+ [4] exec_options(opts::Base.JLOptions)
+   @ Base .\client.jl:317
+ [5] _start()
+   @ Base .\client.jl:550
+in expression starting at C:\JuliaProjects\Exoplanet vetting\sweeps\p2_build.jl:76
+VettingSetup loaded:11 features, data at C:\JuliaProjects\Exoplanet vetting\data\koi_cumulative.csv
+cmd : ┌ Info: clean_koi
+At line:1 char:343
++ ... t vetting"; cmd /c "start /b /wait /belownormal julia --project=. -t  ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (┌ Info: clean_koi:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+│   raw = 9564
+│   kept = 9201
+│   stars = 7927
+│   planets = 4619
+└   false_pos = 4582
+ERROR: LoadError: MethodError: no method matching DataFrame(::Pair{Symbol, Vector{Float64}}, ::Pair{Symbol, 
+Vector{Float64}}, ::Pair{Symbol, Vector{Int64}}, ::Pair{Symbol, Vector{Float64}}, ::Pair{Symbol, Vector{Float64}}, 
+::Pair{Symbol, Vector{Float64}}, ::Pair{Symbol, Vector{Float64}}, ::Pair{Symbol, Vector{Float64}}; 
+kepid::Vector{Int64}, kepoi_name::Vector{String})
+This method does not support all of the given keyword arguments (and may not support any).
+
+Closest candidates are:
+  DataFrame(::Pair{Symbol}...; makeunique, copycols) got unsupported keyword arguments "kepid", "kepoi_name"
+   @ DataFrames C:\JuliaDEPOT\packages\DataFrames\0Y1g5\src\dataframe\dataframe.jl:259
+  DataFrame(::Any; copycols) got unsupported keyword arguments "kepid", "kepoi_name"
+   @ DataFrames C:\JuliaDEPOT\packages\DataFrames\0Y1g5\src\other\tables.jl:48
+  DataFrame(::Any, !Matched::AbstractVector; makeunique, copycols) got unsupported keyword arguments "kepid", 
+"kepoi_name"
+   @ DataFrames C:\JuliaDEPOT\packages\DataFrames\0Y1g5\src\other\tables.jl:67
+  ...
+
+Stacktrace:
+ [1] kwerr(::@NamedTuple{kepid::Vector{Int64}, kepoi_name::Vector{String}}, ::Type, ::Pair{Symbol, Vector{Float64}}, 
+::Pair{Symbol, Vector{Float64}}, ::Pair{Symbol, Vector{Int64}}, ::Pair{Symbol, Vector{Float64}}, ::Pair{Symbol, 
+Vector{Float64}}, ::Pair{Symbol, Vector{Float64}}, ::Pair{Symbol, Vector{Float64}}, ::Pair{Symbol, Vector{Float64}})
+   @ Base .\error.jl:175
+ [2] top-level scope
+   @ C:\JuliaProjects\Exoplanet vetting\sweeps\p2_build.jl:78
+ [3] include(mod::Module, _path::String)
+   @ Base .\Base.jl:306
+ [4] exec_options(opts::Base.JLOptions)
+   @ Base .\client.jl:317
+ [5] _start()
+   @ Base .\client.jl:550
+in expression starting at C:\JuliaProjects\Exoplanet vetting\sweeps\p2_build.jl:78
+VettingSetup loaded:11 features, data at C:\JuliaProjects\Exoplanet vetting\data\koi_cumulative.csv
+cmd : ┌ Info: clean_koi
+At line:1 char:343
++ ... t vetting"; cmd /c "start /b /wait /belownormal julia --project=. -t  ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (┌ Info: clean_koi:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+│   raw = 9564
+│   kept = 9201
+│   stars = 7927
+│   planets = 4619
+└   false_pos = 4582
+
+M2 build: 9270 KOIs with views on 7926 stars, 1 star errors. QA flags: few transits 20, empty 2, depth mismatch 290, timing 3094
+VettingSetup loaded:11 features, data at C:\JuliaProjects\Exoplanet vetting\data\koi_cumulative.csv
+cmd : ┌ Info: clean_koi
+At line:1 char:446
++ ... irm:$false; cmd /c "start /b /wait /belownormal julia --project=. -t  ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (┌ Info: clean_koi:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+│   raw = 9564
+│   kept = 9201
+│   stars = 7927
+│   planets = 4619
+└   false_pos = 4582
+03:11  shard 7/32: 280 KOIs, 0 star errors; 0.05 h elapsed, ~0.0 h left
+
+M2 build: 9271 KOIs with views on 7927 stars, 0 star errors. QA flags: few transits 20, empty 3, depth mismatch 291, timing 3095
+VettingSetup loaded:11 features, data at C:\JuliaProjects\Exoplanet vetting\data\koi_cumulative.csv
+cmd : ┌ Info: clean_koi
+At line:1 char:343
++ ... t vetting"; cmd /c "start /b /wait /belownormal julia --project=. -t  ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (┌ Info: clean_koi:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+│   raw = 9564
+│   kept = 9201
+│   stars = 7927
+│   planets = 4619
+└   false_pos = 4582
+
+M2 build: 9271 KOIs with views on 7927 stars, 0 star errors. QA flags: few transits 20, empty 3, depth mismatch 291, timing 222

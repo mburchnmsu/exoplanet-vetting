@@ -1,0 +1,54 @@
+VettingSetup loaded:11 features, data at C:\JuliaProjects\Exoplanet vetting\data\koi_cumulative.csv
+10:41  shard 1/32: 276 KOIs, 0 star errors; 0.05 h elapsed, ~1.7 h left
+10:44  shard 2/32: 298 KOIs, 0 star errors; 0.11 h elapsed, ~1.6 h left
+10:47  shard 3/32: 292 KOIs, 0 star errors; 0.16 h elapsed, ~1.5 h left
+10:50  shard 4/32: 285 KOIs, 0 star errors; 0.21 h elapsed, ~1.5 h left
+10:53  shard 5/32: 291 KOIs, 0 star errors; 0.25 h elapsed, ~1.4 h left
+10:55  shard 6/32: 286 KOIs, 0 star errors; 0.29 h elapsed, ~1.3 h left
+10:58  shard 7/32: 280 KOIs, 0 star errors; 0.34 h elapsed, ~1.2 h left
+11:01  shard 8/32: 308 KOIs, 0 star errors; 0.39 h elapsed, ~1.2 h left
+11:04  shard 9/32: 286 KOIs, 0 star errors; 0.43 h elapsed, ~1.1 h left
+11:07  shard 10/32: 297 KOIs, 0 star errors; 0.48 h elapsed, ~1.1 h left
+11:10  shard 11/32: 281 KOIs, 0 star errors; 0.53 h elapsed, ~1.0 h left
+11:13  shard 12/32: 304 KOIs, 0 star errors; 0.58 h elapsed, ~1.0 h left
+11:15  shard 13/32: 294 KOIs, 0 star errors; 0.62 h elapsed, ~0.9 h left
+11:18  shard 14/32: 292 KOIs, 0 star errors; 0.66 h elapsed, ~0.9 h left
+11:20  shard 15/32: 297 KOIs, 0 star errors; 0.71 h elapsed, ~0.8 h left
+11:23  shard 16/32: 286 KOIs, 0 star errors; 0.75 h elapsed, ~0.8 h left
+11:26  shard 17/32: 295 KOIs, 0 star errors; 0.80 h elapsed, ~0.7 h left
+11:28  shard 18/32: 290 KOIs, 0 star errors; 0.84 h elapsed, ~0.7 h left
+11:31  shard 19/32: 297 KOIs, 0 star errors; 0.89 h elapsed, ~0.6 h left
+11:34  shard 20/32: 285 KOIs, 0 star errors; 0.94 h elapsed, ~0.6 h left
+11:37  shard 21/32: 303 KOIs, 0 star errors; 1.00 h elapsed, ~0.5 h left
+11:41  shard 22/32: 281 KOIs, 0 star errors; 1.05 h elapsed, ~0.5 h left
+11:44  shard 23/32: 290 KOIs, 0 star errors; 1.10 h elapsed, ~0.4 h left
+11:47  shard 24/32: 288 KOIs, 0 star errors; 1.15 h elapsed, ~0.4 h left
+11:49  shard 25/32: 304 KOIs, 0 star errors; 1.20 h elapsed, ~0.3 h left
+11:52  shard 26/32: 297 KOIs, 0 star errors; 1.24 h elapsed, ~0.3 h left
+11:55  shard 27/32: 293 KOIs, 0 star errors; 1.29 h elapsed, ~0.2 h left
+11:58  shard 28/32: 303 KOIs, 0 star errors; 1.34 h elapsed, ~0.2 h left
+12:01  shard 29/32: 296 KOIs, 0 star errors; 1.39 h elapsed, ~0.1 h left
+12:04  shard 30/32: 298 KOIs, 0 star errors; 1.44 h elapsed, ~0.1 h left
+12:07  shard 31/32: 293 KOIs, 0 star errors; 1.48 h elapsed, ~0.0 h left
+12:09  shard 32/32: 205 KOIs, 0 star errors; 1.52 h elapsed, ~0.0 h left
+┌ Info: clean_koi
+│   raw = 9564
+│   kept = 9201
+│   stars = 7927
+│   planets = 4619
+└   false_pos = 4582
+
+M3 features: 9271 KOIs on 7927 stars, 0 star errors
+  lc_snr          finite  9257 / 9271   median      21.3   [5%, 95%]      4.71   2.1e+03
+  lc_depth_ratio  finite  9200 / 9271   median     0.966   [5%, 95%]     0.698      1.29
+  lc_vshape       finite  9258 / 9271   median       0.6   [5%, 95%]      0.05         1
+  lc_dur_ratio    finite  9258 / 9271   median       1.1   [5%, 95%]       0.9      2.11
+  lc_oe_sig       finite  9239 / 9271   median      1.11   [5%, 95%]    0.0438        19
+  lc_sec_sig      finite  8989 / 9271   median      3.03   [5%, 95%]      1.46       132
+  lc_sec_ratio    finite  8980 / 9271   median      0.13   [5%, 95%]   0.00614      0.76
+  lc_sec_phase    finite  8989 / 9271   median     0.326   [5%, 95%]    0.0576       0.5
+  lc_sev_ratio    finite  9202 / 9271   median     0.303   [5%, 95%]    0.0606     0.948
+  lc_timing       finite  7774 / 9271   median     0.185   [5%, 95%]    0.0371     0.519
+  lc_ntransits    finite  9271 / 9271   median       123   [5%, 95%]         4  1.74e+03
+  lc_cen_sig      finite  8976 / 9271   median      3.86   [5%, 95%]     0.694       355
+  lc_cen_offset   finite  8967 / 9271   median     0.194   [5%, 95%]   0.00896      6.17

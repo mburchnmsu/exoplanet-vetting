@@ -1,0 +1,28 @@
+﻿VettingSetup loaded:11 features, data at C:\JuliaProjects\Exoplanet vetting\data\koi_cumulative.csv
+cmd : ┌ Info: clean_koi
+At line:1 char:455
++ ... irm:$false; cmd /c "start /b /wait /belownormal julia --project=. -t  ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (┌ Info: clean_koi:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+│   raw = 9564
+│   kept = 9201
+│   stars = 7927
+│   planets = 4619
+└   false_pos = 4582
+49 pilot stars
+┌ Info: download_stars
+│   requested = 49
+└   already_done = 0
+12:44  10/49 stars, 0.01 h elapsed, ~0.0 h left
+12:44  20/49 stars, 0.01 h elapsed, ~0.0 h left
+12:44  30/49 stars, 0.01 h elapsed, ~0.0 h left
+12:44  40/49 stars, 0.01 h elapsed, ~0.0 h left
+12:44  49/49 stars, 0.01 h elapsed, ~0.0 h left
+
+=== M0 pilot summary ===
+stars ok 49 / 49 (errors 0), quarters per star median 17
+raw FITS per star 6.9 MB, cache per star 1.86 MB (27% of raw)
+download+cache 1.0 s per star; detrend+views 1.2 s per star (71 KOIs)
+extrapolated to 7927 stars: raw 55 GB, cache 14.7 GB, download 2.3 h, views 2.7 h (1 process)

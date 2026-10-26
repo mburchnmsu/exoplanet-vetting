@@ -1,0 +1,128 @@
+﻿VettingSetup loaded:11 features, data at C:\JuliaProjects\Exoplanet vetting\data\koi_cumulative.csv
+cmd : ┌ Info: clean_koi
+At line:1 char:343
++ ... t vetting"; cmd /c "start /b /wait /belownormal julia --project=. -t  ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (┌ Info: clean_koi:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+│   raw = 9564
+│   kept = 9201
+│   stars = 7927
+│   planets = 4619
+└   false_pos = 4582
+┌ Info: download_stars
+│   requested = 7927
+└   already_done = 49
+13:01  100/7878 stars, 0.03 h elapsed, ~2.7 h left
+13:03  200/7878 stars, 0.06 h elapsed, ~2.4 h left
+13:04  300/7878 stars, 0.09 h elapsed, ~2.3 h left
+VettingSetup loaded:11 features, data at C:\JuliaProjects\Exoplanet vetting\data\koi_cumulative.csv
+cmd : ┌ Info: clean_koi
+At line:1 char:343
++ ... t vetting"; cmd /c "start /b /wait /belownormal julia --project=. -t  ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (┌ Info: clean_koi:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+│   raw = 9564
+│   kept = 9201
+│   stars = 7927
+│   planets = 4619
+└   false_pos = 4582
+┌ Info: download_stars
+│   requested = 7927
+└   already_done = 437
+VettingSetup loaded:11 features, data at C:\JuliaProjects\Exoplanet vetting\data\koi_cumulative.csv
+cmd : ┌ Info: clean_koi
+At line:1 char:343
++ ... t vetting"; cmd /c "start /b /wait /belownormal julia --project=. -t  ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (┌ Info: clean_koi:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+│   raw = 9564
+│   kept = 9201
+│   stars = 7927
+│   planets = 4619
+└   false_pos = 4582
+┌ Info: download_stars
+│   requested = 7927
+└   already_done = 524
+15:04  100/7403 stars, 0.02 h elapsed, ~1.7 h left
+15:05  200/7403 stars, 0.05 h elapsed, ~1.6 h left
+15:06  300/7403 stars, 0.07 h elapsed, ~1.6 h left
+15:08  400/7403 stars, 0.09 h elapsed, ~1.6 h left
+15:09  500/7403 stars, 0.11 h elapsed, ~1.5 h left
+15:10  600/7403 stars, 0.13 h elapsed, ~1.5 h left
+15:11  700/7403 stars, 0.15 h elapsed, ~1.4 h left
+15:13  800/7403 stars, 0.17 h elapsed, ~1.4 h left
+15:14  900/7403 stars, 0.19 h elapsed, ~1.4 h left
+15:15  1000/7403 stars, 0.22 h elapsed, ~1.4 h left
+15:19  1100/7403 stars, 0.28 h elapsed, ~1.6 h left
+15:21  1200/7403 stars, 0.30 h elapsed, ~1.6 h left
+15:22  1300/7403 stars, 0.33 h elapsed, ~1.5 h left
+15:23  1400/7403 stars, 0.34 h elapsed, ~1.5 h left
+15:25  1500/7403 stars, 0.37 h elapsed, ~1.5 h left
+15:26  1600/7403 stars, 0.40 h elapsed, ~1.4 h left
+15:31  1700/7403 stars, 0.47 h elapsed, ~1.6 h left
+15:32  1800/7403 stars, 0.49 h elapsed, ~1.5 h left
+15:33  1900/7403 stars, 0.52 h elapsed, ~1.5 h left
+15:35  2000/7403 stars, 0.54 h elapsed, ~1.5 h left
+15:36  2100/7403 stars, 0.56 h elapsed, ~1.4 h left
+15:37  2200/7403 stars, 0.58 h elapsed, ~1.4 h left
+15:38  2300/7403 stars, 0.60 h elapsed, ~1.3 h left
+15:40  2400/7403 stars, 0.62 h elapsed, ~1.3 h left
+15:43  2500/7403 stars, 0.68 h elapsed, ~1.3 h left
+15:45  2600/7403 stars, 0.71 h elapsed, ~1.3 h left
+15:46  2700/7403 stars, 0.73 h elapsed, ~1.3 h left
+15:48  2800/7403 stars, 0.75 h elapsed, ~1.2 h left
+15:49  2900/7403 stars, 0.78 h elapsed, ~1.2 h left
+15:50  3000/7403 stars, 0.80 h elapsed, ~1.2 h left
+15:52  3100/7403 stars, 0.82 h elapsed, ~1.1 h left
+15:53  3200/7403 stars, 0.85 h elapsed, ~1.1 h left
+15:55  3300/7403 stars, 0.87 h elapsed, ~1.1 h left
+15:56  3400/7403 stars, 0.89 h elapsed, ~1.1 h left
+15:58  3500/7403 stars, 0.92 h elapsed, ~1.0 h left
+15:59  3600/7403 stars, 0.95 h elapsed, ~1.0 h left
+16:01  3700/7403 stars, 0.97 h elapsed, ~1.0 h left
+16:02  3800/7403 stars, 0.99 h elapsed, ~0.9 h left
+16:03  3900/7403 stars, 1.01 h elapsed, ~0.9 h left
+16:04  4000/7403 stars, 1.03 h elapsed, ~0.9 h left
+16:06  4100/7403 stars, 1.06 h elapsed, ~0.9 h left
+16:07  4200/7403 stars, 1.08 h elapsed, ~0.8 h left
+16:08  4300/7403 stars, 1.10 h elapsed, ~0.8 h left
+16:10  4400/7403 stars, 1.12 h elapsed, ~0.8 h left
+16:11  4500/7403 stars, 1.14 h elapsed, ~0.7 h left
+16:12  4600/7403 stars, 1.17 h elapsed, ~0.7 h left
+16:14  4700/7403 stars, 1.19 h elapsed, ~0.7 h left
+16:15  4800/7403 stars, 1.21 h elapsed, ~0.7 h left
+16:16  4900/7403 stars, 1.22 h elapsed, ~0.6 h left
+16:17  5000/7403 stars, 1.25 h elapsed, ~0.6 h left
+16:19  5100/7403 stars, 1.27 h elapsed, ~0.6 h left
+16:20  5200/7403 stars, 1.29 h elapsed, ~0.5 h left
+16:21  5300/7403 stars, 1.31 h elapsed, ~0.5 h left
+16:22  5400/7403 stars, 1.33 h elapsed, ~0.5 h left
+16:23  5500/7403 stars, 1.35 h elapsed, ~0.5 h left
+16:25  5600/7403 stars, 1.38 h elapsed, ~0.4 h left
+16:26  5700/7403 stars, 1.40 h elapsed, ~0.4 h left
+16:28  5800/7403 stars, 1.43 h elapsed, ~0.4 h left
+16:30  5900/7403 stars, 1.45 h elapsed, ~0.4 h left
+16:31  6000/7403 stars, 1.47 h elapsed, ~0.3 h left
+16:32  6100/7403 stars, 1.49 h elapsed, ~0.3 h left
+16:34  6200/7403 stars, 1.52 h elapsed, ~0.3 h left
+16:35  6300/7403 stars, 1.54 h elapsed, ~0.3 h left
+16:37  6400/7403 stars, 1.57 h elapsed, ~0.2 h left
+16:38  6500/7403 stars, 1.59 h elapsed, ~0.2 h left
+16:39  6600/7403 stars, 1.61 h elapsed, ~0.2 h left
+16:41  6700/7403 stars, 1.64 h elapsed, ~0.2 h left
+16:42  6800/7403 stars, 1.66 h elapsed, ~0.1 h left
+16:43  6900/7403 stars, 1.68 h elapsed, ~0.1 h left
+16:45  7000/7403 stars, 1.71 h elapsed, ~0.1 h left
+16:46  7100/7403 stars, 1.73 h elapsed, ~0.1 h left
+16:48  7200/7403 stars, 1.75 h elapsed, ~0.0 h left
+16:49  7300/7403 stars, 1.77 h elapsed, ~0.0 h left
+16:50  7400/7403 stars, 1.80 h elapsed, ~0.0 h left
+16:50  7403/7403 stars, 1.80 h elapsed, ~0.0 h left
+
+M1: 7927 / 7927 stars ok, 0 errors; cache 14.3 GB
