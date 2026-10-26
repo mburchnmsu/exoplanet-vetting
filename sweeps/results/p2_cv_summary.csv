@@ -1,0 +1,7 @@
+family,subset,n,phase1,phase2a,delta,ci_lo,ci_hi
+catalog,DR25 KOIs,7199,0.9552,0.9705,0.0153,0.0124,0.0181
+catalog,supplemental KOIs,1089,0.6678,0.6959,0.0281,0.0039,0.055
+catalog,all pool,8288,0.9352,0.9536,0.0184,0.0154,0.0218
+catalog + centroid,DR25 KOIs,7199,0.983,0.9869,0.0039,0.0026,0.0052
+catalog + centroid,supplemental KOIs,1089,0.7549,0.7661,0.0112,-0.0077,0.0311
+catalog + centroid,all pool,8288,0.9699,0.9752,0.0053,0.0037,0.0068
