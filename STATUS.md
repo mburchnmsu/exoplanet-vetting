@@ -1,11 +1,11 @@
 ﻿# Exoplanet vetting status
-Updated: 2026-10-24 01:40, DESKTOP-BBASC81 (Thinkpad)
+Updated: 2026-10-26, DESKTOP-BBASC81 (Thinkpad)
 
 ## Headline
 **Exoplanet is back on the Thinkpad (10/22), and this session is in charge again;** the Intel laptop setup was
 abandoned (precompile stopped for low memory three times). Phase 1 is finished and tested once. Phase 2 M0 + M1 are
 done: the local light-curve cache is intact (7,927 stars, 14.3 GB). M2 views + QA are built for every KOI and passed
-the gate. Next is M3 (Phase 2a light-curve features), waiting on the user's go.
+the gate. M3 (Phase 2a light-curve features + CV) is running since 10/26.
 
 ## Best model
 Two frozen models (`models/step5_frozen.jld2`). Each is a 50/50 average of a rank-gauss-input MLP (64-32, 10 seeds) and
@@ -44,13 +44,19 @@ scatter (catches Kepler-9 b). **M2 gate passed** (notebook `exo102426.ipynb`): p
 artifacts; secondary and odd/even signals are noise-dominated in class medians, so M3 features must be significances.
 
 ## Running now
-Nothing.
+**M3 (Phase 2a), started 10/26 on the user's go**, alongside Zodi round 34 (below-normal priority, 2 threads, ~2 GB):
+1. `sweeps/p2_features.jl`: 11 light-curve features (`src/LCFeatures.jl`; significances against box noise: SNR,
+   trapezoid depth ratio / V-shape / duration ratio, odd-even σ, secondary σ / ratio / phase, single-event ratio,
+   timing scatter, observed transits) + 2 centroid features for the "+ centroid" family. Test: 0.78 s/star → ~1.7 h.
+   Resumable shards in `data/lightcurves/features/`; output `sweeps/results/p2_lcfeatures.csv`.
+2. Then `sweeps/p2_cv.jl`: trees + quantile MLP, both families, 5 shuffles × 10 seeds, paired vs Phase 1
+   (est. ~1–2 h per family). Logs: `sweeps/results/p2_features.log`, `p2_cv.log`.
 
 ## Waiting on user
-- Go-ahead and timing for M3 (Phase 2a): compute ~10 light-curve features with uncertainties from the cache
-  (~1–1.5 h, 2 threads, ~2 GB), then trees + quantile MLP CV for both families (~1–2 h per family, as in Phase 1).
+- M4 (CNN) timing: when the CPU-heavy timing gate and screens may run (suggested: after Zodi round 34 ends).
+- Optional: back up `data/lightcurves/cache/` (14.3 GB, git-ignored; ~2.5 h to re-download).
 
 ## Next up
-1. M3: Phase 2a light-curve features (odd/even σ, secondary σ, V-shape, single-event dominance, timing scatter,
-   coverage; centroid significance for the "+ centroid" family only) with the existing CV protocol, paired vs Phase 1.
+1. M3 results: QA notebook (feature distributions per class on the pool, paired Δ vs Phase 1 on DR25, blind-spot
+   table by FP flag / period / SNR / QA flags).
 2. M4: CNN timing gate and screens.
