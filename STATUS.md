@@ -35,8 +35,12 @@ Earlier Phase 2: M0 pilot 49/49 stars; M1 7,927/7,927 stars cached (14.3 GB); M2
 passed (notebooks `exo101926`, `exo102426`).
 
 ## Running now
-**M4 (Phase 2b CNNs), started 10/28 ~16:25 on the user's go** (Zodi idle; below-normal priority, 2 threads, ~2.4 GB):
-`sweeps/p2_cnn.jl --auto`, log `sweeps/results/p2_cnn.log`, resumable per variant.
+Nothing. **M4 stopped ~16:31 on 10/28, 8 min after it started** (during the first screen variant's first folds;
+nothing saved yet). There was no Julia error in the log, and Windows logged nothing, so it was most likely killed
+from outside (the memory reaper; 11 GB free afterwards). Not restarted; waiting on the user.
+
+M4 plan, as launched (below-normal priority, 2 threads, ~2.4 GB): `sweeps/p2_cnn.jl --auto`, log
+`sweeps/results/p2_cnn.log`, resumable per variant.
 - Timing gate passed (`p2_cnn_gate.log`): ~182k-parameter two-tower CNN, 13–16 s per epoch, one full model 4.3 min
   (best epoch 11). On repeat 1 / fold 1, one CNN alone is below Phase 2a (DR25 0.959 vs 0.968), so the question is
   whether it adds in an ensemble.
@@ -46,6 +50,7 @@ passed (notebooks `exo101926`, `exo102426`).
   ~5.5 h each → done ~10/29 morning (~15 h total).
 
 ## Waiting on user
+- **M4 restart:** OK to restart `sweeps/p2_cnn.jl --auto` (same settings, or 4 threads since the PC is idle)?
 - Public repo (scan sent to the hub): commit author email in history; whether to keep CLAUDE.md / HANDOFF.md /
   STATUS.md public. No secrets found.
 - Optional: back up `data/lightcurves/cache/` (14.3 GB, git-ignored; ~2.5 h to re-download).
