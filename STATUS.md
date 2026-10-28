@@ -37,7 +37,8 @@ passed (notebooks `exo101926`, `exo102426`).
 ## Running now
 Nothing. **M4 stopped ~16:31 on 10/28, 8 min after it started** (during the first screen variant's first folds;
 nothing saved yet). There was no Julia error in the log, and Windows logged nothing, so it was most likely killed
-from outside (the memory reaper; 11 GB free afterwards). Not restarted; waiting on the user.
+from outside (the memory reaper; 11 GB free afterwards). **Restart approved by the user, scheduled for tonight
+~20:03** (afternoon kept free for Zodi), same settings → done ~10/29 late morning.
 
 M4 plan, as launched (below-normal priority, 2 threads, ~2.4 GB): `sweeps/p2_cnn.jl --auto`, log
 `sweeps/results/p2_cnn.log`, resumable per variant.
@@ -50,7 +51,6 @@ M4 plan, as launched (below-normal priority, 2 threads, ~2.4 GB): `sweeps/p2_cnn
   ~5.5 h each → done ~10/29 morning (~15 h total).
 
 ## Waiting on user
-- **M4 restart:** OK to restart `sweeps/p2_cnn.jl --auto` (same settings, or 4 threads since the PC is idle)?
 - Public repo (scan sent to the hub): commit author email in history; whether to keep CLAUDE.md / HANDOFF.md /
   STATUS.md public. No secrets found.
 - Optional: back up `data/lightcurves/cache/` (14.3 GB, git-ignored; ~2.5 h to re-download).
