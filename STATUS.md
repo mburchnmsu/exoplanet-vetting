@@ -1,5 +1,5 @@
 # Exoplanet vetting status
-Updated: 2026-10-26 13:00, DESKTOP-BBASC81 (Thinkpad)
+Updated: 2026-10-28 16:25, DESKTOP-BBASC81 (Thinkpad)
 
 ## Headline
 **M3 (Phase 2a) done: our own light-curve features clearly improve both families** (CV, DR25: catalog 0.955 → 0.971,
@@ -35,10 +35,17 @@ Earlier Phase 2: M0 pilot 49/49 stars; M1 7,927/7,927 stars cached (14.3 GB); M2
 passed (notebooks `exo101926`, `exo102426`).
 
 ## Running now
-Nothing.
+**M4 (Phase 2b CNNs), started 10/28 ~16:25 on the user's go** (Zodi idle; below-normal priority, 2 threads, ~2.4 GB):
+`sweeps/p2_cnn.jl --auto`, log `sweeps/results/p2_cnn.log`, resumable per variant.
+- Timing gate passed (`p2_cnn_gate.log`): ~182k-parameter two-tower CNN, 13–16 s per epoch, one full model 4.3 min
+  (best epoch 11). On repeat 1 / fold 1, one CNN alone is below Phase 2a (DR25 0.959 vs 0.968), so the question is
+  whether it adds in an ensemble.
+- Screens (D6: 1 fold shuffle × 2 seeds) of 5 variants: views only; + catalog; + catalog + LC features; centroid
+  channels + catalog + centroid; + all. ~3.8 h.
+- Then the final 5 × 3 CV for the best variant of each family (ranked by DR25 AUC of its 50/50 with Phase 2a):
+  ~5.5 h each → done ~10/29 morning (~15 h total).
 
 ## Waiting on user
-- M4 (CNN) timing: when the CPU-heavy timing gate and screens may run (suggested: after Zodi round 34 ends).
 - Public repo (scan sent to the hub): commit author email in history; whether to keep CLAUDE.md / HANDOFF.md /
   STATUS.md public. No secrets found.
 - Optional: back up `data/lightcurves/cache/` (14.3 GB, git-ignored; ~2.5 h to re-download).
@@ -46,4 +53,5 @@ Nothing.
 ## Next up
 1. M3 notebook: feature distributions per class (pool), feature importance, blind-spot table (by FP flag, period,
    SNR, QA flags) and where Phase 2a fixes / breaks Phase 1 calls.
-2. M4: CNN timing gate and screens.
+2. M4 results: M4 gate = beats 2a, or adds to it in an ensemble (CI excludes 0). Then M5 (ensemble, calibration,
+   freeze) and M6 (the one Phase 2 test scoring).

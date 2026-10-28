@@ -1,0 +1,43 @@
+VettingSetup loaded:11 features, data at C:\JuliaProjects\Exoplanet vetting\data\koi_cumulative.csv
+10-28 16:08  timing gate, 2 threads
+  views      params  181497   epoch 16.1 s (first, incl. compile 71.8 s)   RSS 2.29 GB
+  hybrid     params  182201   epoch 16.0 s (first, incl. compile 16.9 s)   RSS 2.30 GB
+  hybrid_lc  params  182905   epoch 15.3 s (first, incl. compile 16.8 s)   RSS 2.30 GB
+  cent       params  182809   epoch 16.0 s (first, incl. compile 15.6 s)   RSS 2.34 GB
+  cent_lc    params  183641   epoch 13.7 s (first, incl. compile 16.2 s)   RSS 2.34 GB
+┌ Info: clean_koi
+│   raw = 9564
+│   kept = 9201
+│   stars = 7927
+│   planets = 4619
+└   false_pos = 4582
+┌ Warning: Assignment to `v` in soft scope is ambiguous because a global variable by the same name exists: `v` will be treated as a new local. Disambiguate by using `local v` to suppress this warning or `global v` to assign to the existing global variable.
+└ @ C:\JuliaProjects\Exoplanet vetting\sweeps\p2_cnn.jl:55
+┌ Warning: Assignment to `data` in soft scope is ambiguous because a global variable by the same name exists: `data` will be treated as a new local. Disambiguate by using `local data` to suppress this warning or `global data` to assign to the existing global variable.
+└ @ C:\JuliaProjects\Exoplanet vetting\sweeps\p2_cnn.jl:56
+┌ Warning: Assignment to `m` in soft scope is ambiguous because a global variable by the same name exists: `m` will be treated as a new local. Disambiguate by using `local m` to suppress this warning or `global m` to assign to the existing global variable.
+└ @ C:\JuliaProjects\Exoplanet vetting\sweeps\p2_cnn.jl:57
+┌ Warning: Assignment to `h` in soft scope is ambiguous because a global variable by the same name exists: `h` will be treated as a new local. Disambiguate by using `local h` to suppress this warning or `global h` to assign to the existing global variable.
+└ @ C:\JuliaProjects\Exoplanet vetting\sweeps\p2_cnn.jl:57
+epoch   1  val 0.3369  (12.8 s)
+epoch   2  val 0.3231  (12.7 s)
+epoch   3  val 0.3148  (12.9 s)
+epoch   4  val 0.3174  (13.0 s)
+epoch   5  val 0.3160  (12.8 s)
+epoch   6  val 0.3177  (12.9 s)
+epoch   7  val 0.3079  (12.9 s)
+epoch   8  val 0.3019  (13.1 s)
+epoch   9  val 0.3075  (13.1 s)
+epoch  10  val 0.3049  (13.8 s)
+epoch  11  val 0.2997  (14.2 s)
+epoch  12  val 0.3055  (13.8 s)
+epoch  13  val 0.3232  (14.2 s)
+epoch  14  val 0.3170  (14.1 s)
+epoch  15  val 0.3097  (14.3 s)
+epoch  16  val 0.3273  (14.2 s)
+epoch  17  val 0.3135  (14.2 s)
+epoch  18  val 0.3206  (14.2 s)
+epoch  19  val 0.3327  (14.4 s)
+  full hybrid_lc model, repeat 1 fold 1: 4.3 min, best epoch 11 of 19, fold AUC 0.9399 (DR25 0.9592)
+  same fold, Phase 2a MLP + trees (2 seeds): AUC 0.9500 (DR25 0.9677)
+10-28 16:16  gate done

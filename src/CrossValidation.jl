@@ -74,7 +74,7 @@ Default is the MLP's `train_model`; Baselines.jl adds `train_evotree`.
 """
 function cv_run(pool::DataFrame; k = 5, repeats = 3, seeds = 1:10, features = FEATURES,
                 inner_val = 1 / 9, fold_seed0 = 1000, name = "cv", verbose = true,
-                trainer = train_model, transform = :default, train_filter = nothing, train_kw...)
+                trainer = train_model, transform = :default, train_filter = nothing, extra = nothing, train_kw...)
     seeds = collect(seeds)
     n = nrow(pool)
     oof = fill(NaN, n, repeats, length(seeds))
@@ -91,9 +91,11 @@ function cv_run(pool::DataFrame; k = 5, repeats = 3, seeds = 1:10, features = FE
             fit_df, test_df = pool[fit_rows, :], pool[held, :]
             tr, va = split_by_star(fit_df; at = (1 - inner_val,), seed = fold_seed0 + 100r + f)
             data = prepare_data(tr, va, test_df; features, transform)
+            # extra(tr, va, te) adds per-KOI arrays (e.g. light-curve views for the CNN) to the fold's data
+            extra === nothing || (data = merge(data, extra(tr, va, test_df)))
             for (si, s) in enumerate(seeds)
                 model, hist = trainer(data; seed = s, verbose = false, train_kw...)
-                p = Float64.(predict_proba(model, data.Xte))
+                p = Float64.(predict_test(model, data))
                 oof[held, r, si] = p
                 push!(rows, merge((name = name, repeat = r, fold = f, seed = s,
                                    best_epoch = hist.best_epoch, n_test = nrow(test_df)),
@@ -110,6 +112,9 @@ function cv_run(pool::DataFrame; k = 5, repeats = 3, seeds = 1:10, features = FE
     return (results = DataFrame(rows), oof = oof, folds = folds, config = config,
             kepoi = String.(pool.kepoi_name))
 end
+
+"Held-out predictions of a trained model on a fold's test part (models needing more than `Xte` add a method)."
+predict_test(model, data) = predict_proba(model, data.Xte)
 
 const CV_DIR = joinpath(PROJECT_DIR, "sweeps", "results")
 
