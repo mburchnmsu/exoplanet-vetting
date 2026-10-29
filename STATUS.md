@@ -1,5 +1,5 @@
 # Exoplanet vetting status
-Updated: 2026-10-28 20:05, DESKTOP-BBASC81 (Thinkpad)
+Updated: 2026-10-28 22:05, DESKTOP-BBASC81 (Thinkpad)
 
 ## Headline
 **M3 (Phase 2a) done: our own light-curve features clearly improve both families** (CV, DR25: catalog 0.955 → 0.971,
@@ -35,9 +35,15 @@ Earlier Phase 2: M0 pilot 49/49 stars; M1 7,927/7,927 stars cached (14.3 GB); M2
 passed (notebooks `exo101926`, `exo102426`).
 
 ## Running now
-**M4 restarted 10/28 20:03** (PID 4356, BelowNormal, 2 threads; 8.5 GB free at launch) → expected done ~10/29
-11:00 (~15 h). The first attempt (10/28 16:23) stopped after 8 min with no Julia error and nothing saved, most
-likely killed from outside; the user approved this restart for the evening to keep the afternoon free for Zodi.
+Nothing. **M4 stopped again ~22:00 on 10/28**: Claude Code's memory reaper killed it (system low on memory: 5.9 GB
+free afterwards, with two other Julia processes at 3.5 GB and 1.7 GB). Not restarted; waiting on the user.
+- Saved before the stop: the **views-only screen** (`cv_cnn_views_r1s2.jld2`, 1.3 h, median best epoch 11). The
+  hybrid screen had just started; the run resumes per variant, so a restart skips views.
+- Timing is slower than the gate estimate: 1.3 h per screen (not ~45 min), so the rest is ~5 h of screens + ~2 ×
+  9 h of finals (~23 h) at 2 threads.
+- The first attempt (10/28 16:23) also died after 8 min, most likely the same reaper.
+- To stop the reaper killing it: start Claude Code with `CLAUDE_CODE_DISABLE_BG_SHELL_PRESSURE_REAP=1`, or launch
+  the job detached outside Claude Code, or run when other Julia jobs are closed.
 
 M4 plan, as launched (below-normal priority, 2 threads, ~2.4 GB): `sweeps/p2_cnn.jl --auto`, log
 `sweeps/results/p2_cnn.log`, resumable per variant.
@@ -50,6 +56,7 @@ M4 plan, as launched (below-normal priority, 2 threads, ~2.4 GB): `sweeps/p2_cnn
   ~5.5 h each → done ~10/29 morning (~15 h total).
 
 ## Waiting on user
+- M4 restart: when, and how (see Running now; the memory reaper killed both attempts).
 - Public repo (scan sent to the hub): commit author email in history; whether to keep CLAUDE.md / HANDOFF.md /
   STATUS.md public. No secrets found.
 - Optional: back up `data/lightcurves/cache/` (14.3 GB, git-ignored; ~2.5 h to re-download).
