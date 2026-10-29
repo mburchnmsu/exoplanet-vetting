@@ -1,5 +1,5 @@
 # Exoplanet vetting status
-Updated: 2026-10-29 13:22, DESKTOP-BBASC81 (Thinkpad)
+Updated: 2026-10-29 14:25, DESKTOP-BBASC81 (Thinkpad)
 
 ## Headline
 **M3 (Phase 2a) done: our own light-curve features clearly improve both families** (CV, DR25: catalog 0.955 → 0.971,
@@ -16,6 +16,20 @@ Best in CV (not yet frozen): the same recipes + the 11 Phase 2a light-curve feat
 the "+ centroid" family): DR25 CV ROC-AUC **0.971** / **0.987**.
 
 ## Latest results
+**M4 screens (10/29; 1 fold shuffle × 2 seeds, paired star bootstrap vs the Phase 2a MLP + trees average; DR25):
+no CNN variant beats Phase 2a, and none adds to it in a 50/50 ensemble.**
+
+| Variant | CNN alone | Phase 2a | Δ [95% CI] | 50/50 with 2a: Δ [95% CI] |
+|---|---|---|---|---|
+| views only | 0.949 | 0.969 | −0.020 [−0.024, −0.017] | −0.002 [−0.004, −0.001] |
+| + catalog | 0.958 | 0.969 | −0.011 [−0.014, −0.009] | −0.001 [−0.002, +0.000] |
+| + catalog + LC | 0.962 | 0.969 | −0.007 [−0.009, −0.005] | −0.001 [−0.002, −0.000] |
+| centroid + catalog + centroid | 0.980 | 0.987 | −0.007 [−0.009, −0.005] | −0.001 [−0.002, −0.000] |
+| centroid + all | 0.983 | 0.987 | −0.004 [−0.005, −0.003] | −0.001 [−0.001, −0.000] |
+
+All-KOI results show the same pattern (`sweeps/results/p2_cnn.log`). The views alone carry most of the signal
+(0.949), but the tabular models already capture it. Family picks for the finals: hybrid_lc and (next) cent_lc.
+
 M3, CV only (standard folds, 5 shuffles × 10 seeds; paired star-bootstrap 95% CI; `sweeps/results/p2_cv_summary.csv`):
 
 | MLP + trees average | Subset | Phase 1 | + LC features | Δ [95% CI] |
@@ -39,8 +53,10 @@ passed (notebooks `exo101926`, `exo102426`).
 choice, alongside Zodi's daytime test) → ~23 h, done ~10/30 morning. Log appends to `sweeps/results/p2_cnn.log`;
 no automatic end notice, so the log is checked periodically. Stop it with `Stop-Process -Id 33652`.
 - Saved so far: views screen (10/28, 1.3 h), hybrid screen (10/29 10:43, 1.0 h, median best epoch 12),
-  hybrid_lc screen (11:37, 0.9 h, median best epoch 10), **cent screen (12:35, 1.0 h, median best epoch 10)**;
-  now cent_lc (last screen). AUC comparisons are printed once all five screens are done.
+  hybrid_lc screen (11:37, 0.9 h, median best epoch 10), cent screen (12:35, 1.0 h, median best epoch 10),
+  cent_lc screen (13:25, 0.8 h, median best epoch 9). **Now the hybrid_lc final (5 × 3) since 13:25, ~8 h; then
+  the cent_lc final, ~8 h** → done ~10/30 05:00. The screens already fail the M4 gate, so whether to let the finals
+  run is a question for the user. AUC comparisons are printed once all five screens are done.
 - History: **M4 stopped ~22:00 on 10/28**: Claude Code's memory reaper killed it (system low on memory: 5.9 GB
   free afterwards, with two other Julia processes at 3.5 GB and 1.7 GB).
 - Saved before the stop: the **views-only screen** (`cv_cnn_views_r1s2.jld2`, 1.3 h, median best epoch 11). The
@@ -62,6 +78,8 @@ M4 plan, as launched (below-normal priority, 2 threads, ~2.4 GB): `sweeps/p2_cnn
   ~5.5 h each → done ~10/29 morning (~15 h total).
 
 ## Waiting on user
+- M4: let the two finals run (~16 h of CPU, gives the definitive 5 × 3 numbers), or stop after the screens and go
+  to M5 with Phase 2a as the model?
 - Public repo (scan sent to the hub): commit author email in history; whether to keep CLAUDE.md / HANDOFF.md /
   STATUS.md public. No secrets found.
 - Optional: back up `data/lightcurves/cache/` (14.3 GB, git-ignored; ~2.5 h to re-download).
