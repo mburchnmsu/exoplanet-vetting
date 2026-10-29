@@ -1,5 +1,5 @@
 # Exoplanet vetting status
-Updated: 2026-10-28 16:25, DESKTOP-BBASC81 (Thinkpad)
+Updated: 2026-10-28 20:05, DESKTOP-BBASC81 (Thinkpad)
 
 ## Headline
 **M3 (Phase 2a) done: our own light-curve features clearly improve both families** (CV, DR25: catalog 0.955 → 0.971,
@@ -35,10 +35,9 @@ Earlier Phase 2: M0 pilot 49/49 stars; M1 7,927/7,927 stars cached (14.3 GB); M2
 passed (notebooks `exo101926`, `exo102426`).
 
 ## Running now
-Nothing. **M4 stopped ~16:31 on 10/28, 8 min after it started** (during the first screen variant's first folds;
-nothing saved yet). There was no Julia error in the log, and Windows logged nothing, so it was most likely killed
-from outside (the memory reaper; 11 GB free afterwards). **Restart approved by the user, scheduled for tonight
-~20:03** (afternoon kept free for Zodi), same settings → done ~10/29 late morning.
+**M4 restarted 10/28 20:03** (PID 4356, BelowNormal, 2 threads; 8.5 GB free at launch) → expected done ~10/29
+11:00 (~15 h). The first attempt (10/28 16:23) stopped after 8 min with no Julia error and nothing saved, most
+likely killed from outside; the user approved this restart for the evening to keep the afternoon free for Zodi.
 
 M4 plan, as launched (below-normal priority, 2 threads, ~2.4 GB): `sweeps/p2_cnn.jl --auto`, log
 `sweeps/results/p2_cnn.log`, resumable per variant.
