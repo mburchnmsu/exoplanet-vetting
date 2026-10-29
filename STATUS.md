@@ -1,5 +1,5 @@
 # Exoplanet vetting status
-Updated: 2026-10-29 12:22, DESKTOP-BBASC81 (Thinkpad)
+Updated: 2026-10-29 13:22, DESKTOP-BBASC81 (Thinkpad)
 
 ## Headline
 **M3 (Phase 2a) done: our own light-curve features clearly improve both families** (CV, DR25: catalog 0.955 → 0.971,
@@ -39,7 +39,8 @@ passed (notebooks `exo101926`, `exo102426`).
 choice, alongside Zodi's daytime test) → ~23 h, done ~10/30 morning. Log appends to `sweeps/results/p2_cnn.log`;
 no automatic end notice, so the log is checked periodically. Stop it with `Stop-Process -Id 33652`.
 - Saved so far: views screen (10/28, 1.3 h), hybrid screen (10/29 10:43, 1.0 h, median best epoch 12),
-  **hybrid_lc screen (11:37, 0.9 h, median best epoch 10)**; now cent. AUC comparisons are printed once all five screens are done.
+  hybrid_lc screen (11:37, 0.9 h, median best epoch 10), **cent screen (12:35, 1.0 h, median best epoch 10)**;
+  now cent_lc (last screen). AUC comparisons are printed once all five screens are done.
 - History: **M4 stopped ~22:00 on 10/28**: Claude Code's memory reaper killed it (system low on memory: 5.9 GB
   free afterwards, with two other Julia processes at 3.5 GB and 1.7 GB).
 - Saved before the stop: the **views-only screen** (`cv_cnn_views_r1s2.jld2`, 1.3 h, median best epoch 11). The
