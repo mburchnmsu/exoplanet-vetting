@@ -86,8 +86,8 @@ outside Claude Code after Claude Code's memory safeguard killed two earlier atte
 
 ## Waiting on user
 - **M6 go-ahead:** the one Phase 2 sealed-test scoring (D5) with `models/p2_frozen.jld2`. Scored once only.
-- Public repo (scan sent to the hub): commit author email in history; whether to keep CLAUDE.md / HANDOFF.md /
-  STATUS.md public. No secrets found.
+- Public repo: the user OK'd going public as-is (10/30; email in history and notes files stay). Final pass found
+  nothing sensitive. The user flips visibility themselves.
 - Optional: back up `data/lightcurves/cache/` (14.3 GB, git-ignored; ~2.5 h to re-download).
 
 ## Next up
