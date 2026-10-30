@@ -1,23 +1,39 @@
 # Exoplanet vetting status
-Updated: 2026-10-29 21:00, DESKTOP-BBASC81 (Thinkpad)
+Updated: 2026-10-30, DESKTOP-BBASC81 (Thinkpad)
 
 ## Headline
-**M4 (CNN) closed: the CNNs neither beat Phase 2a nor add to it, so Phase 2a is the Phase 2 model.** **M5 done**:
-no calibrator needed, 3 of 4 success criteria met (blind spots only partly), both models frozen
-(`models/p2_frozen.jld2`). Next: M6, the one sealed-test scoring, on the user's go-ahead. Phase 2a's own light-curve features lift DR25 CV
-ROC-AUC 0.955 → 0.971 (catalog, level with the robovetter's `koi_score` 0.970) and 0.983 → 0.987 (+ centroid).
-Phase 1 is finished and tested once; Phase 2 M0–M4 are done. A public-facing `README.md` is at the repo root.
+**Phase 2 is done (M0–M6). On the sealed test set, our light-curve features lift DR25 ROC-AUC 0.957 → 0.976
+(catalog-only, near the robovetter's `koi_score` 0.979) and 0.988 → 0.993 (+ centroid)**, both paired gains with
+CIs above 0, matching CV. The model is Phase 2a (MLP + trees with our LC features); the CNNs (M4) neither beat nor
+added to it. A public-facing `README.md` is at the repo root (still shows Phase 1 results).
 
 ## Best model
-Frozen (Phase 1, `models/step5_frozen.jld2`): two 50/50 averages of a rank-gauss-input MLP (64-32, 10 seeds) and
-EvoTrees (depth 8, 10 seeds). Headline operating point: 98% planet recall.
-- **Catalog-only**: sealed-test DR25 ROC-AUC 0.957 [0.944, 0.970]; at 98% recall precision 0.77, 31% of FPs kept.
-- **Catalog + centroid** (partly circular with Kepler's centroid test): 0.988 [0.982, 0.994]; precision 0.87, 16% kept.
+Frozen Phase 2 (`models/p2_frozen.jld2`): two 50/50 averages of a rank-gauss-input MLP (64-32, 10 seeds) and
+EvoTrees (depth 8, 10 seeds), on the catalog features + our 11 light-curve features (+ DV centroid + our 2
+centroid features in the "+ centroid" family). No calibrator. Headline operating point: 98% planet recall.
+- **Catalog-only**: sealed-test DR25 ROC-AUC **0.976** [0.966, 0.984]; at 98% recall precision 0.82, 23% of FPs kept.
+- **Catalog + centroid** (partly circular with Kepler's centroid test): **0.993** [0.988, 0.996]; precision 0.90,
+  12% kept.
 
-Best in CV, to be frozen in M5: the same recipes + the 11 Phase 2a light-curve features (+ 2 of our centroid
-features in the "+ centroid" family): DR25 CV ROC-AUC **0.971** / **0.987**.
+Phase 1 (`models/step5_frozen.jld2`, catalog only): test 0.957 / 0.988.
 
 ## Latest results
+**M6, the one Phase 2 sealed-test scoring (10/30, `sweeps/p2_test.jl`, user's go-ahead; same 913 test KOIs /
+792 stars as Phase 1; `sweeps/results/p2_test_*.csv`). The test set confirms CV: Phase 2a beats Phase 1 on the
+test set too, in both families.**
+
+| DR25 KOIs (796) | Test ROC-AUC [95% CI] | CV expected | Phase 1 test | Δ vs Phase 1, paired [95% CI] |
+|---|---|---|---|---|
+| Catalog-only | **0.976** [0.966, 0.984] | 0.970 | 0.957 | +0.018 [+0.011, +0.027] |
+| Catalog + centroid | **0.993** [0.988, 0.996] | 0.987 | 0.988 | +0.004 [+0.001, +0.009] |
+| Robovetter `koi_score` (reference) | 0.979 | — | — | — |
+
+- Supplemental KOIs (117): 0.760 / 0.797 (Phase 1 0.724 / 0.788; Δ CIs include 0, small n).
+- **98% planet recall (frozen thresholds), DR25 test:** catalog-only recall 0.985 [0.972, 0.995], precision 0.815,
+  23% of FPs kept (Phase 1 test: 31%; CV 25%); + centroid recall 0.990 [0.979, 0.998], precision 0.897, 12% kept
+  (Phase 1 test: 16%; CV 14%). CONFIRMED planets lost: 0.4% / 0%.
+- Every CV expectation lies inside the test CI. Like Phase 1, the test split scores a little higher than CV.
+
 **M5 analysis (10/29, from the saved CV; `sweeps/p2_m5.jl --analyze`, `sweeps/results/p2_m5_*.csv`).** Phase 1
 rows reproduce step 5's menu exactly.
 - **Calibration: still not needed.** Platt fit a = 1.035 / 1.038, b ≈ 0; nested Platt/isotonic don't improve DR25
@@ -85,12 +101,12 @@ M4 run notes: CNNs need ~1 h per screen and ~6.4 h per 5 × 3 final at 2 threads
 outside Claude Code after Claude Code's memory safeguard killed two earlier attempts.
 
 ## Waiting on user
-- **M6 go-ahead:** the one Phase 2 sealed-test scoring (D5) with `models/p2_frozen.jld2`. Scored once only.
+- Whether to update the public `README.md` with the Phase 2 results (test table + figure), and what comes next
+  (Phase 2 write-up notebook; any further work, e.g. the NT/EC blind spots).
 - Public repo: the user OK'd going public as-is (10/30; email in history and notes files stay). Final pass found
   nothing sensitive. The user flips visibility themselves.
 - Optional: back up `data/lightcurves/cache/` (14.3 GB, git-ignored; ~2.5 h to re-download).
 
 ## Next up
-1. M5 done (analysis + freeze).
-2. M6: the one Phase 2 sealed-test scoring (D5), with the user's go-ahead.
-3. Notebook for M3–M5 (feature distributions, blind-spot table, menu).
+1. Phase 2 write-up notebook (M3–M6: feature distributions, blind-spot table, CNN result, menu, test results).
+2. README update with the Phase 2 test results (on the user's OK).
