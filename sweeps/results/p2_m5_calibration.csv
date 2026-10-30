@@ -1,0 +1,19 @@
+family,calibrator,subset,logloss,brier,ece,roc_auc,mean_p,planet_rate
+catalog,none,DR25,0.2226,0.0664,0.0118,0.9698,0.516,0.513
+catalog,none,supplemental,0.6342,0.2194,0.0615,0.6916,0.418,0.431
+catalog,none,all,0.2767,0.0865,0.0098,0.9527,0.503,0.502
+catalog,platt,DR25,0.2226,0.0664,0.0099,0.9697,0.515,0.513
+catalog,platt,supplemental,0.6376,0.2202,0.0637,0.6911,0.415,0.431
+catalog,platt,all,0.2771,0.0866,0.0089,0.9525,0.502,0.502
+catalog,isotonic,DR25,0.2255,0.0666,0.0081,0.9691,0.516,0.513
+catalog,isotonic,supplemental,0.6424,0.2205,0.0663,0.6862,0.411,0.431
+catalog,isotonic,all,0.2803,0.0868,0.0054,0.9517,0.502,0.502
++ centroid,none,DR25,0.1472,0.0426,0.0119,0.9865,0.517,0.513
++ centroid,none,supplemental,0.5674,0.1953,0.0529,0.7617,0.405,0.431
++ centroid,none,all,0.2024,0.0627,0.0078,0.9746,0.502,0.502
++ centroid,platt,DR25,0.1473,0.0427,0.0103,0.9864,0.517,0.513
++ centroid,platt,supplemental,0.5698,0.196,0.0569,0.761,0.403,0.431
++ centroid,platt,all,0.2028,0.0628,0.0073,0.9744,0.502,0.502
++ centroid,isotonic,DR25,0.149,0.0428,0.0085,0.986,0.518,0.513
++ centroid,isotonic,supplemental,0.5746,0.1966,0.0504,0.7579,0.4,0.431
++ centroid,isotonic,all,0.2049,0.063,0.0042,0.9739,0.502,0.502

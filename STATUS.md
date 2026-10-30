@@ -1,5 +1,5 @@
 # Exoplanet vetting status
-Updated: 2026-10-29 20:45, DESKTOP-BBASC81 (Thinkpad)
+Updated: 2026-10-29 20:58, DESKTOP-BBASC81 (Thinkpad)
 
 ## Headline
 **M4 (CNN) closed: the CNNs neither beat Phase 2a nor add to it, so Phase 2a is the Phase 2 model.** Starting M5
@@ -17,6 +17,27 @@ Best in CV, to be frozen in M5: the same recipes + the 11 Phase 2a light-curve f
 features in the "+ centroid" family): DR25 CV ROC-AUC **0.971** / **0.987**.
 
 ## Latest results
+**M5 analysis (10/29, from the saved CV; `sweeps/p2_m5.jl --analyze`, `sweeps/results/p2_m5_*.csv`).** Phase 1
+rows reproduce step 5's menu exactly.
+- **Calibration: still not needed.** Platt fit a = 1.035 / 1.038, b ≈ 0; nested Platt/isotonic don't improve DR25
+  log-loss (0.223 / 0.147 uncalibrated). DR25 ECE 0.012. Supplemental KOIs remain miscalibrated (ECE 0.05–0.06).
+- **98% planet recall (headline), nested, DR25:**
+
+| Family | Phase | Threshold | Precision | FPs kept | FPs kept /1000 | CONFIRMED lost |
+|---|---|---|---|---|---|---|
+| Catalog | Phase 1 | 0.15 | 0.745 | 35% | 172 | 0.4% |
+| Catalog | **Phase 2a** | 0.18 | **0.805** | **25%** | 122 | 0.4% |
+| + centroid | Phase 1 | 0.21 | 0.856 | 17% | 84 | 0.4% |
+| + centroid | **Phase 2a** | 0.25 | **0.882** | **14%** | 67 | 0.3% |
+
+- **Plan §1 criteria:**
+  1. Main (beats Phase 1, CI > 0): **met** in both families (M3).
+  2. Blind spots: **partly.** At p = 0.5, NT-only FPs missed 22.8 → 20.8% (catalog) / 27.0 → 23.7% (+ centroid);
+     EC-only 21.4 → 18.0% / 26.3 → 23.2%. Both fall, but not below the 15% target. Supplemental AUC rises
+     (0.664 → 0.692 / 0.751 → 0.762). USP planets (P < 1.5 d) called FP: 59.7 → 40.2% / 32.0 → 26.5%.
+  3. No regressions: **met.** CONFIRMED lost at 98% recall 0.4 → 0.4% / 0.4 → 0.3%.
+  4. Stretch (catalog-only reaches `koi_score`'s 0.970): **met** (0.970).
+
 **M4 (10/29; paired star bootstrap vs the Phase 2a MLP + trees average, DR25): no CNN variant beats Phase 2a, and
 none adds to it in a 50/50 ensemble. Gate failed; stopped by the user's decision before the cent_lc final.**
 
@@ -53,7 +74,10 @@ Earlier Phase 2: M0 pilot 49/49 stars; M1 7,927/7,927 stars cached (14.3 GB); M2
 passed (notebooks `exo101926`, `exo102426`); M3 features 9,271 KOIs, 0 errors.
 
 ## Running now
-Nothing. M4 was stopped 10/29 ~20:30 (user's decision, during the cent_lc final; nothing lost that matters).
+**M5 freeze since 10/29 20:51** (`sweeps/p2_m5.jl --freeze`, detached outside Claude Code, julia PID 16116,
+BelowNormal, 2 threads, ~2 GB; log `sweeps/results/p2_m5_freeze.log`) → ~30–60 min → `models/p2_frozen.jld2`.
+
+M4 was stopped 10/29 ~20:30 (user's decision, during the cent_lc final; nothing lost that matters).
 M4 run notes: CNNs need ~1 h per screen and ~6.4 h per 5 × 3 final at 2 threads, ~2 GB; launched detached
 outside Claude Code after Claude Code's memory safeguard killed two earlier attempts.
 

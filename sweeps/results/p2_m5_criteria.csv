@@ -1,0 +1,37 @@
+group,n,family,phase,pct_at_p05,pct_at_recall98
+FP missed: NT only,849,catalog,Phase 1,22.8,73.6
+FP missed: NT only,849,catalog,Phase 2a,20.8,70.7
+FP missed: NT only,849,+ centroid,Phase 1,27.0,66.6
+FP missed: NT only,849,+ centroid,Phase 2a,23.7,60.2
+FP missed: EC only,111,catalog,Phase 1,21.4,52.8
+FP missed: EC only,111,catalog,Phase 2a,18.0,44.3
+FP missed: EC only,111,+ centroid,Phase 1,26.3,47.2
+FP missed: EC only,111,+ centroid,Phase 2a,23.2,33.7
+FP missed: CO only,464,catalog,Phase 1,36.0,71.9
+FP missed: CO only,464,catalog,Phase 2a,34.6,60.8
+FP missed: CO only,464,+ centroid,Phase 1,4.0,10.8
+FP missed: CO only,464,+ centroid,Phase 2a,5.3,10.9
+FP missed: SS only,1307,catalog,Phase 1,3.7,14.3
+FP missed: SS only,1307,catalog,Phase 2a,3.1,9.4
+FP missed: SS only,1307,+ centroid,Phase 1,6.4,12.8
+FP missed: SS only,1307,+ centroid,Phase 2a,5.1,9.8
+FP missed: all,4125,catalog,Phase 1,15.1,42.2
+FP missed: all,4125,catalog,Phase 2a,12.2,33.0
+FP missed: all,4125,+ centroid,Phase 1,10.2,24.3
+FP missed: all,4125,+ centroid,Phase 2a,8.6,20.4
+CONFIRMED called FP,2473,catalog,Phase 1,3.8,0.4
+CONFIRMED called FP,2473,catalog,Phase 2a,2.1,0.4
+CONFIRMED called FP,2473,+ centroid,Phase 1,1.4,0.4
+CONFIRMED called FP,2473,+ centroid,Phase 2a,0.8,0.3
+CONFIRMED called FP (DR25),2459,catalog,Phase 1,3.8,0.4
+CONFIRMED called FP (DR25),2459,catalog,Phase 2a,2.0,0.4
+CONFIRMED called FP (DR25),2459,+ centroid,Phase 1,1.4,0.4
+CONFIRMED called FP (DR25),2459,+ centroid,Phase 2a,0.7,0.3
+planet called FP: P < 1.5 d,201,catalog,Phase 1,59.7,19.9
+planet called FP: P < 1.5 d,201,catalog,Phase 2a,40.2,17.9
+planet called FP: P < 1.5 d,201,+ centroid,Phase 1,32.0,16.2
+planet called FP: P < 1.5 d,201,+ centroid,Phase 2a,26.5,15.8
+planet called FP: all,4163,catalog,Phase 1,14.6,2.1
+planet called FP: all,4163,catalog,Phase 2a,13.1,2.3
+planet called FP: all,4163,+ centroid,Phase 1,10.2,2.4
+planet called FP: all,4163,+ centroid,Phase 2a,10.0,2.8
