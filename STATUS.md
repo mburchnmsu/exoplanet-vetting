@@ -1,5 +1,5 @@
 # Exoplanet vetting status
-Updated: 2026-10-29 14:25, DESKTOP-BBASC81 (Thinkpad)
+Updated: 2026-10-29 20:23, DESKTOP-BBASC81 (Thinkpad)
 
 ## Headline
 **M3 (Phase 2a) done: our own light-curve features clearly improve both families** (CV, DR25: catalog 0.955 → 0.971,
@@ -26,6 +26,10 @@ no CNN variant beats Phase 2a, and none adds to it in a 50/50 ensemble.**
 | + catalog + LC | 0.962 | 0.969 | −0.007 [−0.009, −0.005] | −0.001 [−0.002, −0.000] |
 | centroid + catalog + centroid | 0.980 | 0.987 | −0.007 [−0.009, −0.005] | −0.001 [−0.002, −0.000] |
 | centroid + all | 0.983 | 0.987 | −0.004 [−0.005, −0.003] | −0.001 [−0.001, −0.000] |
+
+**Final 5 × 3 CV, hybrid_lc (10/29 19:47, 6.4 h) confirms it**: DR25 CNN 0.964 vs Phase 2a 0.971, Δ −0.007
+[−0.008, −0.005]; 50/50 with 2a 0.969, Δ −0.001 [−0.002, −0.000]. All KOIs: CNN 0.946 vs 0.954; 50/50 Δ −0.001
+[−0.002, −0.001].
 
 All-KOI results show the same pattern (`sweeps/results/p2_cnn.log`). The views alone carry most of the signal
 (0.949), but the tabular models already capture it. Family picks for the finals: hybrid_lc and (next) cent_lc.
@@ -54,8 +58,8 @@ choice, alongside Zodi's daytime test) → ~23 h, done ~10/30 morning. Log appen
 no automatic end notice, so the log is checked periodically. Stop it with `Stop-Process -Id 33652`.
 - Saved so far: views screen (10/28, 1.3 h), hybrid screen (10/29 10:43, 1.0 h, median best epoch 12),
   hybrid_lc screen (11:37, 0.9 h, median best epoch 10), cent screen (12:35, 1.0 h, median best epoch 10),
-  cent_lc screen (13:25, 0.8 h, median best epoch 9). **Now the hybrid_lc final (5 × 3) since 13:25, ~8 h; then
-  the cent_lc final, ~8 h** → done ~10/30 05:00. The screens already fail the M4 gate, so whether to let the finals
+  cent_lc screen (13:25, 0.8 h, median best epoch 9). hybrid_lc final (5 × 3) saved 19:47 (6.4 h). **Now the
+  cent_lc final since 19:47, ~6.5 h** → done ~10/30 02:30. The screens already fail the M4 gate, so whether to let the finals
   run is a question for the user. AUC comparisons are printed once all five screens are done.
 - History: **M4 stopped ~22:00 on 10/28**: Claude Code's memory reaper killed it (system low on memory: 5.9 GB
   free afterwards, with two other Julia processes at 3.5 GB and 1.7 GB).
@@ -78,7 +82,7 @@ M4 plan, as launched (below-normal priority, 2 threads, ~2.4 GB): `sweeps/p2_cnn
   ~5.5 h each → done ~10/29 morning (~15 h total).
 
 ## Waiting on user
-- M4: let the two finals run (~16 h of CPU, gives the definitive 5 × 3 numbers), or stop after the screens and go
+- M4: let the cent_lc final run (~6.5 h more, definitive 5 × 3 numbers for the centroid family), or stop now and go
   to M5 with Phase 2a as the model?
 - Public repo (scan sent to the hub): commit author email in history; whether to keep CLAUDE.md / HANDOFF.md /
   STATUS.md public. No secrets found.
