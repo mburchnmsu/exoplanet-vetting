@@ -1,0 +1,13 @@
+VettingSetup loaded:11 features, data at C:\JuliaProjects\Exoplanet vetting\data\koi_cumulative.csv
+catalog_only: frozen in 1.5 min; thresholds Dict("(:recall, 0.99)" => 0.08171558743342758, "(:precision, 0.95)" => 0.7199259579181672, "(:prob, 0.5)" => 0.5, "(:recall, 0.95)" => 0.3593072608113289, "(:recall, 0.98)" => 0.18541182801127432, "(:precision, 0.99)" => 0.9628667563199997, "(:maxf1,)" => 0.5104048617184163)
+catalog_centroid: frozen in 0.5 min; thresholds Dict("(:recall, 0.99)" => 0.10739162229001523, "(:precision, 0.95)" => 0.5624697573482991, "(:prob, 0.5)" => 0.5, "(:recall, 0.95)" => 0.4865350380539894, "(:recall, 0.98)" => 0.24393910802900792, "(:precision, 0.99)" => 0.9200159966945648, "(:maxf1,)" => 0.5411145985126495)
+┌ Info: clean_koi
+│   raw = 9564
+│   kept = 9201
+│   stars = 7927
+│   planets = 4619
+└   false_pos = 4582
+saved: C:\JuliaProjects\Exoplanet vetting\models\p2_frozen.jld2
+catalog_only: in-sample pool AUC 0.9798 (DR25 0.9866), mean p 0.500
+catalog_centroid: in-sample pool AUC 0.9935 (DR25 0.9965), mean p 0.499
+10-29 20:54  DONE

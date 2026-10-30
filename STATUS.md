@@ -1,9 +1,10 @@
 # Exoplanet vetting status
-Updated: 2026-10-29 20:58, DESKTOP-BBASC81 (Thinkpad)
+Updated: 2026-10-29 21:00, DESKTOP-BBASC81 (Thinkpad)
 
 ## Headline
-**M4 (CNN) closed: the CNNs neither beat Phase 2a nor add to it, so Phase 2a is the Phase 2 model.** Starting M5
-(calibration, operating-point menu, success criteria, freeze). Phase 2a's own light-curve features lift DR25 CV
+**M4 (CNN) closed: the CNNs neither beat Phase 2a nor add to it, so Phase 2a is the Phase 2 model.** **M5 done**:
+no calibrator needed, 3 of 4 success criteria met (blind spots only partly), both models frozen
+(`models/p2_frozen.jld2`). Next: M6, the one sealed-test scoring, on the user's go-ahead. Phase 2a's own light-curve features lift DR25 CV
 ROC-AUC 0.955 → 0.971 (catalog, level with the robovetter's `koi_score` 0.970) and 0.983 → 0.987 (+ centroid).
 Phase 1 is finished and tested once; Phase 2 M0–M4 are done. A public-facing `README.md` is at the repo root.
 
@@ -74,21 +75,22 @@ Earlier Phase 2: M0 pilot 49/49 stars; M1 7,927/7,927 stars cached (14.3 GB); M2
 passed (notebooks `exo101926`, `exo102426`); M3 features 9,271 KOIs, 0 errors.
 
 ## Running now
-**M5 freeze since 10/29 20:51** (`sweeps/p2_m5.jl --freeze`, detached outside Claude Code, julia PID 16116,
-BelowNormal, 2 threads, ~2 GB; log `sweeps/results/p2_m5_freeze.log`) → ~30–60 min → `models/p2_frozen.jld2`.
+Nothing. **M5 freeze done 10/29 20:54** (took 2 min): `models/p2_frozen.jld2` (44 MB) holds both Phase 2a models
+(10 MLP + 10 tree seeds each, whole pool, inner split seed 5005), their preprocessing, the menu thresholds (98%
+recall: catalog 0.185, + centroid 0.244) and calibrator "none". Round trip OK (in-sample pool AUC 0.980 / 0.994).
+Log `sweeps/results/p2_m5_freeze.log`. The test split was not touched.
 
 M4 was stopped 10/29 ~20:30 (user's decision, during the cent_lc final; nothing lost that matters).
 M4 run notes: CNNs need ~1 h per screen and ~6.4 h per 5 × 3 final at 2 threads, ~2 GB; launched detached
 outside Claude Code after Claude Code's memory safeguard killed two earlier attempts.
 
 ## Waiting on user
+- **M6 go-ahead:** the one Phase 2 sealed-test scoring (D5) with `models/p2_frozen.jld2`. Scored once only.
 - Public repo (scan sent to the hub): commit author email in history; whether to keep CLAUDE.md / HANDOFF.md /
   STATUS.md public. No secrets found.
 - Optional: back up `data/lightcurves/cache/` (14.3 GB, git-ignored; ~2.5 h to re-download).
 
 ## Next up
-1. M5 (`sweeps/p2_m5.jl`): (a) from the saved CV, light: nested calibration check, operating-point menu, and the
-   plan's §1 criteria (NT/EC miss rates, supplemental AUC, USP planets, CONFIRMED lost at 98% recall), Phase 1 vs
-   Phase 2a; (b) freeze both Phase 2a models on the whole pool (`models/p2_frozen.jld2`), ~2 GB, 2 threads.
+1. M5 done (analysis + freeze).
 2. M6: the one Phase 2 sealed-test scoring (D5), with the user's go-ahead.
 3. Notebook for M3–M5 (feature distributions, blind-spot table, menu).
