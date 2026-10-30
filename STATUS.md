@@ -5,7 +5,7 @@ Updated: 2026-10-30, DESKTOP-BBASC81 (Thinkpad)
 **Phase 2 is done (M0–M6). On the sealed test set, our light-curve features lift DR25 ROC-AUC 0.957 → 0.976
 (catalog-only, near the robovetter's `koi_score` 0.979) and 0.988 → 0.993 (+ centroid)**, both paired gains with
 CIs above 0, matching CV. The model is Phase 2a (MLP + trees with our LC features); the CNNs (M4) neither beat nor
-added to it. A public-facing `README.md` is at the repo root (still shows Phase 1 results).
+added to it. The repo is public; `README.md` shows the Phase 1 and Phase 2 test results.
 
 ## Best model
 Frozen Phase 2 (`models/p2_frozen.jld2`): two 50/50 averages of a rank-gauss-input MLP (64-32, 10 seeds) and
@@ -101,12 +101,11 @@ M4 run notes: CNNs need ~1 h per screen and ~6.4 h per 5 × 3 final at 2 threads
 outside Claude Code after Claude Code's memory safeguard killed two earlier attempts.
 
 ## Waiting on user
-- Whether to update the public `README.md` with the Phase 2 results (test table + figure), and what comes next
-  (Phase 2 write-up notebook; any further work, e.g. the NT/EC blind spots).
+- What comes next: the Phase 2 write-up notebook, and any further work (e.g. the NT/EC blind spots).
 - Public repo: the user OK'd going public as-is (10/30; email in history and notes files stay). Final pass found
   nothing sensitive. The user flips visibility themselves.
 - Optional: back up `data/lightcurves/cache/` (14.3 GB, git-ignored; ~2.5 h to re-download).
 
 ## Next up
 1. Phase 2 write-up notebook (M3–M6: feature distributions, blind-spot table, CNN result, menu, test results).
-2. README update with the Phase 2 test results (on the user's OK).
+2. README: updated with the Phase 2 results and `figures/p2_test_roc.png` (10/30, cff12aa; repo is public).
