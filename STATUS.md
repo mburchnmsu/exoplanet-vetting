@@ -101,11 +101,14 @@ M4 run notes: CNNs need ~1 h per screen and ~6.4 h per 5 × 3 final at 2 threads
 outside Claude Code after Claude Code's memory safeguard killed two earlier attempts.
 
 ## Waiting on user
-- What comes next: the Phase 2 write-up notebook, and any further work (e.g. the NT/EC blind spots).
+- What comes next after Phase 2, e.g. the NT/EC blind spots. Cross-KOI ephemeris matching is the clearest lever
+  for EC. Any new comparison must rest on CV, since the test set has been scored once per phase.
 - Public repo: the user OK'd going public as-is (10/30; email in history and notes files stay). Final pass found
   nothing sensitive. The user flips visibility themselves.
 - Optional: back up `data/lightcurves/cache/` (14.3 GB, git-ignored; ~2.5 h to re-download).
 
 ## Next up
-1. Phase 2 write-up notebook (M3–M6: feature distributions, blind-spot table, CNN result, menu, test results).
+1. Phase 2 write-up notebook: **done** (`notebooks/exo103026.ipynb`, 10/30). It covers the feature distributions
+   and single-feature AUCs (centroid 0.86 and V-shape 0.83 lead), the CV comparison, blind spots, the CNN variants,
+   calibration and the menu, and the test results.
 2. README: updated with the Phase 2 results and `figures/p2_test_roc.png` (10/30, cff12aa; repo is public).

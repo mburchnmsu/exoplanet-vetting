@@ -15,3 +15,6 @@ Dated notebooks (`exoMMDDYY.ipynb`), oldest first. Setup cells load the code wit
 - `exo102426.ipynb` (10/24/2026): Phase 2 M2. Views for all 9,271 KOIs: coverage, label-free QA flags (observed
   transits, depth ratio, timing scatter vs per-transit SNR), median views per class on the pool (local, secondary,
   global, odd − even, centroid, planets by duration), and the M2 gate.
+- `exo103026.ipynb` (10/30/2026): Phase 2 write-up (M3–M6). The light-curve features per class and alone,
+  Phase 1 vs Phase 2a CV, blind spots (NT, EC, ultra-short periods), the CNN variants (tried, not used),
+  calibration and the operating-point menu, the one-time sealed-test results, and the Phase 2 conclusions.
