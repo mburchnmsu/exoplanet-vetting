@@ -101,8 +101,12 @@ M4 run notes: CNNs need ~1 h per screen and ~6.4 h per 5 × 3 final at 2 threads
 outside Claude Code after Claude Code's memory safeguard killed two earlier attempts.
 
 ## Waiting on user
-- What comes next after Phase 2, e.g. the NT/EC blind spots. Cross-KOI ephemeris matching is the clearest lever
-  for EC. Any new comparison must rest on CV, since the test set has been scored once per phase.
+- **Phase 3 plan** (`PHASE3_PLAN.md`, drafted 11/02):
+  - The user chose (11/02): EC first, via ephemeris matching against the KOI table, the Kepler EB catalog and the
+    DR25 TCE list, with the features in a separate "+ ephemeris" family.
+  - Waiting on: the user's OK of the plan (in particular E2's form, two models "catalog + ephemeris" and
+    "catalog + centroid + ephemeris") before M0.
+  - CV only; the test set is spent.
 - Public repo: the user OK'd going public as-is (10/30; email in history and notes files stay). Final pass found
   nothing sensitive. The user flips visibility themselves.
 - Optional: back up `data/lightcurves/cache/` (14.3 GB, git-ignored; ~2.5 h to re-download).
