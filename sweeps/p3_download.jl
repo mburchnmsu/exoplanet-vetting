@@ -1,0 +1,18 @@
+# Phase 3, M0: the small catalogs for ephemeris matching -> data/catalogs/ (git-ignored, a few MB).
+# Only ephemeris, shape, position and brightness columns are downloaded (PHASE3_PLAN.md, E4): no dispositions,
+# robovetter flags or scores of any object.
+#   julia --project=. sweeps/p3_download.jl
+using Downloads
+
+const DIR = joinpath(@__DIR__, "..", "data", "catalogs")
+const TAP = "https://exoplanetarchive.ipac.caltech.edu/TAP/sync?format=csv&query="
+mkpath(DIR)
+for (file, adql) in [("dr25_tce.csv", "select kepid,tce_plnt_num,tce_period,tce_time0bk,tce_duration,tce_depth," *
+                                      "tce_model_snr,ra,dec from q1_q17_dr25_tce"),
+                     ("dr25_stellar.csv", "select kepid,kepmag from q1_q17_dr25_ks")]
+    path = joinpath(DIR, file)
+    Downloads.download(TAP * replace(adql, " " => "+", "," => "%2C"), path)
+    println(file, ": ", countlines(path) - 1, " rows")
+end
+# Kepler EB catalog (Kirk et al. 2016, VizieR J/AJ/151/68, or keplerebs.villanova.edu): neither source could be
+# reached on 11/04/2026 (CDS timed out; the Villanova CSV export returned "page not found"). Added when reachable.

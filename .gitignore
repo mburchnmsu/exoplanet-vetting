@@ -4,3 +4,6 @@
 # Phase 2 light-curve cache, raw downloads and view caches (GBs, regenerable)
 data/lightcurves/
 data/views_*.jld2
+
+# Phase 3 matching catalogs (MBs, regenerable with sweeps/p3_download.jl)
+data/catalogs/

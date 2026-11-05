@@ -77,6 +77,42 @@ The thresholds and radius are fixed in M1, from label-free checks, before any CV
 **Models and CV.** Same learners, hyperparameters and folds as Phase 2a (MLP + trees 50/50, 5 shuffles × 10 seeds),
 paired against Phase 2a, with the M5 blind-spot table and operating-point menu.
 
+### 3.1 M0–M1 outcome (11/04/2026): what changed after the label-free checks
+
+- **Catalogs:** the DR25 TCE list (34,032 TCEs) and DR25 stellar magnitudes are downloaded (`sweeps/p3_download.jl`,
+  `data/catalogs/`, git-ignored). **The Kepler EB catalog could not be fetched**: both CDS mirrors timed out, and the
+  Villanova CSV export returns "page not found". v1 runs without it; it can be added later if a source comes back.
+- **The random-epoch null changed the design** (`sweeps/p3_match.jl`, `sweeps/results/p3_match.log`):
+  - With all 63 ratios m:n ≤ 10 and no distance limit, ~90% of KOIs "match" something at score < 1, and the null
+    gives the same rate: pure chance.
+  - The real signal sits at small separations, simple ratios and tight scores. At score < 0.25, matches within 10"
+    are ~95% real, within 1' ~90%, and at 3–10' ~55%. Beyond 30' the "other" ratios are chance.
+- **v1 features** (`src/Ephemeris.jl`, `EPHEMERIS_FEATURES`; ratios 1:1, 1:2, 2:1 only):
+  - from the best match within 10′ (`NEAR` = 600″): `eph_score_near`, `eph_logsep`, `eph_logleak`, `eph_dmag`;
+  - `eph_nmatch_near`, the number of near stars matched with score < 0.25 (`MATCH_CUT`);
+  - `eph_score_far`, the best 1:1 score beyond 10′ (cross-talk candidates; only ~38% real at < 0.25, so the model
+    weighs it).
+
+  "No match" takes the search limit (score 3, separation 10′, leak 6), not a missing indicator.
+- **Size of the real signal:** near matches at score < 0.25 number 1,400 KOIs vs 369 by chance, an excess of
+  ~1,030 KOIs, close to the 1,148 KOIs carrying the EC flag.
+
+**Pool-only class check (`--classes`, `sweeps/results/p3_match_classes.log`):**
+
+| Pool group | n | Near match (score < 0.25) | Far 1:1 match | Of near matches: other star could cause the dip |
+|---|---|---|---|---|
+| Planets | 4,163 | 0.5% | 0.4% | 4.5% |
+| EC-only FPs | 111 | **68.5%** | 46.8% | 69.7% |
+| Any EC-flagged FP | 1,022 | **86.0%** | 30.0% | 69.5% |
+| SS-only FPs | 1,307 | 22.3% | 2.8% | 2.1% |
+| CO-only FPs | 464 | 2.6% | 1.1% | 58.3% |
+| NT-only FPs | 849 | 3.4% | 2.0% | 10.7% |
+
+- The features find most contamination FPs and almost no planets.
+- The SS-only matches are mostly the **sources** (bright EBs that contaminate their neighbours): only 2% of them
+  could have been caused by the matched star. The leak feature tells victim from source.
+- Single-feature AUC, EC-only FPs vs planets: 0.90 (near score, separation, leak), 0.82 (far score).
+
 ## 4. Rules carried over
 
 - **No test-set use.** The sealed test split (seed 42) has been scored once per phase. Phase 3 is judged on CV only.

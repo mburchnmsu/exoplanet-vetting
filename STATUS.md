@@ -101,11 +101,15 @@ M4 run notes: CNNs need ~1 h per screen and ~6.4 h per 5 × 3 final at 2 threads
 outside Claude Code after Claude Code's memory safeguard killed two earlier attempts.
 
 ## Waiting on user
-- **Phase 3 plan** (`PHASE3_PLAN.md`, drafted 11/02):
-  - The user chose (11/02): EC first, via ephemeris matching against the KOI table, the Kepler EB catalog and the
-    DR25 TCE list, with the features in a separate "+ ephemeris" family.
-  - Waiting on: the user's OK of the plan (in particular E2's form, two models "catalog + ephemeris" and
-    "catalog + centroid + ephemeris") before M0.
+- **Phase 3 (`PHASE3_PLAN.md`): EC blind spot via ephemeris matching.**
+  - User decisions (11/02): EC first; a separate "+ ephemeris" family as two new models; M0 + M1 approved.
+  - **M0 + M1 done 11/04.** The DR25 TCE list and stellar magnitudes are downloaded. The Kepler EB catalog is
+    unreachable (CDS and Villanova both down), so v1 runs without it.
+  - The random-epoch null showed that broad matching is pure chance. v1 keeps ratios 1:1, 1:2, 2:1, near matches
+    within 10′, and a tight score cut of 0.25.
+  - Pool check: a near match for 68.5% of EC-only FPs (86% of all EC-flagged) vs 0.5% of planets.
+  - Waiting on: the user's OK for **M2**, the CV of the two "+ ephemeris" models (4 runs of 5 × 10,
+    ~30–40 min, 2 threads, ~2–3 GB; tell the hub first).
   - CV only; the test set is spent.
 - Public repo: the user OK'd going public as-is (10/30; email in history and notes files stay). Final pass found
   nothing sensitive. The user flips visibility themselves.

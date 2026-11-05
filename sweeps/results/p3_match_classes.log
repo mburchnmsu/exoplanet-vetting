@@ -1,0 +1,27 @@
+VettingSetup loaded:11 features, data at C:\JuliaProjects\Exoplanet vetting\data\koi_cumulative.csv
+entries: 43596 (koi 9564, tce 34032); targets: 9564 KOIs
+pool, per class: near (< 600") and far 1:1 matches with score < 0.25, and the share of near
+matches where the other star could cause the dip (log leak < 0):
+7×5 DataFrame
+ Row │ group              n      near_match_pct  far_match_pct  leak_plausible_pct
+     │ String             Int64  Float64         Float64        Float64
+─────┼─────────────────────────────────────────────────────────────────────────────
+   1 │ planets             4163             0.5            0.4                 4.5
+   2 │ FP: EC only          111            68.5           46.8                69.7
+   3 │ FP: EC flag (any)   1022            86.0           30.0                69.5
+   4 │ FP: SS only         1307            22.3            2.8                 2.1
+   5 │ FP: CO only          464             2.6            1.1                58.3
+   6 │ FP: NT only          849             3.4            2.0                10.7
+   7 │ FP: all             4125            30.0            9.1                51.4
+single-feature AUC, DR25 pool (folded: 0.5 useless); last column = EC-only FPs vs planets:
+6×4 DataFrame
+ Row │ feature          auc_dr25_alone  planets_higher  ec_only_vs_planets
+     │ String           Float64         Bool            Float64
+─────┼─────────────────────────────────────────────────────────────────────
+   1 │ eph_score_near            0.68             true               0.898
+   2 │ eph_logsep                0.679            true               0.896
+   3 │ eph_logleak               0.679            true               0.899
+   4 │ eph_dmag                  0.505            true               0.566
+   5 │ eph_nmatch_near           0.669           false               0.857
+   6 │ eph_score_far             0.679            true               0.823
+11-04 17:05  DONE
