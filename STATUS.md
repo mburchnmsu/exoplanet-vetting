@@ -17,7 +17,11 @@ Updated: 2026-11-09 00:20, DESKTOP-BBASC81 (Thinkpad)
 - **M3 write-up done:** `notebooks/exo110826.ipynb`; README has a Phase 3 section and `figures/p3_cv_lowfp.png`;
   `PHASE3_PLAN.md` §3.2.
 - **Waiting on the user:** adopt the "+ ephemeris" models (a freeze would be labelled "post-test, CV-validated") or
-  not; and whether the NT blind spot (still ~21–24% missed) becomes the next phase.
+  not; and whether the NT blind spot (still ~21–24% missed at p = 0.5, ~70% at 98% recall) becomes Phase 4.
+- **`PHASE4_PLAN.md` DRAFT (NT), not approved, nothing run** apart from the pool-only scoping (`sweeps/p4_scoping.jl`).
+  The missed NT FPs are low-SNR, U-shaped and multi-transit; the robovetter caught them with event-uniqueness and
+  per-transit / bad-time (SKYE) tests. The draft proposes: N-c bad-time clustering from the TCE list (cheap) first,
+  then uniqueness + per-transit consistency in one light-curve pass. Decisions N1–N5 are open.
 
 ## Headline (Phase 2)
 **Phase 2 is done (M0–M6). On the sealed test set, our light-curve features lift DR25 ROC-AUC 0.957 → 0.976

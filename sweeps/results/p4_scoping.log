@@ -1,0 +1,62 @@
+VettingSetup loaded:11 features, data at C:\JuliaProjects\Exoplanet vetting\data\koi_cumulative.csv
+NT-only FPs: 849 (DR25 433); missed at p = 0.5: 173 (20.4%; DR25 18.5%, supplemental 22.4%)
+robovetter comment tokens on NT-only FPs (n >= 15):
+19×4 DataFrame
+ Row │ token                      n_nt   missed_pct  share_of_missed
+     │ String                     Int64  Float64     Float64
+─────┼───────────────────────────────────────────────────────────────
+   1 │ LPP_DV                       169         3.6              3.5
+   2 │ CENT_FEW_DIFFS               152        23.0             20.2
+   3 │ MOD_NONUNIQ_ALT              106        39.6             24.3
+   4 │ INCONSISTENT_TRANS            80        17.5              8.1
+   5 │ ALL_TRANS_CHASES              57        12.3              4.0
+   6 │ CENT_SATURATED                41         2.4              0.6
+   7 │ CENT_NOFITS                   41         0.0              0.0
+   8 │ LPP_ALT                       37         0.0              0.0
+   9 │ LPP_ALT_TOO_HIGH              33        24.2              4.6
+  10 │ INDIV_TRANS_SKYE              32        40.6              7.5
+  11 │ EYEBALL                       30        13.3              2.3
+  12 │ MOD_NONUNIQ_DV                28         3.6              0.6
+  13 │ SAME_NTL_PERIOD               25         0.0              0.0
+  14 │ CENT_KIC_POS                  24        20.8              2.9
+  15 │ INDIV_TRANS_MARSHALL_SKYE     24        12.5              1.7
+  16 │ SWEET_NTL                     23         0.0              0.0
+  17 │ TOO_FEW_QUARTERS              22        18.2              2.3
+  18 │ LPP_DV_TOO_HIGH               16         6.2              0.6
+  19 │ MARSHALL_FAIL                 16         6.2              0.6
+medians:
+11×4 DataFrame
+ Row │ feature         planets  nt_caught  nt_missed
+     │ String          Float64  Float64    Float64
+─────┼───────────────────────────────────────────────
+   1 │ koi_period       13.2      198.0      114.0
+   2 │ koi_duration      3.57       8.11       4.15
+   3 │ koi_depth       354.0      410.0      287.0
+   4 │ koi_model_snr    19.7       11.6        8.2
+   5 │ lc_snr           21.4        7.92       7.93
+   6 │ lc_ntransits     92.0        6.0       10.0
+   7 │ lc_sev_ratio      0.323      0.744      0.651
+   8 │ lc_timing         0.222      0.185      0.222
+   9 │ lc_vshape         0.45       0.65       0.25
+  10 │ lc_depth_ratio    0.948      0.948      0.886
+  11 │ lc_dur_ratio      1.1        1.1        1.05
+NT-only FPs by period [d]:
+5×4 DataFrame
+ Row │ bin         nt     missed_pct  planets
+     │ String      Int64  Float64     Int64
+─────┼────────────────────────────────────────
+   1 │ 0.0–1.5       112         3.6      201
+   2 │ 1.5–10.0       93        12.9     1539
+   3 │ 10.0–50.0     112        34.8     1496
+   4 │ 50.0–200.0    129        39.5      560
+   5 │ 200.0–Inf     403        16.6      367
+NT-only FPs by observed transits:
+5×4 DataFrame
+ Row │ bin         nt     missed_pct  planets
+     │ String      Int64  Float64     Int64
+─────┼────────────────────────────────────────
+   1 │ 0.0–3.0         2       100.0       15
+   2 │ 3.0–6.0       379        15.8      332
+   3 │ 6.0–20.0      139        36.0      479
+   4 │ 20.0–100.0    111        36.9     1340
+   5 │ 100.0–Inf     218         9.2     1997
