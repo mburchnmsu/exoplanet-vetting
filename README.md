@@ -4,7 +4,8 @@ An independent project: a classifier that separates real transiting planets from
 ~9,200 Kepler Objects of Interest (KOIs), written in Julia (Flux.jl, EvoTrees.jl). The emphasis is on an honest
 evaluation: star-grouped splits, a repeated cross-validation protocol with a measured noise floor, and a test set
 that stays sealed until the models are frozen and is then scored once per phase (once for Phase 1, once for
-Phase 2). Phase 1 uses catalog numbers only; Phase 2 adds features measured from the Kepler light curves.
+Phase 2). Phase 1 uses catalog numbers only; Phase 2 adds features measured from the Kepler light curves; Phase 3
+(cross-validation only) matches each KOI's ephemeris against signals on other stars to catch contamination.
 
 **Task.** Label = planet (CONFIRMED or CANDIDATE) vs FALSE POSITIVE, from the NASA Exoplanet Archive cumulative
 KOI table. 9,201 KOIs on 7,927 stars (4,619 planets, 4,582 false positives). The robovetter's outputs
@@ -105,6 +106,37 @@ Phase 2 choice was tuned on the test set.
   27% → 24% and 26% → 23% in the "+ centroid" family, CV, threshold 0.5) but stay the largest error groups.
   Ultra-short-period planets wrongly rejected fall from 60% to 40% in the catalog family.
 
+## Phase 3: contamination false positives by ephemeris matching (cross-validation only)
+
+Many contamination ("EC") false positives are another star's signal leaking into the target's pixels. The evidence
+lives on the other star, so no per-KOI measurement can see it. Phase 3 rebuilds Kepler's ephemeris-matching test
+from catalog data: does a KOI's period and transit time match a signal on another star, among the KOIs and the
+34,032 DR25 threshold-crossing events?
+- A random-epoch null fixed the design without labels: matches are kept within 10′, at period ratios 1:1, 1:2 and 2:1.
+- 6 features: the best match score, its separation, its brightness difference, whether that star could produce the
+  dip, the number of matched neighbours, and a far-field cross-talk score.
+- Only the other objects' ephemerides, positions and brightnesses are used, never their dispositions, and a KOI is
+  never matched to its own star.
+
+Like the centroid features, this is partly circular with Kepler's own EC flag, so it forms **a separate
+"+ ephemeris" family**. The Phase 2 models are unchanged. The test set was already used for Phase 2, so Phase 3 is
+judged on cross-validation only (5 fold shuffles × 10 seeds, paired against Phase 2a on identical folds):
+
+| CV, DR25 KOIs | Catalog: Phase 2a → + ephemeris | + centroid: Phase 2a → + ephemeris |
+|---|---|---|
+| ROC-AUC (paired Δ [95% CI]) | 0.971 → **0.976** (+0.006 [+0.004, +0.008]) | 0.987 → **0.989** (+0.002 [+0.001, +0.003]) |
+| Contamination-only FPs missed (p = 0.5) | 18.0% → **4.3%** | 23.2% → **6.7%** |
+| FPs kept at 98% planet recall | 25% → 20% | 14% → 12% |
+| Planet recall at a 10% FP rate (`koi_score`: 0.968) | 0.918 → 0.936 | 0.966 → **0.973** |
+
+- CONFIRMED planets lost at 98% recall stay at 0.3–0.4% (paired change 0.0, CI within ±0.2 points).
+- Side effect: in the catalog family, false positives from a faint neighbour (centroid offset) get a little harder to
+  catch, because their sources usually have no catalogued signal to match.
+- Adding the Kepler eclipsing-binary catalog (Kirk et al. 2016) changes nothing measurable; most of its EBs are
+  already DR25 events.
+
+![CV ROC at low false-positive rates, DR25 KOIs](figures/p3_cv_lowfp.png)
+
 ## Repository layout
 
 | Path | Contents |
@@ -113,12 +145,13 @@ Phase 2 choice was tuned on the test set.
 | `src/CrossValidation.jl` | Star-grouped repeated CV, out-of-fold predictions, paired star-bootstrap comparisons |
 | `src/Baselines.jl`, `Centroids.jl`, `Calibration.jl`, `ErrorAnalysis.jl` | Trees, centroid features, operating points, error analysis |
 | `src/LightCurves.jl`, `Detrend.jl`, `Views.jl`, `LCFeatures.jl`, `CNN.jl` | Phase 2: MAST download + cache, detrending, views, light-curve features, CNN |
+| `src/Ephemeris.jl` | Phase 3: ephemeris matching against other stars' signals |
 | `sweeps/*.jl` | Scripts that run each experiment (resumable) |
 | `sweeps/results/` | CV results (out-of-fold predictions), QA and feature tables, test tables |
 | `sweeps/REPORT.md` | The full write-up, step by step |
 | `notebooks/` | Dated notebooks (`exoMMDDYY.ipynb`) with plots; index in `notebooks/README.md` |
 | `ExoOnboarding.ipynb` | Introduction: data, physics, method, results |
-| `PHASE2_PLAN.md` | Phase 2 design and milestones |
+| `PHASE2_PLAN.md`, `PHASE3_PLAN.md` | Phase 2 and Phase 3 design, milestones and outcomes |
 | `models/step5_frozen.jld2`, `models/p2_frozen.jld2` | The frozen Phase 1 and Phase 2 models (two families each) |
 | `data/koi_cumulative.csv` | NASA Exoplanet Archive cumulative KOI table (as downloaded) |
 
@@ -136,6 +169,8 @@ julia --project=. -t auto sweeps/cv_baselines.jl      # Phase 1 CV examples; see
   cache under `data/lightcurves/`, not in git). Then run `sweeps/p2_build.jl` (views + QA, ~1.5 h),
   `sweeps/p2_features.jl`, `sweeps/p2_cv.jl`, `sweeps/p2_cnn.jl` (CNN; slow on a CPU) and `sweeps/p2_m5.jl`
   (calibration, operating points, freeze).
+- Phase 3: `sweeps/p3_download.jl` (small catalogs into `data/catalogs/`), `sweeps/p3_match.jl` (matching + null),
+  `sweeps/p3_cv.jl` and `sweeps/p3_m2.jl` (CV and analysis; `--eb` for the eclipsing-binary variant).
 - The sealed-test scripts (`sweeps/step5_test.jl`, `sweeps/p2_test.jl`) are kept for the record; each refuses to
   score the test set a second time.
 
@@ -143,5 +178,7 @@ julia --project=. -t auto sweeps/cv_baselines.jl      # Phase 1 CV examples; see
 
 - KOI table: NASA Exoplanet Archive, Kepler cumulative KOI table.
 - Light curves: Kepler DR25 long-cadence data, from MAST (STScI).
+- Phase 3: the DR25 TCE and stellar tables (NASA Exoplanet Archive), and the Kepler Eclipsing Binary Catalog, third
+  revision (Kirk et al. 2016, AJ 151, 68; VizieR J/AJ/151/68).
 - Methods follow Shallue & Vanderburg (2018, AstroNet) for the views and Hippke et al. (2019, `wotan`) for
   detrending.

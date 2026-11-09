@@ -1,0 +1,37 @@
+family,model,rule,t_median,dr25_recall,dr25_precision,dr25_fp_kept,fps_kept_per1000,confirmed_lost,supp_recall,supp_precision
+catalog,Phase 2a,planet recall 95%,0.358,0.949,0.865,0.156,76,0.011,0.766,0.534
+catalog,Phase 2a,planet recall 98%,0.178,0.98,0.805,0.251,122,0.004,0.953,0.481
+catalog,Phase 2a,planet recall 99%,0.082,0.99,0.752,0.344,167,0.002,0.98,0.467
+catalog,Phase 2a,precision 95%,0.722,0.838,0.95,0.046,22,0.054,0.148,0.72
+catalog,Phase 2a,max F1,0.502,0.919,0.905,0.102,49,0.019,0.469,0.59
+catalog,Phase 2a,p = 0.5,0.5,0.919,0.905,0.101,49,0.02,0.469,0.601
+catalog,+ ephemeris,planet recall 95%,0.4,0.95,0.891,0.123,60,0.01,0.69,0.549
+catalog,+ ephemeris,planet recall 98%,0.199,0.98,0.835,0.204,99,0.004,0.951,0.487
+catalog,+ ephemeris,planet recall 99%,0.1,0.99,0.791,0.276,134,0.002,0.979,0.473
+catalog,+ ephemeris,precision 95%,0.692,0.876,0.949,0.049,24,0.034,0.188,0.697
+catalog,+ ephemeris,max F1,0.541,0.923,0.918,0.086,42,0.019,0.425,0.605
+catalog,+ ephemeris,p = 0.5,0.5,0.93,0.914,0.093,45,0.016,0.478,0.596
++ centroid,Phase 2a,planet recall 95%,0.492,0.949,0.935,0.069,34,0.007,0.535,0.655
++ centroid,Phase 2a,planet recall 98%,0.25,0.979,0.882,0.138,67,0.003,0.916,0.546
++ centroid,Phase 2a,planet recall 99%,0.107,0.99,0.838,0.202,98,0.003,0.982,0.494
++ centroid,Phase 2a,precision 95%,0.571,0.937,0.95,0.052,26,0.01,0.408,0.726
++ centroid,Phase 2a,max F1,0.541,0.942,0.945,0.057,28,0.008,0.45,0.701
++ centroid,Phase 2a,p = 0.5,0.5,0.948,0.938,0.066,32,0.007,0.517,0.665
++ centroid,+ ephemeris,planet recall 95%,0.515,0.95,0.945,0.058,28,0.007,0.501,0.677
++ centroid,+ ephemeris,planet recall 98%,0.255,0.98,0.896,0.12,58,0.004,0.903,0.551
++ centroid,+ ephemeris,planet recall 99%,0.118,0.99,0.857,0.175,85,0.002,0.983,0.498
++ centroid,+ ephemeris,precision 95%,0.542,0.947,0.95,0.053,26,0.007,0.463,0.704
++ centroid,+ ephemeris,max F1,0.601,0.94,0.958,0.043,21,0.01,0.378,0.743
++ centroid,+ ephemeris,p = 0.5,0.5,0.952,0.943,0.061,30,0.007,0.524,0.665
+catalog,+ eph + EB,planet recall 95%,0.401,0.95,0.89,0.124,60,0.01,0.694,0.55
+catalog,+ eph + EB,planet recall 98%,0.2,0.98,0.835,0.204,99,0.004,0.95,0.487
+catalog,+ eph + EB,planet recall 99%,0.1,0.99,0.791,0.275,134,0.002,0.98,0.473
+catalog,+ eph + EB,precision 95%,0.693,0.878,0.95,0.049,24,0.034,0.196,0.71
+catalog,+ eph + EB,max F1,0.523,0.925,0.918,0.088,43,0.018,0.433,0.604
+catalog,+ eph + EB,p = 0.5,0.5,0.93,0.913,0.093,45,0.016,0.481,0.597
++ centroid,+ eph + EB,planet recall 95%,0.514,0.95,0.945,0.058,28,0.007,0.508,0.68
++ centroid,+ eph + EB,planet recall 98%,0.256,0.98,0.896,0.12,58,0.004,0.907,0.549
++ centroid,+ eph + EB,planet recall 99%,0.118,0.99,0.858,0.173,84,0.002,0.984,0.498
++ centroid,+ eph + EB,precision 95%,0.543,0.946,0.95,0.052,26,0.008,0.46,0.708
++ centroid,+ eph + EB,max F1,0.602,0.938,0.959,0.043,21,0.01,0.377,0.738
++ centroid,+ eph + EB,p = 0.5,0.5,0.953,0.942,0.062,30,0.007,0.526,0.662

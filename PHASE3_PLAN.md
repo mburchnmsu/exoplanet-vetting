@@ -81,7 +81,8 @@ paired against Phase 2a, with the M5 blind-spot table and operating-point menu.
 
 - **Catalogs:** the DR25 TCE list (34,032 TCEs) and DR25 stellar magnitudes are downloaded (`sweeps/p3_download.jl`,
   `data/catalogs/`, git-ignored). **The Kepler EB catalog could not be fetched**: both CDS mirrors timed out, and the
-  Villanova CSV export returns "page not found". v1 runs without it; it can be added later if a source comes back.
+  Villanova CSV export returns "page not found". v1 runs without it. (It was fetched on 11/08 from the CfA mirror
+  and tested as v2; see 3.2.)
 - **The random-epoch null changed the design** (`sweeps/p3_match.jl`, `sweeps/results/p3_match.log`):
   - With all 63 ratios m:n ≤ 10 and no distance limit, ~90% of KOIs "match" something at score < 1, and the null
     gives the same rate: pure chance.
@@ -112,6 +113,31 @@ paired against Phase 2a, with the M5 blind-spot table and operating-point menu.
 - The SS-only matches are mostly the **sources** (bright EBs that contaminate their neighbours): only 2% of them
   could have been caused by the matched star. The leak feature tells victim from source.
 - Single-feature AUC, EC-only FPs vs planets: 0.90 (near score, separation, leak), 0.82 (far score).
+
+### 3.2 M2 outcome (11/08/2026): criteria met
+
+CV, 5 × 10, paired vs Phase 2a (`sweeps/p3_cv.jl`, 13 min for all four runs; analysis `sweeps/p3_m2.jl`,
+`sweeps/results/p3_m2_*.csv`):
+
+| | Catalog: Phase 2a → + ephemeris | + centroid: Phase 2a → + ephemeris |
+|---|---|---|
+| DR25 ROC-AUC (Δ [95% CI]) | 0.971 → **0.976** (+0.006 [+0.004, +0.008]) | 0.987 → **0.989** (+0.002 [+0.001, +0.003]) |
+| EC-only FPs missed, p = 0.5 | 18.0 → **4.3%** (Δ −13.7 [−20.5, −7.1]) | 23.2 → **6.7%** (−16.6 [−23.3, −10.0]) |
+| EC-only FPs missed, 98% recall | 44.3 → 15.0% | 33.7 → 13.3% |
+| EC-flagged FPs missed, 98% recall | 22.4 → 3.2% | 9.3 → 2.3% |
+| DR25 FPs kept at 98% recall | 25 → 20% | 14 → 12% |
+| CONFIRMED lost at 98% recall | 0.4 → 0.4% | 0.3 → 0.4% (Δ 0.0 [−0.1, +0.2]) |
+| Recall at 5% / 10% FP rate (`koi_score` 0.953 / 0.968) | 0.849 / 0.918 → 0.880 / 0.936 | 0.935 / 0.966 → 0.946 / **0.973** |
+
+- §1 criteria: **1 (main) met** in both families. **2 met**: AUC up, CONFIRMED lost unchanged within CI.
+  **3 reported**: + centroid + ephemeris beats `koi_score` at a 10% FP rate and below ~3%, and trails it at 5%.
+- Side effect: in the catalog family, CO-only FPs missed rise 34.6 → 40.8% (p = 0.5; CI above 0). Their sources
+  are mostly non-targets with no TCE, so "no match" reads as planet-like. In + centroid the rise is small
+  (5.3 → 6.7%). NT-only +0.8 points.
+- **v2 with the Kepler EB catalog** (CfA VizieR mirror, 11/08; `--eb` flags): ~15 more real near matches. Every
+  change vs v1 is ≈ 0 (`p3_m2eb_*.csv`), because most EBs are already DR25 TCEs. **v1 stays.**
+- Write-up: `notebooks/exo110826.ipynb`. Open, for the user: adopt (freeze, labelled "post-test, CV-validated") or
+  not; whether NT is next.
 
 ## 4. Rules carried over
 

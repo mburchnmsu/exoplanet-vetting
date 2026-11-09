@@ -18,3 +18,6 @@ Dated notebooks (`exoMMDDYY.ipynb`), oldest first. Setup cells load the code wit
 - `exo103026.ipynb` (10/30/2026): Phase 2 write-up (M3–M6). The light-curve features per class and alone,
   Phase 1 vs Phase 2a CV, blind spots (NT, EC, ultra-short periods), the CNN variants (tried, not used),
   calibration and the operating-point menu, the one-time sealed-test results, and the Phase 2 conclusions.
+- `exo110826.ipynb` (11/08/2026): Phase 3 write-up (CV only). Ephemeris matching against KOIs and DR25 TCEs, the
+  random-epoch null, the features per class, the "+ ephemeris" models vs Phase 2a, the EC blind spot and the other
+  blind spots, the operating points, the low-FP-rate comparison with `koi_score`, and v2 with the Kepler EB catalog.

@@ -1,0 +1,37 @@
+group,n,family,rule,old_pct,new_pct,delta_pct,ci_lo,ci_hi
+FP missed: EC only,111,catalog,p = 0.5,4.3,4.3,0.0,0.0,0.0
+FP missed: EC only,111,catalog,planet recall 98%,15.0,15.1,0.2,-0.4,0.7
+FP missed: EC only,111,+ centroid,p = 0.5,6.7,6.8,0.2,0.0,0.5
+FP missed: EC only,111,+ centroid,planet recall 98%,13.3,13.2,-0.2,-0.5,0.0
+FP missed: EC flag (any),1022,catalog,p = 0.5,0.8,0.8,-0.0,-0.1,0.0
+FP missed: EC flag (any),1022,catalog,planet recall 98%,3.2,3.2,0.0,-0.3,0.3
+FP missed: EC flag (any),1022,+ centroid,p = 0.5,0.8,0.8,0.0,0.0,0.1
+FP missed: EC flag (any),1022,+ centroid,planet recall 98%,2.3,2.3,0.1,-0.0,0.3
+FP missed: NT only,849,catalog,p = 0.5,21.6,21.9,0.3,-0.0,0.6
+FP missed: NT only,849,catalog,planet recall 98%,70.0,70.0,-0.0,-0.3,0.3
+FP missed: NT only,849,+ centroid,p = 0.5,24.4,24.9,0.5,0.1,0.9
+FP missed: NT only,849,+ centroid,planet recall 98%,59.7,60.2,0.5,0.1,1.0
+FP missed: CO only,464,catalog,p = 0.5,40.8,40.7,-0.1,-0.5,0.3
+FP missed: CO only,464,catalog,planet recall 98%,66.2,66.0,-0.2,-0.9,0.4
+FP missed: CO only,464,+ centroid,p = 0.5,6.7,6.9,0.2,-0.1,0.5
+FP missed: CO only,464,+ centroid,planet recall 98%,11.9,12.0,0.1,0.0,0.3
+FP missed: SS only,1307,catalog,p = 0.5,3.4,3.4,0.0,-0.1,0.1
+FP missed: SS only,1307,catalog,planet recall 98%,9.0,9.1,0.0,-0.1,0.2
+FP missed: SS only,1307,+ centroid,p = 0.5,5.4,5.4,0.0,-0.1,0.1
+FP missed: SS only,1307,+ centroid,planet recall 98%,9.7,9.7,-0.1,-0.2,0.0
+FP missed: all,4125,catalog,p = 0.5,11.6,11.6,0.0,-0.1,0.1
+FP missed: all,4125,catalog,planet recall 98%,28.7,28.7,0.0,-0.1,0.1
+FP missed: all,4125,+ centroid,p = 0.5,8.2,8.3,0.1,0.0,0.2
+FP missed: all,4125,+ centroid,planet recall 98%,18.5,18.7,0.1,0.0,0.2
+CONFIRMED called FP,2473,catalog,p = 0.5,1.7,1.7,0.0,-0.0,0.1
+CONFIRMED called FP,2473,catalog,planet recall 98%,0.4,0.4,0.0,-0.0,0.0
+CONFIRMED called FP,2473,+ centroid,p = 0.5,0.8,0.8,0.0,-0.0,0.0
+CONFIRMED called FP,2473,+ centroid,planet recall 98%,0.4,0.4,-0.0,-0.0,0.0
+CONFIRMED called FP (DR25),2459,catalog,p = 0.5,1.6,1.6,0.0,-0.0,0.1
+CONFIRMED called FP (DR25),2459,catalog,planet recall 98%,0.4,0.4,0.0,-0.0,0.0
+CONFIRMED called FP (DR25),2459,+ centroid,p = 0.5,0.7,0.7,0.0,-0.0,0.0
+CONFIRMED called FP (DR25),2459,+ centroid,planet recall 98%,0.4,0.4,-0.0,-0.0,0.0
+planet called FP: all,4163,catalog,p = 0.5,12.1,12.0,-0.1,-0.2,0.0
+planet called FP: all,4163,catalog,planet recall 98%,2.4,2.4,0.0,-0.0,0.1
+planet called FP: all,4163,+ centroid,p = 0.5,9.6,9.5,-0.1,-0.2,0.0
+planet called FP: all,4163,+ centroid,planet recall 98%,2.9,2.8,-0.1,-0.1,-0.0

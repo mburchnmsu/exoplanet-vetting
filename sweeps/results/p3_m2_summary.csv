@@ -1,0 +1,7 @@
+family,subset,n,old,auc_old,new,auc_new,delta,ci_lo,ci_hi
+catalog,DR25 KOIs,7199,Phase 2a,0.9705,+ ephemeris,0.9764,0.0059,0.0042,0.0075
+catalog,supplemental KOIs,1089,Phase 2a,0.6959,+ ephemeris,0.6979,0.002,-0.0055,0.0098
+catalog,all pool,8288,Phase 2a,0.9536,+ ephemeris,0.9605,0.0069,0.0052,0.0087
++ centroid,DR25 KOIs,7199,Phase 2a,0.9869,+ ephemeris,0.9889,0.002,0.0013,0.0027
++ centroid,supplemental KOIs,1089,Phase 2a,0.7661,+ ephemeris,0.769,0.0029,-0.0031,0.0097
++ centroid,all pool,8288,Phase 2a,0.9752,+ ephemeris,0.9778,0.0026,0.0018,0.0035

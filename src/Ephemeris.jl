@@ -13,12 +13,14 @@ const MISSION_SPAN = 1460.0        # days, Q1–Q17 (BKJD ~131.5 to ~1591)
 const ALL_RATIOS = sort(unique([(m ÷ gcd(m, n), n ÷ gcd(m, n)) for m in 1:10, n in 1:10]))
 
 """
-    ephemeris_entries(df_raw) -> DataFrame
+    ephemeris_entries(df_raw; eb = false) -> DataFrame
 
 Every signal that could be a contamination source: all KOIs (catalog = "koi") and all DR25 TCEs ("tce"), with
 kepid, period [d], epoch [BKJD], duration [h], depth [ppm], ra, dec [deg], kepmag. Only these columns are read.
+With `eb = true`, also the Kepler EB catalog ("eb"; period, epoch and the star's position and magnitude only; its
+depth and duration are unknown, NaN). v1 (M1/M2) ran without it.
 """
-function ephemeris_entries(df_raw::DataFrame)
+function ephemeris_entries(df_raw::DataFrame; eb = false)
     k = DataFrame(catalog = "koi", kepid = df_raw.kepid, period = df_raw.koi_period, epoch = df_raw.koi_time0bk,
                   duration = df_raw.koi_duration, depth = df_raw.koi_depth, ra = df_raw.ra, dec = df_raw.dec,
                   kepmag = df_raw.koi_kepmag)
@@ -29,6 +31,18 @@ function ephemeris_entries(df_raw::DataFrame)
                   duration = t.tce_duration, depth = t.tce_depth, ra = t.ra, dec = t.dec,
                   kepmag = [get(mag, id, missing) for id in t.kepid])
     e = vcat(k, t)
+    if eb
+        # VizieR TSV: comment lines, a header, a units row and a dashes row, then KIC  Per  BJD0  Kpmag
+        num(s) = (v = tryparse(Float64, strip(s)); v === nothing ? NaN : v)
+        rs = [split(l, '\t') for l in eachline(joinpath(CATALOG_DIR, "kepler_eb.tsv")) if !isempty(l) && isdigit(l[1])]
+        b = DataFrame(KIC = [parse(Int, r[1]) for r in rs], Per = [num(r[2]) for r in rs], BJD0 = [num(r[3]) for r in rs])
+        pos = Dict(zip(st.kepid, zip(st.ra, st.dec)))
+        b = filter(r -> haskey(pos, r.KIC), b)
+        e = vcat(e, DataFrame(catalog = "eb", kepid = b.KIC, period = b.Per,
+                              epoch = coalesce.(b.BJD0, NaN) .- 54833.0,          # BJD − 2400000 -> BKJD
+                              duration = NaN, depth = NaN, ra = [pos[i][1] for i in b.KIC],
+                              dec = [pos[i][2] for i in b.KIC], kepmag = [get(mag, i, missing) for i in b.KIC]))
+    end
     for c in [:period, :epoch, :duration, :depth, :ra, :dec, :kepmag]
         e[!, c] = Float64.(coalesce.(e[!, c], NaN))
     end
@@ -120,6 +134,10 @@ function ephemeris_features(targets::DataFrame, M::DataFrame)
             k = argmin(near.score)
             F.eph_score_near[i] = near.score[k]; F.eph_logsep[i] = log10(max(near.sep[k], 0.1))
             F.eph_logleak[i] = near.logleak[k]; F.eph_dmag[i] = isfinite(near.dmag[k]) ? near.dmag[k] : 0.0
+            if near.catalog[k] == "eb"            # EB depths are unknown: take the leak from the best match that has one
+                kk = findall(isfinite, near.logleak)
+                isempty(kk) || (F.eph_logleak[i] = near.logleak[kk[argmin(near.score[kk])]])
+            end
             F.eph_nmatch_near[i] = length(unique(near.other[near.score .< MATCH_CUT]))
         end
         far = g[(g.sep .>= NEAR) .& (g.m .== 1) .& (g.n .== 1), :]

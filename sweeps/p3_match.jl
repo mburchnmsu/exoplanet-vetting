@@ -3,15 +3,17 @@
 #              ratio (no labels); the features -> sweeps/results/p3_ephemeris.csv
 #   --classes  pool only: feature values per class (planets, EC-only, other FP patterns). Run after the feature
 #              definitions are fixed from the label-free part.
+#   --eb       also match against the Kepler EB catalog (v2) -> sweeps/results/p3_ephemeris_eb.csv
 #   cmd /c "start /b /wait /belownormal julia --project=. -t 2 sweeps/p3_match.jl"
 include(joinpath(@__DIR__, "..", "src", "VettingSetup.jl"))
 using Dates
 
 df_raw = load_koi()
-entries = ephemeris_entries(df_raw)
-@printf("entries: %d (koi %d, tce %d); targets: %d KOIs\n", nrow(entries), count(==("koi"), entries.catalog),
-        count(==("tce"), entries.catalog), nrow(df_raw))
-out = joinpath(CV_DIR, "p3_ephemeris.csv")
+const EB = "--eb" in ARGS
+entries = ephemeris_entries(df_raw; eb = EB)
+@printf("entries: %d (koi %d, tce %d, eb %d); targets: %d KOIs\n", nrow(entries), count(==("koi"), entries.catalog),
+        count(==("tce"), entries.catalog), count(==("eb"), entries.catalog), nrow(df_raw))
+out = joinpath(CV_DIR, EB ? "p3_ephemeris_eb.csv" : "p3_ephemeris.csv")
 show_df(t) = (show(stdout, MIME"text/plain"(), t; allrows = true, allcols = true); println(); flush(stdout))
 const SEPBINS = [(0, 10, "a < 10\""), (10, 60, "b 10-60\""), (60, 180, "c 1-3'"), (180, 600, "d 3-10'"),
                  (600, 1800, "e 10-30'"), (1800, Inf, "f > 30'")]
@@ -45,6 +47,13 @@ if !("--classes" in ARGS)
         push!(rows, (feature = lab, real_kois = r, null_kois = round(nl; digits = 1), purity = round(1 - nl / r; digits = 3)))
     end
     println("features (simple ratios 1:1, 1:2, 2:1):"); show_df(DataFrame(rows))
+    simple_near(D, cat) = length(unique(D.kepoi_name[(D.catalog .== cat) .& (D.sep .< NEAR) .& (D.score .< MATCH_CUT) .&
+                                                     [(a, b) in SIMPLE for (a, b) in zip(D.m, D.n)]]))
+    for cat in unique(entries.catalog)
+        r, nl = simple_near(M, cat), mean(simple_near(d, cat) for d in nulls)
+        @printf("near simple matches < %.2f against catalog %-4s: %d KOIs real, %.1f null (purity %.3f)\n",
+                MATCH_CUT, cat, r, nl, 1 - nl / max(r, 1))
+    end
     F.kepid = df_raw.kepid
     CSV.write(out, F)
     show_df(describe(F[:, EPHEMERIS_FEATURES], :mean, :median, :min, :max))

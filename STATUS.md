@@ -1,7 +1,25 @@
 # Exoplanet vetting status
-Updated: 2026-10-30, DESKTOP-BBASC81 (Thinkpad)
+Updated: 2026-11-09 00:20, DESKTOP-BBASC81 (Thinkpad)
 
-## Headline
+## Phase 3 (11/08–09, CV only): ephemeris matching closes the contamination blind spot
+- **M2 done.** The two "+ ephemeris" models (Phase 2a features + 6 matching features) vs Phase 2a, 5 × 10 CV,
+  paired (`sweeps/p3_cv.jl`, 13 min; `sweeps/p3_m2.jl`, `sweeps/results/p3_m2_*.csv`):
+  - DR25 AUC 0.971 → **0.976** (+0.006 [+0.004, +0.008]) catalog; 0.987 → **0.989** (+0.002 [+0.001, +0.003])
+    + centroid.
+  - **EC-only FPs missed (p = 0.5): 18.0 → 4.3% / 23.2 → 6.7%**, Δ CIs far below 0, so the main criterion (< 15%) is
+    met in both. At 98% recall: 44 → 15% / 34 → 13%.
+  - FPs kept at 98% recall 25 → 20% / 14 → 12%. CONFIRMED lost unchanged (0.4 / 0.3–0.4%).
+  - Recall at 10% FP rate: + centroid + ephemeris 0.973 vs `koi_score` 0.968 (beats it; also below ~3% FPR). At 5%:
+    0.946 vs 0.953.
+  - Side effect: catalog-family CO-only FPs missed 34.6 → 40.8% (sources without a TCE look "unmatched").
+- **v2 with the Kepler EB catalog** (fetched 11/08 from the CfA VizieR mirror): Δ ≈ 0 everywhere vs v1, so **v1
+  stays** (`p3_m2eb_*.csv`).
+- **M3 write-up done:** `notebooks/exo110826.ipynb`; README has a Phase 3 section and `figures/p3_cv_lowfp.png`;
+  `PHASE3_PLAN.md` §3.2.
+- **Waiting on the user:** adopt the "+ ephemeris" models (a freeze would be labelled "post-test, CV-validated") or
+  not; and whether the NT blind spot (still ~21–24% missed) becomes the next phase.
+
+## Headline (Phase 2)
 **Phase 2 is done (M0–M6). On the sealed test set, our light-curve features lift DR25 ROC-AUC 0.957 → 0.976
 (catalog-only, near the robovetter's `koi_score` 0.979) and 0.988 → 0.993 (+ centroid)**, both paired gains with
 CIs above 0, matching CV. The model is Phase 2a (MLP + trees with our LC features); the CNNs (M4) neither beat nor
@@ -91,7 +109,7 @@ Earlier Phase 2: M0 pilot 49/49 stars; M1 7,927/7,927 stars cached (14.3 GB); M2
 passed (notebooks `exo101926`, `exo102426`); M3 features 9,271 KOIs, 0 errors.
 
 ## Running now
-Nothing. **M5 freeze done 10/29 20:54** (took 2 min): `models/p2_frozen.jld2` (44 MB) holds both Phase 2a models
+Nothing (11/09 00:20). Earlier: **M5 freeze done 10/29 20:54** (took 2 min): `models/p2_frozen.jld2` (44 MB) holds both Phase 2a models
 (10 MLP + 10 tree seeds each, whole pool, inner split seed 5005), their preprocessing, the menu thresholds (98%
 recall: catalog 0.185, + centroid 0.244) and calibrator "none". Round trip OK (in-sample pool AUC 0.980 / 0.994).
 Log `sweeps/results/p2_m5_freeze.log`. The test split was not touched.
@@ -108,8 +126,7 @@ outside Claude Code after Claude Code's memory safeguard killed two earlier atte
   - The random-epoch null showed that broad matching is pure chance. v1 keeps ratios 1:1, 1:2, 2:1, near matches
     within 10′, and a tight score cut of 0.25.
   - Pool check: a near match for 68.5% of EC-only FPs (86% of all EC-flagged) vs 0.5% of planets.
-  - Waiting on: the user's OK for **M2**, the CV of the two "+ ephemeris" models (4 runs of 5 × 10,
-    ~30–40 min, 2 threads, ~2–3 GB; tell the hub first).
+  - M2 + M3 done 11/08–09 (see the top of this file).
   - CV only; the test set is spent.
 - Public repo: the user OK'd going public as-is (10/30; email in history and notes files stay). Final pass found
   nothing sensitive. The user flips visibility themselves.
