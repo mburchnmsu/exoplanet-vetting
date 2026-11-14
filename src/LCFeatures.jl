@@ -268,6 +268,58 @@ function star_nt_features(kepid, df_raw)
     return [koi_nt_features(d, e, filter(o -> o.name != e.name, ephs)) for e in ephs]
 end
 
+# ------------------------------------------------------------------------------
+# Phase 4 (N-d): does the signal survive other detrendings? A real transit keeps
+# its depth when the trend is fitted differently; a dip made by variability or by
+# the trend interpolated across the masked transit window changes or vanishes.
+# ------------------------------------------------------------------------------
+const LC_ND_FEATURES = [
+    :nd_dep_short,   # depth with an UNMASKED short biweight (window max(0.25 d, 2.5 durations)) / default depth
+    :nd_snr_short,   # SNR with that detrending / default SNR
+    :nd_dep_long,    # depth with a masked long biweight (window max(2 d, 10 × the longest duration)) / default depth
+    :nd_snr_long,    # SNR with that detrending / default SNR
+]
+
+"(depth, SNR) of KOI `e` in detrended light curve `d`, other KOIs masked; the same box statistics as koi_lc_features."
+function box_depth_snr(d, e, others)
+    keep = trues(length(d.time))
+    for o in others
+        keep .&= .!in_transit(d.time, o)
+    end
+    t, f = d.time[keep], d.flux[keep] .- 1
+    length(t) > 100 && e.dur > 0 || return (NaN, NaN)
+    ph = fold_phase.(t, e.period, e.t0)
+    B = box_index(ph, f, e.period)
+    _, _, _, lvl, σe = box_noise(B, e.period, e.dur)
+    if !isfinite(σe)
+        oot = abs.(ph) .> e.dur
+        lvl = any(oot) ? median(f[oot]) : 0.0
+        σe = any(oot) ? 1.4826 * median(abs.(f[oot] .- lvl)) : NaN
+    end
+    m0, n0 = box_mean(B, 0.0, e.dur)
+    dep = lvl - m0
+    return dep, dep / (σe / sqrt(max(n0, 1)))
+end
+
+"Phase 4: LC_ND_FEATURES of every KOI on a star (default, unmasked-short per KOI, and masked-long detrendings)."
+function star_nd_features(kepid, df_raw)
+    ephs = star_ephemerides(df_raw, kepid)
+    lc = load_lc(kepid)
+    lc = merge(lc, (cen1 = fill(NaN32, length(lc.time)), cen2 = fill(NaN32, length(lc.time))))   # skip centroid trends
+    d0 = detrend_lc(lc, ephs)
+    dl = detrend_lc(lc, ephs; window = max(2.0, 10 * maximum(e.dur for e in ephs; init = 0.0)))
+    ratio(a, b) = isfinite(a) && isfinite(b) && abs(b) > 0 ? clamp(a / b, -3.0, 3.0) : NaN
+    rows = NamedTuple[]
+    for e in ephs
+        others = filter(o -> o.name != e.name, ephs)
+        ds = detrend_lc(lc, others; window = max(0.25, 2.5 * e.dur))       # the target itself is NOT masked
+        p0, ps, pl = box_depth_snr(d0, e, others), box_depth_snr(ds, e, others), box_depth_snr(dl, e, others)
+        push!(rows, (kepoi_name = e.name, nd_dep_short = ratio(ps[1], p0[1]), nd_snr_short = ratio(ps[2], p0[2]),
+                     nd_dep_long = ratio(pl[1], p0[1]), nd_snr_long = ratio(pl[2], p0[2])))
+    end
+    return rows
+end
+
 "Detrend a star once and compute the LC features of every KOI on it."
 function star_lc_features(kepid, df_raw)
     ephs = star_ephemerides(df_raw, kepid)

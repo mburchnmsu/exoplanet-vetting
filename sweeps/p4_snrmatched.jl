@@ -10,13 +10,16 @@ pool = leftjoin(pool, CSV.read(joinpath(CV_DIR, "p2_lcfeatures.csv"), DataFrame)
 pool = leftjoin(pool, CSV.read(joinpath(CV_DIR, "p4_badtimes.csv"), DataFrame)[:, [:kepoi_name; BADTIME_FEATURES]];
                 on = :kepoi_name, order = :left)
 pool = leftjoin(pool, CSV.read(joinpath(CV_DIR, "p4_ntfeatures.csv"), DataFrame); on = :kepoi_name, order = :left)
+const NDFILE = joinpath(CV_DIR, "p4_ndfeatures.csv")
+isfile(NDFILE) && (pool = leftjoin(pool, CSV.read(NDFILE, DataFrame); on = :kepoi_name, order = :left))
 y = pool.label
 nt = (y .== 0) .& (with_vetting_info(pool, df_raw, zeros(nrow(pool))).flag_pattern .== "NT")
 snr = Float64.(coalesce.(pool.koi_model_snr, NaN))
 show_df(t) = (show(stdout, MIME"text/plain"(), t; allrows = true, allcols = true); println(); flush(stdout))
 bins = [(7.0, 10.0), (10.0, 15.0), (15.0, 30.0)]
 rows = NamedTuple[]
-for c in [:lc_snr, :lc_vshape, :lc_sev_ratio, :lc_timing, :lc_sec_sig, BADTIME_FEATURES..., LC_NT_FEATURES...]
+for c in [:lc_snr, :lc_vshape, :lc_sev_ratio, :lc_timing, :lc_sec_sig, BADTIME_FEATURES..., LC_NT_FEATURES...,
+          (isfile(NDFILE) ? LC_ND_FEATURES : Symbol[])...]
     x = Float64.(coalesce.(pool[!, c], NaN))
     r = Dict{Symbol, Any}(:feature => string(c))
     for (lo, hi) in bins

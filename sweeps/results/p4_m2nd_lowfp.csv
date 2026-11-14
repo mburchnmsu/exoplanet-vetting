@@ -1,0 +1,11 @@
+fp_rate,family,model,n,recall,spread
+0.05,catalog,+ ephemeris,7199,0.88,0.002
+0.05,catalog,+ eph + ND,7199,0.879,0.002
+0.05,+ centroid,+ ephemeris,7199,0.946,0.001
+0.05,+ centroid,+ eph + ND,7199,0.945,0.001
+0.05,reference,koi_score,7199,0.953,0.0
+0.1,catalog,+ ephemeris,7199,0.936,0.002
+0.1,catalog,+ eph + ND,7199,0.937,0.003
+0.1,+ centroid,+ ephemeris,7199,0.973,0.001
+0.1,+ centroid,+ eph + ND,7199,0.974,0.002
+0.1,reference,koi_score,7199,0.968,0.0

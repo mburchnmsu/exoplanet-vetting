@@ -77,7 +77,7 @@ clips upward outliers only (> `clip` robust σ). Returns time, flux (≈ 1 out o
 transit), the raw normalised flux and trend (for plots), centroids with their
 own trend removed, quarter, and the window used.
 """
-function detrend_lc(lc, ephs; factor = 1.5, clip = 3.0)
+function detrend_lc(lc, ephs; factor = 1.5, clip = 3.0, window = nothing)   # window: override (Phase 4, N-d)
     ok = ((lc.quality .& QUALITY_MASK) .== 0) .& isfinite.(lc.flux) .& isfinite.(lc.time)
     t, q = lc.time[ok], lc.quarter[ok]
     raw = Float64.(lc.flux[ok]); c1 = Float64.(lc.cen1[ok]); c2 = Float64.(lc.cen2[ok])
@@ -89,7 +89,7 @@ function detrend_lc(lc, ephs; factor = 1.5, clip = 3.0)
     if count(.!intr) < 0.2 * length(t)        # nonsense ephemerides (e.g. duration > period): cap each mask at P/4
         intr = reduce(.|, (abs.(fold_phase.(t, e.period, e.t0)) .< min(factor * e.dur / 2, e.period / 4)) for e in ephs)
     end
-    window = max(0.5, 3 * maximum(e.dur for e in ephs; init = 0.0))
+    window = something(window, max(0.5, 3 * maximum(e.dur for e in ephs; init = 0.0)))
     trend = fill(NaN, length(t)); ct1 = fill(NaN, length(t)); ct2 = fill(NaN, length(t))
     for s in segments(t, q)
         use = .!intr[s]

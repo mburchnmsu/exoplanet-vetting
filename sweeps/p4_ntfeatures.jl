@@ -8,9 +8,13 @@
 include(joinpath(@__DIR__, "..", "src", "VettingSetup.jl"))
 using Dates
 
-const FEAT_DIR = joinpath(LC_DIR, "features_p4")
+#   --nd : N-d instead (alternative detrendings, LC_ND_FEATURES) -> features_p4nd/, p4_ndfeatures.csv
+const ND = "--nd" in ARGS
+const FEAT_DIR = joinpath(LC_DIR, ND ? "features_p4nd" : "features_p4")
 const SHARD = 250
-const OUT = joinpath(CV_DIR, "p4_ntfeatures.csv")
+const OUT = joinpath(CV_DIR, ND ? "p4_ndfeatures.csv" : "p4_ntfeatures.csv")
+const FEATS = ND ? LC_ND_FEATURES : LC_NT_FEATURES
+const STAR_FN = ND ? star_nd_features : star_nt_features
 
 df_raw = load_koi()
 stars = sort(unique(clean_koi(df_raw).kepid))
@@ -19,7 +23,7 @@ show_df(t) = (show(stdout, MIME"text/plain"(), t; allrows = true, allcols = true
 
 function feat_star(k)
     try
-        return star_nt_features(k, df_raw), ""
+        return STAR_FN(k, df_raw), ""
     catch e
         return [], first(replace(sprint(showerror, e), r"[\r\n]" => " "), 200)
     end
@@ -73,9 +77,9 @@ if !("--classes" in ARGS)
     end
     nt = DataFrame(feats)
     CSV.write(OUT, nt)
-    isempty(errs) || CSV.write(joinpath(CV_DIR, "p4_ntfeatures_errors.csv"), DataFrame(errs))
-    @printf("\nM1 features: %d KOIs on %d stars, %d star errors\n", nrow(nt), length(stars), length(errs))
-    for c in LC_NT_FEATURES
+    isempty(errs) || CSV.write(replace(OUT, ".csv" => "_errors.csv"), DataFrame(errs))
+    @printf("\nfeatures: %d KOIs on %d stars, %d star errors\n", nrow(nt), length(stars), length(errs))
+    for c in FEATS
         v = Float64.(coalesce.(nt[!, c], NaN)); ok = filter(isfinite, v)
         @printf("  %-12s finite %5d / %d   median %9.3g   [5%%, 95%%] %9.3g %9.3g\n", c, length(ok), length(v),
                 median(ok), quantile(ok, 0.05), quantile(ok, 0.95))
@@ -99,9 +103,9 @@ if "--classes" in ARGS          # labels on the CV pool only; the test split is 
               ("FP: CO only", (y .== 0) .& (pat .== "CO"))]
     q(v, m) = (x = filter(isfinite, Float64.(coalesce.(v[m], NaN))); isempty(x) ? NaN : round(median(x); sigdigits = 3))
     println("pool, medians per class:")
-    show_df(DataFrame([(group = g, n = sum(m), (c => q(pool[!, c], m) for c in LC_NT_FEATURES)...) for (g, m) in groups]))
+    show_df(DataFrame([(group = g, n = sum(m), (c => q(pool[!, c], m) for c in FEATS)...) for (g, m) in groups]))
     rows = NamedTuple[]
-    for c in LC_NT_FEATURES
+    for c in FEATS
         x = Float64.(coalesce.(pool[!, c], NaN))
         function au(m)
             m = m .& isfinite.(x); v = fast_auc(Float64.(y[m]), x[m]); return round(max(v, 1 - v); digits = 3)

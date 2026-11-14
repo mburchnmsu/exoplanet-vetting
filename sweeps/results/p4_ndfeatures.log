@@ -1,0 +1,46 @@
+VettingSetup loaded:11 features, data at C:\JuliaProjects\Exoplanet vetting\data\koi_cumulative.csv
+00:49  shard 1/32: 276 KOIs, 0 star errors; 0.07 h elapsed, ~2.2 h left; RSS 2.00 GB
+00:53  shard 2/32: 298 KOIs, 0 star errors; 0.13 h elapsed, ~2.0 h left; RSS 2.04 GB
+00:57  shard 3/32: 292 KOIs, 0 star errors; 0.20 h elapsed, ~1.9 h left; RSS 2.07 GB
+01:01  shard 4/32: 285 KOIs, 0 star errors; 0.27 h elapsed, ~1.9 h left; RSS 2.09 GB
+01:05  shard 5/32: 291 KOIs, 0 star errors; 0.33 h elapsed, ~1.8 h left; RSS 2.10 GB
+01:08  shard 6/32: 286 KOIs, 0 star errors; 0.39 h elapsed, ~1.7 h left; RSS 2.10 GB
+01:12  shard 7/32: 280 KOIs, 0 star errors; 0.45 h elapsed, ~1.6 h left; RSS 2.10 GB
+01:16  shard 8/32: 308 KOIs, 0 star errors; 0.52 h elapsed, ~1.6 h left; RSS 2.10 GB
+01:19  shard 9/32: 286 KOIs, 0 star errors; 0.57 h elapsed, ~1.5 h left; RSS 2.11 GB
+01:23  shard 10/32: 297 KOIs, 0 star errors; 0.64 h elapsed, ~1.4 h left; RSS 2.11 GB
+01:27  shard 11/32: 281 KOIs, 0 star errors; 0.70 h elapsed, ~1.3 h left; RSS 2.11 GB
+01:31  shard 12/32: 304 KOIs, 0 star errors; 0.76 h elapsed, ~1.3 h left; RSS 2.11 GB
+01:34  shard 13/32: 294 KOIs, 0 star errors; 0.83 h elapsed, ~1.2 h left; RSS 2.11 GB
+01:38  shard 14/32: 292 KOIs, 0 star errors; 0.88 h elapsed, ~1.1 h left; RSS 2.11 GB
+01:41  shard 15/32: 297 KOIs, 0 star errors; 0.94 h elapsed, ~1.1 h left; RSS 2.11 GB
+01:45  shard 16/32: 286 KOIs, 0 star errors; 1.00 h elapsed, ~1.0 h left; RSS 2.11 GB
+01:50  shard 17/32: 295 KOIs, 0 star errors; 1.08 h elapsed, ~1.0 h left; RSS 2.11 GB
+01:54  shard 18/32: 290 KOIs, 0 star errors; 1.15 h elapsed, ~0.9 h left; RSS 2.12 GB
+01:58  shard 19/32: 297 KOIs, 0 star errors; 1.22 h elapsed, ~0.8 h left; RSS 2.12 GB
+02:03  shard 20/32: 285 KOIs, 0 star errors; 1.29 h elapsed, ~0.8 h left; RSS 2.12 GB
+02:06  shard 21/32: 303 KOIs, 0 star errors; 1.36 h elapsed, ~0.7 h left; RSS 2.12 GB
+02:10  shard 22/32: 281 KOIs, 0 star errors; 1.42 h elapsed, ~0.6 h left; RSS 2.14 GB
+02:14  shard 23/32: 290 KOIs, 0 star errors; 1.48 h elapsed, ~0.6 h left; RSS 2.14 GB
+02:17  shard 24/32: 288 KOIs, 0 star errors; 1.53 h elapsed, ~0.5 h left; RSS 2.14 GB
+02:21  shard 25/32: 304 KOIs, 0 star errors; 1.59 h elapsed, ~0.4 h left; RSS 2.14 GB
+02:24  shard 26/32: 297 KOIs, 0 star errors; 1.65 h elapsed, ~0.4 h left; RSS 2.15 GB
+02:27  shard 27/32: 293 KOIs, 0 star errors; 1.71 h elapsed, ~0.3 h left; RSS 2.15 GB
+02:31  shard 28/32: 303 KOIs, 0 star errors; 1.77 h elapsed, ~0.3 h left; RSS 2.15 GB
+02:34  shard 29/32: 296 KOIs, 0 star errors; 1.82 h elapsed, ~0.2 h left; RSS 2.15 GB
+02:38  shard 30/32: 298 KOIs, 0 star errors; 1.88 h elapsed, ~0.1 h left; RSS 2.15 GB
+02:41  shard 31/32: 293 KOIs, 0 star errors; 1.94 h elapsed, ~0.1 h left; RSS 2.15 GB
+02:44  shard 32/32: 205 KOIs, 0 star errors; 1.98 h elapsed, ~0.0 h left; RSS 2.15 GB
+┌ Info: clean_koi
+│   raw = 9564
+│   kept = 9201
+│   stars = 7927
+│   planets = 4619
+└   false_pos = 4582
+
+features: 9271 KOIs on 7927 stars, 0 star errors
+  nd_dep_short finite  9258 / 9271   median     0.638   [5%, 95%]     0.445     0.998
+  nd_snr_short finite  9257 / 9271   median     0.733   [5%, 95%]     0.486      1.58
+  nd_dep_long  finite  9258 / 9271   median         1   [5%, 95%]     0.791      1.23
+  nd_snr_long  finite  9257 / 9271   median     0.747   [5%, 95%]     0.147       1.1
+11-14 02:44  DONE

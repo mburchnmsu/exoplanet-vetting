@@ -22,8 +22,11 @@ bt = CSV.read(joinpath(CV_DIR, "p4_badtimes.csv"), DataFrame)
 pool = leftjoin(pool, bt[:, [:kepoi_name; BADTIME_FEATURES]]; on = :kepoi_name, order = :left)
 ntf = CSV.read(joinpath(CV_DIR, "p4_ntfeatures.csv"), DataFrame)
 pool = leftjoin(pool, ntf[:, [:kepoi_name; LC_NT_FEATURES]]; on = :kepoi_name, order = :left)
+const NDFILE = joinpath(CV_DIR, "p4_ndfeatures.csv")              # N-d (sweeps/p4_ntfeatures.jl --nd)
+isfile(NDFILE) && (pool = leftjoin(pool, CSV.read(NDFILE, DataFrame); on = :kepoi_name, order = :left))
 @assert pool.kepoi_name == pool0.kepoi_name
-for c in [LC_FEATURES; LC_CENTROID_FEATURES; EPHEMERIS_FEATURES; BADTIME_FEATURES; LC_NT_FEATURES]
+for c in [LC_FEATURES; LC_CENTROID_FEATURES; EPHEMERIS_FEATURES; BADTIME_FEATURES; LC_NT_FEATURES;
+          (isfile(NDFILE) ? LC_ND_FEATURES : Symbol[])]
     pool[!, c] = Float64.(coalesce.(pool[!, c], NaN))
 end
 dr = is_dr25(pool, df_raw)
@@ -54,7 +57,17 @@ specs = [("nt_trees", "cv_evotree_nt_r5s10.jld2", "cv_evotree_lc_r5s10.jld2", (f
          ("centephnt_trees", "cv_evotree_centephnt_r5s10.jld2", "cv_evotree_centeph_r5s10.jld2",
           (features = [LCF; EPHEMERIS_FEATURES; NT], TREE_KW...)),
          ("centephnt_mlp", "cv_mlpq_centephnt_r5s10.jld2", "cv_mlpq_centeph_r5s10.jld2",
-          (features = [LCF; EPHEMERIS_FEATURES; NT], MLP_KW...))]
+          (features = [LCF; EPHEMERIS_FEATURES; NT], MLP_KW...)),
+         # N-d (alternative detrending), on the adopted "+ ephemeris" lineage only; run by name:
+         #   p4_cv.jl ephnd_trees ephnd_mlp centephnd_trees centephnd_mlp
+         ("ephnd_trees", "cv_evotree_ephnd_r5s10.jld2", "cv_evotree_eph_r5s10.jld2",
+          (features = [LF; EPHEMERIS_FEATURES; LC_ND_FEATURES], TREE_KW...)),
+         ("ephnd_mlp", "cv_mlpq_ephnd_r5s10.jld2", "cv_mlpq_eph_r5s10.jld2",
+          (features = [LF; EPHEMERIS_FEATURES; LC_ND_FEATURES], MLP_KW...)),
+         ("centephnd_trees", "cv_evotree_centephnd_r5s10.jld2", "cv_evotree_centeph_r5s10.jld2",
+          (features = [LCF; EPHEMERIS_FEATURES; LC_ND_FEATURES], TREE_KW...)),
+         ("centephnd_mlp", "cv_mlpq_centephnd_r5s10.jld2", "cv_mlpq_centeph_r5s10.jld2",
+          (features = [LCF; EPHEMERIS_FEATURES; LC_ND_FEATURES], MLP_KW...))]
 
 "Restrict a CV result to a subset of pool rows (for the DR25 headline)."
 sub(cv, m) = (results = cv.results, oof = cv.oof[m, :, :], folds = cv.folds[m, :], config = cv.config, kepoi = cv.kepoi[m])

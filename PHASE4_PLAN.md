@@ -102,6 +102,20 @@ The CNN route (shape learning) was tried in Phase 2 and added nothing, so it is 
     gain nothing new. The NT FPs that still pass are the ones none of these measurements tell apart from
     low-SNR planets.
   - Per N2, this leaves a gap, so **N-d (alternative detrending)**, the last planned feature group, runs next.
+- **11/14, N-d done** (`LC_ND_FEATURES` in `src/LCFeatures.jl`, `sweeps/p4_ntfeatures.jl --nd`; 1.6 h, 2.1 GB,
+  9,271 KOIs, no errors; CV `sweeps/p4_cv.jl ephnd_* centephnd_*`, `sweeps/p4_m2.jl --nd`,
+  `sweeps/results/p4_m2nd_*.csv`). **Small gain in the catalog family only; criterion N5 not met.**
+  - Features: box depth and SNR re-measured after a short unmasked biweight (window max(0.25 d, 2.5 durations),
+    which eats a long smooth "transit") and a long masked one (max(2 d, 10 durations)), as ratios to the default
+    detrending. Pool look: they barely separate NT FPs from planets (single-feature AUC 0.50–0.58, also within SNR
+    bins); they mainly flag secondary-eclipse (SS) FPs, whose long-window SNR drops.
+  - CV vs "+ ephemeris": DR25 AUC unchanged (+0.0000 [−0.0003, +0.0004] catalog, +0.0001 [−0.0000, +0.0003]
+    + centroid).
+  - Catalog family at 98% recall: NT-only misses 70.0 → 67.9% (−2.1 [−2.9, −1.3]; DR25 KOIs 54.1 → 52.6%),
+    centroid-only misses −1.6 [−2.5, −0.8], all FPs kept 28.7 → 27.9% (−0.8 [−1.1, −0.6]). Real but far from the
+    10-point target.
+  - + centroid family: no change anywhere (NT 59.7 → 59.7%). No CONFIRMED regression in either family.
+  - With N-d, every planned feature group (N-a to N-d) has been tried. Adoption is the user's call.
 
 ## 5. Rules carried over
 

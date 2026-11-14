@@ -8,9 +8,12 @@
 #   julia --project=. -t 2 sweeps/p4_m2.jl [--eph]
 include(joinpath(@__DIR__, "..", "src", "VettingSetup.jl"))
 using Dates
-const EPH = "--eph" in ARGS
-const OLD, NEW = EPH ? ("+ ephemeris", "+ eph + NT") : ("Phase 2a", "+ NT")
-const TAG = EPH ? "p4_m2eph" : "p4_m2"
+#   --nd : N-d (alternative detrending), + eph + ND vs + ephemeris -> p4_m2nd_*.csv
+const ND = "--nd" in ARGS
+const EPH = "--eph" in ARGS || ND
+const OLD, NEW = ND ? ("+ ephemeris", "+ eph + ND") : EPH ? ("+ ephemeris", "+ eph + NT") : ("Phase 2a", "+ NT")
+const TAG = ND ? "p4_m2nd" : EPH ? "p4_m2eph" : "p4_m2"
+const NSFX = ND ? "nd" : "nt"
 
 df_raw = load_koi()
 pool, _ = cv_pool(clean_koi(df_raw))
@@ -23,9 +26,9 @@ const RULES = [("planet recall 95%", (:recall, 0.95)), ("planet recall 98%", (:r
 # (family, model, MLP CV, trees CV)
 const MODELS = EPH ?
     [("catalog", OLD, "cv_mlpq_eph_r5s10.jld2", "cv_evotree_eph_r5s10.jld2"),
-     ("catalog", NEW, "cv_mlpq_ephnt_r5s10.jld2", "cv_evotree_ephnt_r5s10.jld2"),
+     ("catalog", NEW, "cv_mlpq_eph$(NSFX)_r5s10.jld2", "cv_evotree_eph$(NSFX)_r5s10.jld2"),
      ("+ centroid", OLD, "cv_mlpq_centeph_r5s10.jld2", "cv_evotree_centeph_r5s10.jld2"),
-     ("+ centroid", NEW, "cv_mlpq_centephnt_r5s10.jld2", "cv_evotree_centephnt_r5s10.jld2")] :
+     ("+ centroid", NEW, "cv_mlpq_centeph$(NSFX)_r5s10.jld2", "cv_evotree_centeph$(NSFX)_r5s10.jld2")] :
     [("catalog", OLD, "cv_mlpq_lc_r5s10.jld2", "cv_evotree_lc_r5s10.jld2"),
      ("catalog", NEW, "cv_mlpq_nt_r5s10.jld2", "cv_evotree_nt_r5s10.jld2"),
      ("+ centroid", OLD, "cv_mlpq_lccent_r5s10.jld2", "cv_evotree_lccent_r5s10.jld2"),

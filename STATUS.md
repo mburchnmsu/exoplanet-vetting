@@ -1,5 +1,5 @@
 # Exoplanet vetting status
-Updated: 2026-11-13 23:45, DESKTOP-BBASC81 (Thinkpad)
+Updated: 2026-11-14 03:20, DESKTOP-BBASC81 (Thinkpad)
 
 ## Phase 4 (started 11/13, CV only): the "not transit-like" (NT) blind spot
 - **User decisions 11/13 (via the hub):** adopt the Phase 3 "+ ephemeris" models; start Phase 4 with N1–N5 as
@@ -18,7 +18,12 @@ Updated: 2026-11-13 23:45, DESKTOP-BBASC81 (Thinkpad)
   - vs the adopted "+ ephemeris" models: Δ ≈ 0. N5 is not met.
   - Pool check (`sweeps/p4_snrmatched.jl`): the new features separate NT from planets at matched SNR, but the
     Phase 2 features (`lc_sev_ratio`, `lc_sec_sig`, `lc_snr`) already carry the same information.
-- **Next: N-d (alternative detrending)**, the plan's last feature group, since N-a to N-c leave the gap open.
+- **N-d (alternative detrending) done** (`sweeps/p4_ntfeatures.jl --nd`, 1.6 h, 2.1 GB; CV 4 runs, 16 min;
+  `sweeps/p4_m2.jl --nd`): DR25 AUC unchanged vs "+ ephemeris". Catalog family at 98% recall: NT-only misses
+  70.0 → 67.9% (−2.1 [−2.9, −1.3]) and all FPs kept 28.7 → 27.9%. + centroid: no change. No CONFIRMED regression.
+  Small and real, but N5 (≥ 10 points) is not met.
+- **All four planned feature groups tried; N5 not met by any.** Adopting any Phase 4 features is the user's call.
+- **Next: M3 write-up** (`notebooks/exo111426.ipynb`, README Phase 4 section).
 
 ## Phase 3 (11/08–09, CV only): ephemeris matching closes the contamination blind spot
 - **M2 done.** The two "+ ephemeris" models (Phase 2a features + 6 matching features) vs Phase 2a, 5 × 10 CV,
