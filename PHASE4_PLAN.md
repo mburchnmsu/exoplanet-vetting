@@ -1,7 +1,8 @@
-# Phase 4 plan (DRAFT, not approved): the "not transit-like" (NT) blind spot
+# Phase 4 plan: the "not transit-like" (NT) blind spot
 
-*Drafted 11/09/2026 after Phase 3 (`PHASE3_PLAN.md`). Nothing here has run except the pool-only scoping in §1.
-Every decision below is open for the user.*
+*Drafted 11/09/2026 after Phase 3 (`PHASE3_PLAN.md`). **Approved 11/13/2026** (user, via the hub): N1–N5 take the
+recommended option in §3. The same day the user adopted the Phase 3 "+ ephemeris" models (frozen in
+`models/p3_frozen.jld2`, post-test, CV-validated), so N4's second comparison (on the "+ ephemeris" lineage) is run.*
 
 ## 1. Where NT stands, and what the misses look like
 
@@ -44,9 +45,9 @@ other stars.
 
 The CNN route (shape learning) was tried in Phase 2 and added nothing, so it is not proposed again.
 
-## 3. Decisions (open)
+## 3. Decisions (approved 11/13: the recommendation in every row)
 
-| # | **DECISION** | Recommendation | Why |
+| # | Decision | Chosen (= recommendation) | Why |
 |---|---|---|---|
 | N1 | Phase 4 target | **NT**, as above | The largest error group left; 70% pass at 98% recall |
 | N2 | Feature groups | **N-c first** (cheap, catalog-only), **then N-a + N-b in one light-curve pass**; N-d only if those leave a gap | Ordered by cost and by the share of misses each targets |
@@ -62,6 +63,22 @@ The CNN route (shape learning) was tried in Phase 2 and added nothing, so it is 
 | M1 | N-a + N-b in `src/LCFeatures.jl` (new functions), one pass over the cache; pool-only per-class look | ~1.5 h, 2–3 GB |
 | M2 | CV of the new features in both families (4 runs of 5 × 10), paired vs Phase 2a; blind-spot table, menu, low-FP-rate recall vs `koi_score` | ~15–20 min, < 2 GB |
 | M3 | Write-up notebook, README/STATUS; with the user: adopt or not | ~½ day |
+
+## 4.1 Progress
+
+- **11/13, Phase 3 freeze:** `models/p3_frozen.jld2` (`sweeps/p3_freeze.jl`), post-test, CV-validated.
+- **11/13, M0 (N-c) done** (`src/BadTimes.jl`, `sweeps/p4_badtimes.jl`; `sweeps/results/p4_badtimes*.log/.csv`).
+  Sources: the 29,180 DR25 TCEs with P ≥ 1 d. Predicted transit midpoints are counted in 0.25-d bins (3-bin
+  smoothed). Features: global robust z, with each TCE weighted 1/N_transits and the target's own star removed, and
+  a local Poisson significance from TCEs on other stars within 30′. Both are given as a mean over the KOI's transits
+  and as the fraction of its transits in bad bins.
+  - Label-free check: unweighted, the global series is swamped by short-period TCEs and shows nothing. Weighted, 77
+    windows have z > 4 (22 with z > 8; worst at BKJD 1093.9, 1339.9, 601.6, 972.1, 1561.1) vs 0–5 in random-epoch
+    nulls. Locally, 905 KOIs have a transit in a bad bin vs ~60 in the null.
+  - Pool look (labels for analysis only): the signal is real but small. Only 99 pool FPs carry the robovetter's SKYE
+    comment, and the missed NT-only FPs are not concentrated in bad times; if anything they sit there less than the
+    caught ones. Single-feature AUC, NT-only vs planets: 0.57–0.58 (global), ~0.51 (local). So N-c alone will not
+    close the gap. It still goes into M2 together with N-a + N-b, as planned.
 
 ## 5. Rules carried over
 

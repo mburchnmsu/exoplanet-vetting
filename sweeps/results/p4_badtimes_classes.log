@@ -1,0 +1,31 @@
+VettingSetup loaded:11 features, data at C:\JuliaProjects\Exoplanet vetting\data\koi_cumulative.csv
+pool, per class: share with any / at least half of their transits in bad bins:
+9×8 DataFrame
+ Row │ group                              n      glob_frac_gt0_pct  glob_frac_ge05_pct  loc_frac_gt0_pct  loc_frac_ge05_pct  glob_mean_med  loc_mean_med
+     │ String                             Int64  Float64            Float64             Float64           Float64            Float64        Float64
+─────┼───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+   1 │ planets                             4163               67.5                 0.0               5.9                0.0          0.092         0.281
+   2 │ FP: NT only                          849               40.2                 0.4               5.1                0.2          0.101         0.287
+   3 │ FP: NT only, missed (p >= 0.5, +…    173               28.9                 0.0               2.3                0.0          0.091         0.282
+   4 │ FP: NT only, caught                  676               43.0                 0.4               5.8                0.3          0.104         0.288
+   5 │ FP: SKYE comment (any)                99               24.2                 1.0              15.2                1.0          0.364         0.371
+   6 │ FP: EC only                          111               95.5                 0.0              30.6                0.0          0.095         0.407
+   7 │ FP: SS only                         1307               80.0                 0.1               9.5                0.1          0.092         0.295
+   8 │ FP: CO only                          464               87.9                 0.0              10.3                0.0          0.09          0.286
+   9 │ FP: all                             4125               75.9                 0.1              13.5                1.1          0.094         0.298
+single-feature AUC, DR25 pool (folded: 0.5 useless); NT-only FPs vs planets; SKYE-comment FPs vs other FPs (unfolded):
+4×5 DataFrame
+ Row │ feature       auc_dr25_alone  planets_higher  nt_only_vs_planets  skye_vs_rest_fps
+     │ String        Float64         Bool            Float64             Float64
+─────┼────────────────────────────────────────────────────────────────────────────────────
+   1 │ bt_glob_mean           0.53            false               0.568             0.689
+   2 │ bt_glob_frac           0.534           false               0.579             0.297
+   3 │ bt_loc_mean            0.627           false               0.505             0.565
+   4 │ bt_loc_frac            0.544           false               0.508             0.512
+┌ Info: clean_koi
+│   raw = 9564
+│   kept = 9201
+│   stars = 7927
+│   planets = 4619
+└   false_pos = 4582
+11-13 23:25  DONE

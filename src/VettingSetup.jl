@@ -405,5 +405,6 @@ include(joinpath(@__DIR__, "Views.jl"))
 include(joinpath(@__DIR__, "LCFeatures.jl"))
 include(joinpath(@__DIR__, "CNN.jl"))
 include(joinpath(@__DIR__, "Ephemeris.jl"))         # Phase 3
+include(joinpath(@__DIR__, "BadTimes.jl"))          # Phase 4
 
 println("VettingSetup loaded:$(length(FEATURES)) features, data at $(KOI_PATH)")

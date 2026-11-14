@@ -1,0 +1,56 @@
+VettingSetup loaded:11 features, data at C:\JuliaProjects\Exoplanet vetting\data\koi_cumulative.csv
+sources: 29180 DR25 TCEs with P >= 1 d on 14875 stars; 6122120 transit midpoints; 5920 bins of 0.25 d
+real: features in 35.2 s; global median 14.6 per 0.75-d window, σ 2.23
+global bad bins and KOIs with transits in bad bins, real vs null (label-free):
+4×8 DataFrame
+ Row │ run     bad_bins_z4  bad_bins_z8  max_z    kois_glob_frac_gt0  kois_glob_frac_ge05  kois_loc_frac_gt0  kois_loc_frac_ge05
+     │ String  Int64        Int64        Float64  Int64               Int64                Int64              Int64
+─────┼───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+   1 │ real             77           22   13.713                6782                    6                905                  51
+   2 │ null 1            1            0    4.238                 670                    0                 61                   0
+   3 │ null 2            0            0    3.986                   0                    0                 71                   0
+   4 │ null 3            5            0    5.329                2508                    0                 55                   0
+the 25 worst 0.75-d windows (BKJD centre, count of other-star TCE midpoints, z):
+25×3 DataFrame
+ Row │ bkjd      count    z
+     │ Float64   Float64  Float64
+─────┼────────────────────────────
+   1 │ 1093.88   45.1557   13.713
+   2 │ 1093.62   43.288    12.876
+   3 │ 1094.12   43.0792   12.782
+   4 │ 1339.88   36.6086    9.88
+   5 │ 1339.62   36.1588    9.678
+   6 │  972.125  35.8801    9.553
+   7 │  601.625  35.7285    9.485
+   8 │ 1340.12   35.4982    9.382
+   9 │  971.875  34.9049    9.116
+  10 │ 1561.12   34.7682    9.054
+  11 │  602.375  34.6439    8.999
+  12 │  972.375  34.6076    8.982
+  13 │  971.625  34.5967    8.977
+  14 │ 1561.38   34.4322    8.904
+  15 │  601.375  34.3517    8.868
+  16 │  601.875  33.9674    8.695
+  17 │ 1231.88   33.8249    8.631
+  18 │  602.125  33.5864    8.524
+  19 │  971.125  33.3006    8.396
+  20 │  972.625  33.2885    8.391
+  21 │  373.875  33.0232    8.272
+  22 │ 1232.12   32.4636    8.021
+  23 │  602.625  32.3511    7.97
+  24 │  971.375  31.5534    7.613
+  25 │  373.625  31.2936    7.496
+bt_glob_mean  real mean 0.1385  null mean 0.0407
+bt_glob_frac  real mean 0.0152  null mean 0.0003
+bt_loc_mean   real mean 0.3855  null mean 0.2769
+bt_loc_frac   real mean 0.0091  null mean 0.0000
+4×5 DataFrame
+ Row │ variable      mean        median     min       max
+     │ Symbol        Float64     Float64    Float64   Float64
+─────┼────────────────────────────────────────────────────────
+   1 │ bt_glob_mean  0.138499    0.0930141  -1.64522  6.88665
+   2 │ bt_glob_frac  0.0152359   0.0119826   0.0      1.0
+   3 │ bt_loc_mean   0.385539    0.289012    0.0      8.53578
+   4 │ bt_loc_frac   0.00913937  0.0         0.0      1.0
+saved: C:\JuliaProjects\Exoplanet vetting\sweeps\results\p4_badtimes.csv
+11-13 23:24  DONE

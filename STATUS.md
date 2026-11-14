@@ -1,5 +1,18 @@
 # Exoplanet vetting status
-Updated: 2026-11-09 00:20, DESKTOP-BBASC81 (Thinkpad)
+Updated: 2026-11-13 23:45, DESKTOP-BBASC81 (Thinkpad)
+
+## Phase 4 (started 11/13, CV only): the "not transit-like" (NT) blind spot
+- **User decisions 11/13 (via the hub):** adopt the Phase 3 "+ ephemeris" models; start Phase 4 with N1–N5 as
+  recommended in `PHASE4_PLAN.md`.
+- **Phase 3 freeze done:** `models/p3_frozen.jld2` (`sweeps/p3_freeze.jl`; keys `catalog_ephemeris`,
+  `centroid_ephemeris`; whole pool, 10 + 10 seeds, menu thresholds from CV; 98%-recall thresholds 0.204 / 0.261).
+  Labelled **post-test, CV-validated**; the test split was not touched.
+- **M0 (N-c, bad-time clustering) done** (`src/BadTimes.jl`, `sweeps/p4_badtimes.jl`, 2 min): label-free, other
+  stars' DR25 TCE transit times pile up in 77 global 0.75-d windows (z > 4) vs ~1 in a random-epoch null, once each
+  TCE is weighted 1/N_transits. But the pool look shows the missed NT FPs are **not** mostly bad-time events
+  (single-feature AUC NT vs planets ~0.57); the features go into M2 anyway, as planned.
+- **M1 (N-a + N-b, light-curve pass) running** (`sweeps/p4_ntfeatures.jl`, ~30 min, ~2 GB). Then M2: 8 CV runs
+  (`sweeps/p4_cv.jl`) and `sweeps/p4_m2.jl [--eph]`.
 
 ## Phase 3 (11/08–09, CV only): ephemeris matching closes the contamination blind spot
 - **M2 done.** The two "+ ephemeris" models (Phase 2a features + 6 matching features) vs Phase 2a, 5 × 10 CV,
@@ -16,12 +29,7 @@ Updated: 2026-11-09 00:20, DESKTOP-BBASC81 (Thinkpad)
   stays** (`p3_m2eb_*.csv`).
 - **M3 write-up done:** `notebooks/exo110826.ipynb`; README has a Phase 3 section and `figures/p3_cv_lowfp.png`;
   `PHASE3_PLAN.md` §3.2.
-- **Waiting on the user:** adopt the "+ ephemeris" models (a freeze would be labelled "post-test, CV-validated") or
-  not; and whether the NT blind spot (still ~21–24% missed at p = 0.5, ~70% at 98% recall) becomes Phase 4.
-- **`PHASE4_PLAN.md` DRAFT (NT), not approved, nothing run** apart from the pool-only scoping (`sweeps/p4_scoping.jl`).
-  The missed NT FPs are low-SNR, U-shaped and multi-transit; the robovetter caught them with event-uniqueness and
-  per-transit / bad-time (SKYE) tests. The draft proposes: N-c bad-time clustering from the TCE list (cheap) first,
-  then uniqueness + per-transit consistency in one light-curve pass. Decisions N1–N5 are open.
+- **Adopted 11/13** by the user and frozen (see Phase 4 above).
 
 ## Headline (Phase 2)
 **Phase 2 is done (M0–M6). On the sealed test set, our light-curve features lift DR25 ROC-AUC 0.957 → 0.976

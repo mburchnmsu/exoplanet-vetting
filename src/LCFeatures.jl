@@ -157,6 +157,117 @@ function koi_lc_features(d, e, others, koi_depth_ppm)
             lc_cen_sig = hypot(z1, z2), lc_cen_offset = depth > 0 ? hypot(s1, s2) / depth : NaN)
 end
 
+# ------------------------------------------------------------------------------
+# Phase 4 (N-a, N-b): is the event UNIQUE in its own light curve, and do the
+# individual transits AGREE? Aimed at "not transit-like" FPs (PHASE4_PLAN.md).
+# Same detrending and box-noise level σ_eff as the Phase 2 features.
+# ------------------------------------------------------------------------------
+const LC_NT_FEATURES = [
+    :nt_red,       # red-noise factor: σ_eff (box scatter, transit timescale) / point-to-point noise (1 = white) [N-a]
+    :nt_pos_sig,   # strongest positive bump at any off-transit phase [σ]                                    [N-a]
+    :nt_ter_sig,   # strongest off-transit dip away from the secondary (the "tertiary") [σ]                  [N-a]
+    :nt_ms_ter,    # lc_snr − nt_ter_sig: primary vs the next-strongest unrelated dip (model-shift MS1-like)  [N-a]
+    :nt_ms_pos,    # lc_snr − nt_pos_sig: primary vs the strongest bump (MS3-like)                           [N-a]
+    :nt_chi2,      # log10 reduced χ² of the individual transit depths about their weighted mean            [N-b]
+    :nt_negfrac,   # fraction of individual transits with depth < 0 (SNR below 0)                           [N-b]
+    :nt_chases,    # median over transits of SNR_i / max(SNR_i, strongest local dip within ±5 durations)     [N-b]
+    :nt_rubble,    # median over transits of observed / expected in-transit cadences                         [N-b]
+]
+const CADENCE = 0.020434                # days, Kepler long cadence
+
+"""
+    koi_nt_features(d, e, others) -> NamedTuple
+
+LC_NT_FEATURES of KOI ephemeris `e` from detrended light curve `d`, the other KOIs on the star masked out.
+"""
+function koi_nt_features(d, e, others)
+    keep = trues(length(d.time))
+    for o in others
+        keep .&= .!in_transit(d.time, o)
+    end
+    t, f = d.time[keep], d.flux[keep] .- 1
+    P, dur = e.period, e.dur
+    nanrow = (; kepoi_name = e.name, (c => NaN for c in LC_NT_FEATURES)...)
+    length(t) > 100 && dur > 0 || return nanrow
+    ph = fold_phase.(t, P, e.t0)
+    B = box_index(ph, f, P)
+    cs, ms, ns, lvl, σe = box_noise(B, P, dur)
+    oot = abs.(ph) .> dur
+    σw = count(oot) > 20 ? 1.4826 * median(abs.(diff(f[oot]))) / sqrt(2) : NaN     # point-to-point white noise
+    if !isfinite(σe)
+        lvl = any(oot) ? median(f[oot]) : 0.0
+        σe = any(oot) ? 1.4826 * median(abs.(f[oot] .- lvl)) : NaN
+    end
+    isfinite(σe) && σe > 0 || return nanrow
+    m0, n0 = box_mean(B, 0.0, dur)
+    snr = (lvl - m0) / (σe / sqrt(max(n0, 1)))
+
+    # N-a: uniqueness in the folded light curve (off-transit boxes from box_noise)
+    pos = ter = NaN
+    if length(ms) >= 10
+        sig = (lvl .- ms) ./ (σe ./ sqrt.(ns))                  # dip significance of every off-transit box
+        isec = argmax(sig)
+        pos = maximum(-sig)
+        away = [abs(mod(c - cs[isec] + P / 2, P) - P / 2) > 2 * dur for c in cs]
+        ter = any(away) ? maximum(sig[away]) : NaN
+    end
+
+    # N-b: individual transits
+    epoch = round.(Int, (t .- e.t0) ./ P)
+    intr = abs.(ph) .< dur / 2
+    sums = Dict{Int, Tuple{Float64, Int}}()
+    for (n, v) in zip(epoch[intr], f[intr])
+        s, k = get(sums, n, (0.0, 0)); sums[n] = (s + v, k + 1)
+    end
+    eps = sort!(collect(keys(sums)))
+    dep = [lvl - sums[n][1] / sums[n][2] for n in eps]
+    err = [σe / sqrt(sums[n][2]) for n in eps]
+    chi2 = negfrac = NaN
+    if length(eps) >= 2
+        w = 1 ./ err .^ 2
+        dm = sum(w .* dep) / sum(w)
+        chi2 = log10(max(sum(w .* (dep .- dm) .^ 2) / (length(eps) - 1), 1e-3))
+        negfrac = mean(dep .< 0)
+    end
+    exp_n = dur / CADENCE
+    rubble = isempty(eps) ? NaN : median(min(sums[n][2] / exp_n, 1.5) for n in eps)
+
+    # chases: each transit against the strongest one-duration dip in its own neighbourhood (time domain)
+    cs_t = [0.0; cumsum(f)]
+    function tbox(c)
+        a = searchsortedfirst(t, c - dur / 2); b = searchsortedlast(t, c + dur / 2)
+        n = b - a + 1
+        return n >= 3 ? ((lvl - (cs_t[b+1] - cs_t[a]) / n) / (σe / sqrt(n)), n) : (NaN, 0)
+    end
+    ch = Float64[]
+    for (n, de, er) in zip(eps, dep, err)
+        si = de / er
+        si > 0 || continue
+        tc = e.t0 + n * P
+        loc = -Inf
+        for c in range(tc - 5dur, tc + 5dur; step = dur / 4)
+            abs(c - tc) < 1.5dur && continue
+            s, k = tbox(c)
+            k > 0 && isfinite(s) && (loc = max(loc, s))
+        end
+        isfinite(loc) && push!(ch, si / max(si, loc))
+    end
+    chases = isempty(ch) ? NaN : median(ch)
+
+    return (kepoi_name = e.name, nt_red = isfinite(σw) && σw > 0 ? σe / σw : NaN, nt_pos_sig = pos, nt_ter_sig = ter,
+            nt_ms_ter = snr - ter, nt_ms_pos = snr - pos, nt_chi2 = chi2, nt_negfrac = negfrac, nt_chases = chases,
+            nt_rubble = rubble)
+end
+
+"Phase 4: detrend a star once (flux only; the same detrending as Phase 2) and compute LC_NT_FEATURES of every KOI on it."
+function star_nt_features(kepid, df_raw)
+    ephs = star_ephemerides(df_raw, kepid)
+    lc = load_lc(kepid)
+    lc = merge(lc, (cen1 = fill(NaN32, length(lc.time)), cen2 = fill(NaN32, length(lc.time))))   # skip centroid trends
+    d = detrend_lc(lc, ephs)
+    return [koi_nt_features(d, e, filter(o -> o.name != e.name, ephs)) for e in ephs]
+end
+
 "Detrend a star once and compute the LC features of every KOI on it."
 function star_lc_features(kepid, df_raw)
     ephs = star_ephemerides(df_raw, kepid)
