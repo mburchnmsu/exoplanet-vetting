@@ -1,0 +1,25 @@
+VettingSetup loaded:11 features, data at C:\JuliaProjects\Exoplanet vetting\data\koi_cumulative.csv
+NT-only FPs / planets per koi_model_snr bin: [7.0, 10.0): 216 / 532, [10.0, 15.0): 196 / 874, [15.0, 30.0): 111 / 1213
+single-feature AUC, NT-only FPs vs planets within SNR bins (folded: 0.5 useless):
+18×4 DataFrame
+ Row │ feature       auc_snr_7_10  auc_snr_10_15  auc_snr_15_30
+     │ String        Float64       Float64        Float64
+─────┼──────────────────────────────────────────────────────────
+   1 │ lc_snr               0.69           0.761          0.793
+   2 │ lc_vshape            0.52           0.588          0.721
+   3 │ lc_sev_ratio         0.764          0.874          0.814
+   4 │ lc_timing            0.686          0.71           0.593
+   5 │ lc_sec_sig           0.651          0.802          0.628
+   6 │ bt_glob_mean         0.573          0.606          0.582
+   7 │ bt_glob_frac         0.614          0.689          0.6
+   8 │ bt_loc_mean          0.536          0.511          0.511
+   9 │ bt_loc_frac          0.51           0.515          0.516
+  10 │ nt_red               0.618          0.775          0.867
+  11 │ nt_pos_sig           0.697          0.79           0.593
+  12 │ nt_ter_sig           0.725          0.848          0.682
+  13 │ nt_ms_ter            0.75           0.86           0.933
+  14 │ nt_ms_pos            0.737          0.825          0.93
+  15 │ nt_chi2              0.612          0.681          0.653
+  16 │ nt_negfrac           0.62           0.66           0.613
+  17 │ nt_chases            0.653          0.645          0.632
+  18 │ nt_rubble            0.51           0.504          0.605

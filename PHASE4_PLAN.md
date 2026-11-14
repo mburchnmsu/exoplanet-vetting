@@ -79,6 +79,29 @@ The CNN route (shape learning) was tried in Phase 2 and added nothing, so it is 
     comment, and the missed NT-only FPs are not concentrated in bad times; if anything they sit there less than the
     caught ones. Single-feature AUC, NT-only vs planets: 0.57–0.58 (global), ~0.51 (local). So N-c alone will not
     close the gap. It still goes into M2 together with N-a + N-b, as planned.
+- **11/13–14, M1 (N-a + N-b) done** (`LC_NT_FEATURES` in `src/LCFeatures.jl`, `sweeps/p4_ntfeatures.jl`; 33 min,
+  2.1 GB, 9,271 KOIs, no errors). The features are:
+  - N-a: `nt_red` (red-noise factor), `nt_pos_sig` / `nt_ter_sig` (strongest off-transit bump / tertiary dip) and
+    `nt_ms_ter` / `nt_ms_pos` (primary minus those).
+  - N-b: `nt_chi2` (per-transit depth χ²), `nt_negfrac`, `nt_chases`, `nt_rubble`. Chases and rubble are cheap extra
+    per-transit checks of the same kind as the robovetter's INDIV_TRANS tests.
+  - Pool look: the uniqueness features separate the missed NT FPs from planets (single-feature AUC 0.89 for
+    `nt_ms_ter`); the per-transit ones barely do (0.50–0.57).
+- **11/14, M2 done** (`sweeps/p4_cv.jl`, 8 runs, 34 min, < 2 GB; `sweeps/p4_m2.jl [--eph]`,
+  `sweeps/results/p4_m2*_*.csv`). **Negative for NT; criterion N5 not met.**
+  - vs Phase 2a: DR25 AUC 0.9705 → 0.9736 (+0.0031 [+0.0019, +0.0043]) catalog, 0.9869 → 0.9878 (+0.0008 [+0.0003,
+    +0.0013]) + centroid.
+  - That gain comes from **contamination**, not NT: EC-only misses at p = 0.5 fall 18.0 → 9.7% and 23.2 → 15.7%.
+    NT-only misses do not move: 70.7 → 70.3% and 60.2 → 60.8% at 98% recall, CIs spanning 0.
+  - vs "+ ephemeris" (the adopted lineage): DR25 AUC +0.0006 [−0.0001, +0.0012] / +0.0002 [−0.0002, +0.0005]. The
+    EC overlap is gone, NT misses are unchanged, and at 98% recall in the + centroid family they are slightly worse
+    (59.7 → 61.9%, CI above 0). No CONFIRMED regression anywhere.
+  - Why (`sweeps/p4_snrmatched.jl`, pool only): within `koi_model_snr` bins the new features do separate NT FPs
+    from planets (`nt_ms_ter` AUC 0.75 / 0.86 / 0.93 at SNR 7–10 / 10–15 / 15–30). But the Phase 2 features already
+    carry the same information (`lc_sev_ratio` 0.76 / 0.87 / 0.81, `lc_sec_sig` 0.65 / 0.80 / 0.63), so the models
+    gain nothing new. The NT FPs that still pass are the ones none of these measurements tell apart from
+    low-SNR planets.
+  - Per N2, this leaves a gap, so **N-d (alternative detrending)**, the last planned feature group, runs next.
 
 ## 5. Rules carried over
 

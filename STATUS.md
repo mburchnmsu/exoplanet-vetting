@@ -11,8 +11,14 @@ Updated: 2026-11-13 23:45, DESKTOP-BBASC81 (Thinkpad)
   stars' DR25 TCE transit times pile up in 77 global 0.75-d windows (z > 4) vs ~1 in a random-epoch null, once each
   TCE is weighted 1/N_transits. But the pool look shows the missed NT FPs are **not** mostly bad-time events
   (single-feature AUC NT vs planets ~0.57); the features go into M2 anyway, as planned.
-- **M1 (N-a + N-b, light-curve pass) running** (`sweeps/p4_ntfeatures.jl`, ~30 min, ~2 GB). Then M2: 8 CV runs
-  (`sweeps/p4_cv.jl`) and `sweeps/p4_m2.jl [--eph]`.
+- **M1 (N-a uniqueness + N-b per-transit consistency) done** (`sweeps/p4_ntfeatures.jl`, 33 min, 2.1 GB).
+- **M2 done, negative for NT** (`sweeps/p4_cv.jl`, 8 runs; `sweeps/p4_m2.jl [--eph]`):
+  - vs Phase 2a, DR25 AUC rises +0.003 / +0.001 (CIs > 0), but only through contamination FPs; NT-only misses do not
+    move (~70% / ~60% at 98% recall).
+  - vs the adopted "+ ephemeris" models: Δ ≈ 0. N5 is not met.
+  - Pool check (`sweeps/p4_snrmatched.jl`): the new features separate NT from planets at matched SNR, but the
+    Phase 2 features (`lc_sev_ratio`, `lc_sec_sig`, `lc_snr`) already carry the same information.
+- **Next: N-d (alternative detrending)**, the plan's last feature group, since N-a to N-c leave the gap open.
 
 ## Phase 3 (11/08–09, CV only): ephemeris matching closes the contamination blind spot
 - **M2 done.** The two "+ ephemeris" models (Phase 2a features + 6 matching features) vs Phase 2a, 5 × 10 CV,

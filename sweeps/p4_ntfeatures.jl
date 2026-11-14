@@ -55,15 +55,15 @@ if !("--classes" in ARGS)
         isfile(shard_path(i)) && continue
         ks = stars[(i-1)*SHARD+1:min(i * SHARD, end)]
         out = run_stars(ks)
-        feats = reduce(vcat, (first(o) for o in out); init = Any[])
-        errs = [(kepid = k, error = last(o)) for (k, o) in zip(ks, out) if !isempty(last(o))]
-        jldsave(shard_path(i) * ".part"; feats, errs)
+        fs = reduce(vcat, (first(o) for o in out); init = Any[])
+        es = [(kepid = k, error = last(o)) for (k, o) in zip(ks, out) if !isempty(last(o))]
+        jldsave(shard_path(i) * ".part"; feats = fs, errs = es)
         mv(shard_path(i) * ".part", shard_path(i); force = true)
         global done_now += 1
         el = (time() - t_start) / 3600
         left = count(j -> !isfile(shard_path(j)), 1:nsh)
         @printf("%s  shard %d/%d: %d KOIs, %d star errors; %.2f h elapsed, ~%.1f h left; RSS %.2f GB\n",
-                Dates.format(now(), "HH:MM"), i, nsh, length(feats), length(errs), el, el / done_now * left, Sys.maxrss() / 1e9)
+                Dates.format(now(), "HH:MM"), i, nsh, length(fs), length(es), el, el / done_now * left, Sys.maxrss() / 1e9)
         flush(stdout)
     end
     feats = Any[]; errs = Any[]

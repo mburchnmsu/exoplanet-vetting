@@ -1,0 +1,55 @@
+VettingSetup loaded:11 features, data at C:\JuliaProjects\Exoplanet vetting\data\koi_cumulative.csv
+23:28  shard 1/32: 276 KOIs, 0 star errors; 0.03 h elapsed, ~0.8 h left; RSS 1.95 GB
+23:29  shard 2/32: 298 KOIs, 0 star errors; 0.04 h elapsed, ~0.7 h left; RSS 1.95 GB
+23:30  shard 3/32: 292 KOIs, 0 star errors; 0.06 h elapsed, ~0.6 h left; RSS 1.95 GB
+23:31  shard 4/32: 285 KOIs, 0 star errors; 0.08 h elapsed, ~0.6 h left; RSS 1.96 GB
+23:33  shard 5/32: 291 KOIs, 0 star errors; 0.10 h elapsed, ~0.6 h left; RSS 1.96 GB
+23:34  shard 6/32: 286 KOIs, 0 star errors; 0.12 h elapsed, ~0.5 h left; RSS 1.96 GB
+23:35  shard 7/32: 280 KOIs, 0 star errors; 0.14 h elapsed, ~0.5 h left; RSS 1.97 GB
+23:36  shard 8/32: 308 KOIs, 0 star errors; 0.16 h elapsed, ~0.5 h left; RSS 1.97 GB
+23:37  shard 9/32: 286 KOIs, 0 star errors; 0.18 h elapsed, ~0.5 h left; RSS 1.97 GB
+23:38  shard 10/32: 297 KOIs, 0 star errors; 0.20 h elapsed, ~0.4 h left; RSS 1.97 GB
+23:40  shard 11/32: 281 KOIs, 0 star errors; 0.22 h elapsed, ~0.4 h left; RSS 1.98 GB
+23:41  shard 12/32: 304 KOIs, 0 star errors; 0.24 h elapsed, ~0.4 h left; RSS 1.98 GB
+23:42  shard 13/32: 294 KOIs, 0 star errors; 0.26 h elapsed, ~0.4 h left; RSS 1.98 GB
+23:43  shard 14/32: 292 KOIs, 0 star errors; 0.28 h elapsed, ~0.4 h left; RSS 1.98 GB
+23:44  shard 15/32: 297 KOIs, 0 star errors; 0.30 h elapsed, ~0.3 h left; RSS 1.99 GB
+23:45  shard 16/32: 286 KOIs, 0 star errors; 0.32 h elapsed, ~0.3 h left; RSS 1.99 GB
+23:47  shard 17/32: 295 KOIs, 0 star errors; 0.34 h elapsed, ~0.3 h left; RSS 1.99 GB
+23:48  shard 18/32: 290 KOIs, 0 star errors; 0.36 h elapsed, ~0.3 h left; RSS 1.99 GB
+23:49  shard 19/32: 297 KOIs, 0 star errors; 0.38 h elapsed, ~0.3 h left; RSS 2.00 GB
+23:50  shard 20/32: 285 KOIs, 0 star errors; 0.40 h elapsed, ~0.2 h left; RSS 2.04 GB
+23:51  shard 21/32: 303 KOIs, 0 star errors; 0.42 h elapsed, ~0.2 h left; RSS 2.06 GB
+23:53  shard 22/32: 281 KOIs, 0 star errors; 0.44 h elapsed, ~0.2 h left; RSS 2.06 GB
+23:54  shard 23/32: 290 KOIs, 0 star errors; 0.46 h elapsed, ~0.2 h left; RSS 2.06 GB
+23:55  shard 24/32: 288 KOIs, 0 star errors; 0.47 h elapsed, ~0.2 h left; RSS 2.06 GB
+23:56  shard 25/32: 304 KOIs, 0 star errors; 0.49 h elapsed, ~0.1 h left; RSS 2.08 GB
+23:57  shard 26/32: 297 KOIs, 0 star errors; 0.51 h elapsed, ~0.1 h left; RSS 2.08 GB
+23:58  shard 27/32: 293 KOIs, 0 star errors; 0.53 h elapsed, ~0.1 h left; RSS 2.09 GB
+23:59  shard 28/32: 303 KOIs, 0 star errors; 0.55 h elapsed, ~0.1 h left; RSS 2.09 GB
+00:00  shard 29/32: 296 KOIs, 0 star errors; 0.57 h elapsed, ~0.1 h left; RSS 2.09 GB
+00:02  shard 30/32: 298 KOIs, 0 star errors; 0.59 h elapsed, ~0.0 h left; RSS 2.09 GB
+00:03  shard 31/32: 293 KOIs, 0 star errors; 0.60 h elapsed, ~0.0 h left; RSS 2.09 GB
+00:03  shard 32/32: 205 KOIs, 0 star errors; 0.62 h elapsed, ~0.0 h left; RSS 2.09 GB
+┌ Info: clean_koi
+│   raw = 9564
+│   kept = 9201
+│   stars = 7927
+│   planets = 4619
+└   false_pos = 4582
+┌ Warning: Assignment to `feats` in soft scope is ambiguous because a global variable by the same name exists: `feats` will be treated as a new local. Disambiguate by using `local feats` to suppress this warning or `global feats` to assign to the existing global variable.
+└ @ C:\JuliaProjects\Exoplanet vetting\sweeps\p4_ntfeatures.jl:58
+┌ Warning: Assignment to `errs` in soft scope is ambiguous because a global variable by the same name exists: `errs` will be treated as a new local. Disambiguate by using `local errs` to suppress this warning or `global errs` to assign to the existing global variable.
+└ @ C:\JuliaProjects\Exoplanet vetting\sweeps\p4_ntfeatures.jl:59
+
+M1 features: 9271 KOIs on 7927 stars, 0 star errors
+  nt_red       finite  9270 / 9271   median      1.06   [5%, 95%]      0.77      25.3
+  nt_pos_sig   finite  8989 / 9271   median      2.76   [5%, 95%]     0.866      4.67
+  nt_ter_sig   finite  8646 / 9271   median      2.45   [5%, 95%]     0.389      4.54
+  nt_ms_ter    finite  8633 / 9271   median      19.6   [5%, 95%]      1.99  2.19e+03
+  nt_ms_pos    finite  8976 / 9271   median      18.3   [5%, 95%]      1.99  2.08e+03
+  nt_chi2      finite  9250 / 9271   median     0.386   [5%, 95%]     -1.02      2.62
+  nt_negfrac   finite  9250 / 9271   median    0.0354   [5%, 95%]         0     0.389
+  nt_chases    finite  9050 / 9271   median         1   [5%, 95%]     0.566         1
+  nt_rubble    finite  9257 / 9271   median     0.974   [5%, 95%]     0.872      1.07
+11-14 00:03  DONE

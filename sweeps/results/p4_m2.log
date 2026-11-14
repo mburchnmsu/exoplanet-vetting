@@ -1,0 +1,113 @@
+VettingSetup loaded:11 features, data at C:\JuliaProjects\Exoplanet vetting\data\koi_cumulative.csv
+6×10 DataFrame
+ Row │ family      subset             n      old       auc_old  new     auc_new  delta    ci_lo    ci_hi
+     │ String      String             Int64  String    Float64  String  Float64  Float64  Float64  Float64
+─────┼─────────────────────────────────────────────────────────────────────────────────────────────────────
+   1 │ catalog     DR25 KOIs           7199  Phase 2a   0.9705  + NT     0.9736   0.0031   0.0019   0.0043
+   2 │ catalog     supplemental KOIs   1089  Phase 2a   0.6959  + NT     0.7073   0.0113  -0.0023   0.0254
+   3 │ catalog     all pool            8288  Phase 2a   0.9536  + NT     0.9576   0.0039   0.0026   0.0053
+   4 │ + centroid  DR25 KOIs           7199  Phase 2a   0.9869  + NT     0.9878   0.0008   0.0003   0.0013
+   5 │ + centroid  supplemental KOIs   1089  Phase 2a   0.7661  + NT     0.7673   0.0012  -0.008    0.0108
+   6 │ + centroid  all pool            8288  Phase 2a   0.9752  + NT     0.9763   0.0011   0.0004   0.0018
+24×11 DataFrame
+ Row │ family      model     rule               t_median  dr25_recall  dr25_precision  dr25_fp_kept  fps_kept_per1000  confirmed_lost  supp_recall  supp_precision
+     │ String      String    String             Float64   Float64      Float64         Float64       Int64             Float64         Float64      Float64
+─────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+   1 │ catalog     Phase 2a  planet recall 95%     0.358        0.949           0.865         0.156                76           0.011        0.766           0.534
+   2 │ catalog     Phase 2a  planet recall 98%     0.178        0.98            0.805         0.251               122           0.004        0.953           0.481
+   3 │ catalog     Phase 2a  planet recall 99%     0.082        0.99            0.752         0.344               167           0.002        0.98            0.467
+   4 │ catalog     Phase 2a  precision 95%         0.722        0.838           0.95          0.046                22           0.054        0.148           0.72
+   5 │ catalog     Phase 2a  max F1                0.502        0.919           0.905         0.102                49           0.019        0.469           0.59
+   6 │ catalog     Phase 2a  p = 0.5               0.5          0.919           0.905         0.101                49           0.02         0.469           0.601
+   7 │ catalog     + NT      planet recall 95%     0.37         0.95            0.878         0.139                68           0.011        0.723           0.552
+   8 │ catalog     + NT      planet recall 98%     0.177        0.98            0.814         0.236               115           0.003        0.954           0.485
+   9 │ catalog     + NT      planet recall 99%     0.093        0.99            0.766         0.318               155           0.001        0.977           0.469
+  10 │ catalog     + NT      precision 95%         0.694        0.862           0.95          0.048                23           0.043        0.204           0.748
+  11 │ catalog     + NT      max F1                0.474        0.927           0.907         0.1                  49           0.017        0.514           0.609
+  12 │ catalog     + NT      p = 0.5               0.5          0.922           0.911         0.094                46           0.019        0.473           0.615
+  13 │ + centroid  Phase 2a  planet recall 95%     0.492        0.949           0.935         0.069                34           0.007        0.535           0.655
+  14 │ + centroid  Phase 2a  planet recall 98%     0.25         0.979           0.882         0.138                67           0.003        0.916           0.546
+  15 │ + centroid  Phase 2a  planet recall 99%     0.107        0.99            0.838         0.202                98           0.003        0.982           0.494
+  16 │ + centroid  Phase 2a  precision 95%         0.571        0.937           0.95          0.052                26           0.01         0.408           0.726
+  17 │ + centroid  Phase 2a  max F1                0.541        0.942           0.945         0.057                28           0.008        0.45            0.701
+  18 │ + centroid  Phase 2a  p = 0.5               0.5          0.948           0.938         0.066                32           0.007        0.517           0.665
+  19 │ + centroid  + NT      planet recall 95%     0.491        0.95            0.939         0.065                32           0.007        0.537           0.668
+  20 │ + centroid  + NT      planet recall 98%     0.237        0.98            0.884         0.135                66           0.003        0.912           0.545
+  21 │ + centroid  + NT      planet recall 99%     0.105        0.99            0.839         0.201                98           0.003        0.981           0.493
+  22 │ + centroid  + NT      precision 95%         0.552        0.94            0.949         0.053                26           0.01         0.441           0.723
+  23 │ + centroid  + NT      max F1                0.592        0.938           0.953         0.049                24           0.01         0.412           0.732
+  24 │ + centroid  + NT      p = 0.5               0.5          0.948           0.941         0.063                30           0.007        0.516           0.679
+old = Phase 2a, new = + NT
+44×9 DataFrame
+ Row │ group                       n      family      rule               old_pct  new_pct  delta_pct  ci_lo    ci_hi
+     │ String                      Int64  String      String             Float64  Float64  Float64    Float64  Float64
+─────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+   1 │ FP missed: NT only            849  catalog     p = 0.5               20.8     21.2        0.5     -1.1      2.0
+   2 │ FP missed: NT only            849  catalog     planet recall 98%     70.7     70.3       -0.4     -1.4      0.5
+   3 │ FP missed: NT only            849  + centroid  p = 0.5               23.7     23.2       -0.5     -1.9      0.9
+   4 │ FP missed: NT only            849  + centroid  planet recall 98%     60.2     60.8        0.6     -0.5      1.8
+   5 │ FP missed: NT only (DR25)     433  catalog     p = 0.5               18.2     19.2        0.9     -0.9      2.8
+   6 │ FP missed: NT only (DR25)     433  catalog     planet recall 98%     54.6     54.2       -0.4     -1.8      0.9
+   7 │ FP missed: NT only (DR25)     433  + centroid  p = 0.5               22.4     23.3        0.8     -1.1      2.7
+   8 │ FP missed: NT only (DR25)     433  + centroid  planet recall 98%     49.3     50.4        1.1     -0.3      2.6
+   9 │ FP missed: NT flag (any)     1197  catalog     p = 0.5               16.9     17.1        0.2     -1.0      1.3
+  10 │ FP missed: NT flag (any)     1197  catalog     planet recall 98%     56.9     56.1       -0.9     -1.8      0.0
+  11 │ FP missed: NT flag (any)     1197  + centroid  p = 0.5               18.1     17.7       -0.4     -1.5      0.6
+  12 │ FP missed: NT flag (any)     1197  + centroid  planet recall 98%     46.6     46.8        0.2     -0.8      1.1
+  13 │ FP missed: EC only            111  catalog     p = 0.5               18.0      9.7       -8.3    -13.2     -3.9
+  14 │ FP missed: EC only            111  catalog     planet recall 98%     44.3     26.8      -17.5    -24.1    -11.2
+  15 │ FP missed: EC only            111  + centroid  p = 0.5               23.2     15.7       -7.6    -11.5     -4.0
+  16 │ FP missed: EC only            111  + centroid  planet recall 98%     33.7     28.5       -5.2     -8.8     -1.6
+  17 │ FP missed: EC flag (any)     1022  catalog     p = 0.5                8.1      5.0       -3.2     -4.2     -2.1
+  18 │ FP missed: EC flag (any)     1022  catalog     planet recall 98%     22.4     15.6       -6.8     -8.4     -5.4
+  19 │ FP missed: EC flag (any)     1022  + centroid  p = 0.5                4.4      2.8       -1.6     -2.3     -0.9
+  20 │ FP missed: EC flag (any)     1022  + centroid  planet recall 98%      9.3      7.1       -2.3     -3.2     -1.4
+  21 │ FP missed: CO only            464  catalog     p = 0.5               34.6     34.9        0.3     -1.8      2.6
+  22 │ FP missed: CO only            464  catalog     planet recall 98%     60.8     62.9        2.1      0.0      4.1
+  23 │ FP missed: CO only            464  + centroid  p = 0.5                5.3      5.9        0.7     -0.0      1.5
+  24 │ FP missed: CO only            464  + centroid  planet recall 98%     10.9     11.8        0.8     -0.3      2.1
+  25 │ FP missed: SS only           1307  catalog     p = 0.5                3.1      2.9       -0.2     -0.7      0.4
+  26 │ FP missed: SS only           1307  catalog     planet recall 98%      9.4      9.7        0.2     -0.5      0.9
+  27 │ FP missed: SS only           1307  + centroid  p = 0.5                5.1      4.8       -0.2     -0.7      0.2
+  28 │ FP missed: SS only           1307  + centroid  planet recall 98%      9.8      9.8        0.0     -0.5      0.6
+  29 │ FP missed: all               4125  catalog     p = 0.5               12.2     11.4       -0.8     -1.3     -0.3
+  30 │ FP missed: all               4125  catalog     planet recall 98%     33.0     31.6       -1.5     -2.0     -0.9
+  31 │ FP missed: all               4125  + centroid  p = 0.5                8.6      8.1       -0.5     -0.9     -0.1
+  32 │ FP missed: all               4125  + centroid  planet recall 98%     20.4     20.1       -0.3     -0.7      0.1
+  33 │ CONFIRMED called FP          2473  catalog     p = 0.5                2.1      2.0       -0.1     -0.5      0.3
+  34 │ CONFIRMED called FP          2473  catalog     planet recall 98%      0.4      0.3       -0.0     -0.1      0.1
+  35 │ CONFIRMED called FP          2473  + centroid  p = 0.5                0.8      0.9        0.1     -0.1      0.2
+  36 │ CONFIRMED called FP          2473  + centroid  planet recall 98%      0.3      0.3        0.0      0.0      0.0
+  37 │ CONFIRMED called FP (DR25)   2459  catalog     p = 0.5                2.0      1.9       -0.1     -0.5      0.3
+  38 │ CONFIRMED called FP (DR25)   2459  catalog     planet recall 98%      0.4      0.3       -0.0     -0.1      0.1
+  39 │ CONFIRMED called FP (DR25)   2459  + centroid  p = 0.5                0.7      0.7        0.1     -0.1      0.2
+  40 │ CONFIRMED called FP (DR25)   2459  + centroid  planet recall 98%      0.3      0.3        0.0      0.0      0.0
+  41 │ planet called FP: all        4163  catalog     p = 0.5               13.1     12.9       -0.3     -0.7      0.2
+  42 │ planet called FP: all        4163  catalog     planet recall 98%      2.3      2.3        0.0     -0.2      0.2
+  43 │ planet called FP: all        4163  + centroid  p = 0.5               10.0     10.0        0.0     -0.3      0.3
+  44 │ planet called FP: all        4163  + centroid  planet recall 98%      2.8      2.8        0.0     -0.2      0.2
+10×6 DataFrame
+ Row │ fp_rate  family      model      n      recall   spread
+     │ Float64  String      String     Int64  Float64  Float64
+─────┼─────────────────────────────────────────────────────────
+   1 │    0.05  catalog     Phase 2a    7199    0.849    0.004
+   2 │    0.05  catalog     + NT        7199    0.868    0.004
+   3 │    0.05  + centroid  Phase 2a    7199    0.935    0.001
+   4 │    0.05  + centroid  + NT        7199    0.938    0.001
+   5 │    0.05  reference   koi_score   7199    0.953    0.0
+   6 │    0.1   catalog     Phase 2a    7199    0.918    0.002
+   7 │    0.1   catalog     + NT        7199    0.928    0.002
+   8 │    0.1   + centroid  Phase 2a    7199    0.966    0.002
+   9 │    0.1   + centroid  + NT        7199    0.97     0.002
+  10 │    0.1   reference   koi_score   7199    0.968    0.0
+┌ Info: clean_koi
+│   raw = 9564
+│   kept = 9201
+│   stars = 7927
+│   planets = 4619
+└   false_pos = 4582
+catalog    Phase 2a    AUC DR25 0.9698, supplemental 0.6916 (mean over fold shuffles)
+catalog    + NT        AUC DR25 0.9730, supplemental 0.7034 (mean over fold shuffles)
++ centroid Phase 2a    AUC DR25 0.9865, supplemental 0.7617 (mean over fold shuffles)
++ centroid + NT        AUC DR25 0.9874, supplemental 0.7625 (mean over fold shuffles)
+11-14 00:39  DONE

@@ -1,0 +1,25 @@
+family,model,rule,t_median,dr25_recall,dr25_precision,dr25_fp_kept,fps_kept_per1000,confirmed_lost,supp_recall,supp_precision
+catalog,Phase 2a,planet recall 95%,0.358,0.949,0.865,0.156,76,0.011,0.766,0.534
+catalog,Phase 2a,planet recall 98%,0.178,0.98,0.805,0.251,122,0.004,0.953,0.481
+catalog,Phase 2a,planet recall 99%,0.082,0.99,0.752,0.344,167,0.002,0.98,0.467
+catalog,Phase 2a,precision 95%,0.722,0.838,0.95,0.046,22,0.054,0.148,0.72
+catalog,Phase 2a,max F1,0.502,0.919,0.905,0.102,49,0.019,0.469,0.59
+catalog,Phase 2a,p = 0.5,0.5,0.919,0.905,0.101,49,0.02,0.469,0.601
+catalog,+ NT,planet recall 95%,0.37,0.95,0.878,0.139,68,0.011,0.723,0.552
+catalog,+ NT,planet recall 98%,0.177,0.98,0.814,0.236,115,0.003,0.954,0.485
+catalog,+ NT,planet recall 99%,0.093,0.99,0.766,0.318,155,0.001,0.977,0.469
+catalog,+ NT,precision 95%,0.694,0.862,0.95,0.048,23,0.043,0.204,0.748
+catalog,+ NT,max F1,0.474,0.927,0.907,0.1,49,0.017,0.514,0.609
+catalog,+ NT,p = 0.5,0.5,0.922,0.911,0.094,46,0.019,0.473,0.615
++ centroid,Phase 2a,planet recall 95%,0.492,0.949,0.935,0.069,34,0.007,0.535,0.655
++ centroid,Phase 2a,planet recall 98%,0.25,0.979,0.882,0.138,67,0.003,0.916,0.546
++ centroid,Phase 2a,planet recall 99%,0.107,0.99,0.838,0.202,98,0.003,0.982,0.494
++ centroid,Phase 2a,precision 95%,0.571,0.937,0.95,0.052,26,0.01,0.408,0.726
++ centroid,Phase 2a,max F1,0.541,0.942,0.945,0.057,28,0.008,0.45,0.701
++ centroid,Phase 2a,p = 0.5,0.5,0.948,0.938,0.066,32,0.007,0.517,0.665
++ centroid,+ NT,planet recall 95%,0.491,0.95,0.939,0.065,32,0.007,0.537,0.668
++ centroid,+ NT,planet recall 98%,0.237,0.98,0.884,0.135,66,0.003,0.912,0.545
++ centroid,+ NT,planet recall 99%,0.105,0.99,0.839,0.201,98,0.003,0.981,0.493
++ centroid,+ NT,precision 95%,0.552,0.94,0.949,0.053,26,0.01,0.441,0.723
++ centroid,+ NT,max F1,0.592,0.938,0.953,0.049,24,0.01,0.412,0.732
++ centroid,+ NT,p = 0.5,0.5,0.948,0.941,0.063,30,0.007,0.516,0.679
