@@ -23,7 +23,9 @@ Updated: 2026-11-14 03:20, DESKTOP-BBASC81 (Thinkpad)
   70.0 → 67.9% (−2.1 [−2.9, −1.3]) and all FPs kept 28.7 → 27.9%. + centroid: no change. No CONFIRMED regression.
   Small and real, but N5 (≥ 10 points) is not met.
 - **All four planned feature groups tried; N5 not met by any.** Adopting any Phase 4 features is the user's call.
-- **Next: M3 write-up** (`notebooks/exo111426.ipynb`, README Phase 4 section).
+- **M3 write-up done:** `notebooks/exo111426.ipynb`, README Phase 4 section, `PHASE4_PLAN.md` §4.1.
+- **Open for the user:** adopt the N-d features in the catalog family (−2 points NT at 98% recall, no cost
+  elsewhere), or keep "+ ephemeris" as is. Phase 4 is otherwise complete.
 
 ## Phase 3 (11/08–09, CV only): ephemeris matching closes the contamination blind spot
 - **M2 done.** The two "+ ephemeris" models (Phase 2a features + 6 matching features) vs Phase 2a, 5 × 10 CV,

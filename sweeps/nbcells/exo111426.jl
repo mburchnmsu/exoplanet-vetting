@@ -186,8 +186,49 @@ DataFrame(rows)
 #
 # ## 5. N-d: alternative detrending
 #
-# NDRESULTS
+# A systematic often lives at one timescale: a slow wiggle that a short detrending window absorbs, or a dip that
+# exists only because a long window leaves a trend in place. N-d re-measures each KOI's box depth and SNR twice
+# (`LC_ND_FEATURES`, `sweeps/p4_ntfeatures.jl --nd`, 1.6 h, 2.1 GB):
+# - **short:** biweight with a window of max(0.25 d, 2.5 transit durations), the KOI itself not masked, so a long
+#   smooth "transit" is partly eaten;
+# - **long:** biweight with a window of max(2 d, 10 durations), all KOIs masked.
+#
+# Each is given as a ratio to the default (Phase 2) detrending. Then 4 CV runs on the "+ ephemeris" lineage
+# (`sweeps/p4_cv.jl ephnd_* centephnd_*`, 16 min) and the same analysis (`sweeps/p4_m2.jl --nd`).
+
+# %%
+DataFrame([(group = g, n = sum(m), (c => round(median(filter(isfinite, Float64.(coalesce.(pool[!, c][m], NaN))));
+                                              digits = 3) for c in LC_ND_FEATURES)...)
+           for (g, m) in [("planets", y .== 1), ("NT-only, caught", nt .& .!missed), ("NT-only, missed", missed),
+                          ("SS-only FPs", (y .== 0) .& (fpat .== "SS"))]])
+
+# %%
+readres("p4_m2nd_summary.csv")
+
+# %%
+c3 = readres("p4_m2nd_criteria.csv")
+c3[in.(c3.group, Ref(("FP missed: NT only", "FP missed: NT only (DR25)", "FP missed: CO only", "FP missed: all",
+                      "CONFIRMED called FP (DR25)"))) .& (c3.rule .== "planet recall 98%"), :]
+
+# %% [markdown]
+# - Planets and NT FPs have nearly the same ratios. The short window removes about 40% of the depth for both, so
+#   the single-feature AUCs are only 0.50–0.58, also within SNR bins (table in §4). The features mainly flag
+#   secondary-eclipse FPs, whose depth is unchanged by the short window and whose long-window SNR drops.
+# - **CV:** DR25 AUC is unchanged (Δ +0.0000 catalog, +0.0001 + centroid; CIs include 0).
+# - **Catalog family at 98% recall:** NT-only misses 70.0 → **67.9%** (−2.1 points, CI [−2.9, −1.3]; DR25 KOIs
+#   54.1 → 52.6%), centroid-only misses −1.6 points, all FPs kept 28.7 → 27.9%. Small but real.
+# - **+ centroid family:** no change (NT 59.7 → 59.7%).
+# - No CONFIRMED regression. Criterion N5 (a 10-point drop) is **not met**.
 #
 # ## 6. Conclusions
 #
-# CONCLUSIONS
+# - **All four planned feature groups were built and tested, and none closes the NT blind spot.** The best result is
+#   N-d's 2-point drop in the catalog family; N-a to N-c help only with contamination, which "+ ephemeris" had
+#   already fixed.
+# - **The information is mostly there already.** At matched SNR, uniqueness and per-transit tests do separate NT
+#   FPs from planets, but so do the Phase 2 features the models already use. The NT FPs that still pass at 98%
+#   recall look like low-SNR planets to every measurement we made.
+# - **What might still help** (not in this plan, not run): pixel-level information beyond the centroid, such as the
+#   per-pixel difference images. That is a much larger project.
+# - **Decision for the user:** the "+ ephemeris" models stay the adopted ones. The N-d features in the catalog family
+#   are the only candidate addition (−2 points NT, no cost elsewhere); adopting them, or none, is the user's call.

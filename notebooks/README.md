@@ -21,3 +21,6 @@ Dated notebooks (`exoMMDDYY.ipynb`), oldest first. Setup cells load the code wit
 - `exo110826.ipynb` (11/08/2026): Phase 3 write-up (CV only). Ephemeris matching against KOIs and DR25 TCEs, the
   random-epoch null, the features per class, the "+ ephemeris" models vs Phase 2a, the EC blind spot and the other
   blind spots, the operating points, the low-FP-rate comparison with `koi_score`, and v2 with the Kepler EB catalog.
+- `exo111426.ipynb` (11/14/2026): Phase 4 write-up (CV only). The Phase 3 freeze, then the "not transit-like" blind
+  spot: bad-time clustering from the DR25 TCEs, uniqueness and per-transit consistency features, alternative
+  detrending, the CV against Phase 2a and "+ ephemeris", the SNR-matched check, and the conclusions.

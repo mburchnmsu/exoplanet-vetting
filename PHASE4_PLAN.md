@@ -116,6 +116,8 @@ The CNN route (shape learning) was tried in Phase 2 and added nothing, so it is 
     10-point target.
   - + centroid family: no change anywhere (NT 59.7 → 59.7%). No CONFIRMED regression in either family.
   - With N-d, every planned feature group (N-a to N-d) has been tried. Adoption is the user's call.
+- **11/14, M3 write-up done:** `notebooks/exo111426.ipynb` (sources `sweeps/nbcells/exo111426.jl`), README Phase 4
+  section.
 
 ## 5. Rules carried over
 

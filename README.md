@@ -137,6 +137,37 @@ judged on cross-validation only (5 fold shuffles × 10 seeds, paired against Pha
 
 ![CV ROC at low false-positive rates, DR25 KOIs](figures/p3_cv_lowfp.png)
 
+The "+ ephemeris" models were adopted on 11/13/2026 and frozen in `models/p3_frozen.jld2` (whole pool, 10 + 10
+seeds, thresholds from the cross-validation). They are labelled post-test, CV-validated: the test set was not used.
+
+## Phase 4: "not transit-like" false positives (cross-validation only)
+
+After Phase 3, the largest error group left is the "not transit-like" (NT) false positives: detrending residuals,
+stellar variability and instrumental events. At 98% planet recall, about seven in ten NT-only FPs still pass in the
+catalog family. Phase 4 rebuilt, as label-free features, the kinds of tests Kepler's robovetter uses on them:
+
+| Group | Idea | Features |
+|---|---|---|
+| Bad times | Do the transits fall on days when many other stars' DR25 events pile up? | global and local excess, per KOI |
+| Uniqueness | Is the transit the only dip of its kind in its own light curve? Red noise, strongest other dip and bump | 5 |
+| Per-transit consistency | Do the individual transits agree in depth, sign and coverage? | 4 |
+| Alternative detrending | Does the signal survive a shorter and a longer detrending window? | 4 |
+
+Each group was added to the adopted models and compared on identical folds (5 shuffles × 10 seeds, paired star
+bootstrap). The target was 10 fewer points of NT-only misses at 98% recall, with no loss of AUC or of CONFIRMED
+planets.
+
+- **Bad-time clustering is real** (77 windows with a z > 4 pile-up vs 0–5 in a random-epoch null), but the missed NT
+  FPs are not mostly bad-time events.
+- **Uniqueness and per-transit features** raise the AUC over Phase 2a (+0.003 catalog), but only by catching
+  contamination FPs, which the "+ ephemeris" models already catch. Against those models: no change.
+- **Alternative detrending** gives a small real gain in the catalog family: NT-only misses at 98% recall 70.0% →
+  67.9% (−2.1 points [−2.9, −1.3]), with AUC unchanged. No change in the "+ centroid" family.
+- **No group meets the target.** At matched SNR the new features do separate NT FPs from planets, but the Phase 2
+  light-curve features already carry the same information. The NT FPs that still pass look like low-SNR planets to
+  every measurement made here.
+- No group lost CONFIRMED planets. The "+ ephemeris" models remain the adopted ones.
+
 ## Repository layout
 
 | Path | Contents |
@@ -146,13 +177,14 @@ judged on cross-validation only (5 fold shuffles × 10 seeds, paired against Pha
 | `src/Baselines.jl`, `Centroids.jl`, `Calibration.jl`, `ErrorAnalysis.jl` | Trees, centroid features, operating points, error analysis |
 | `src/LightCurves.jl`, `Detrend.jl`, `Views.jl`, `LCFeatures.jl`, `CNN.jl` | Phase 2: MAST download + cache, detrending, views, light-curve features, CNN |
 | `src/Ephemeris.jl` | Phase 3: ephemeris matching against other stars' signals |
+| `src/BadTimes.jl` | Phase 4: bad-time clustering of other stars' transit times |
 | `sweeps/*.jl` | Scripts that run each experiment (resumable) |
 | `sweeps/results/` | CV results (out-of-fold predictions), QA and feature tables, test tables |
 | `sweeps/REPORT.md` | The full write-up, step by step |
 | `notebooks/` | Dated notebooks (`exoMMDDYY.ipynb`) with plots; index in `notebooks/README.md` |
 | `ExoOnboarding.ipynb` | Introduction: data, physics, method, results |
-| `PHASE2_PLAN.md`, `PHASE3_PLAN.md` | Phase 2 and Phase 3 design, milestones and outcomes |
-| `models/step5_frozen.jld2`, `models/p2_frozen.jld2` | The frozen Phase 1 and Phase 2 models (two families each) |
+| `PHASE2_PLAN.md`, `PHASE3_PLAN.md`, `PHASE4_PLAN.md` | Phase 2–4 design, milestones and outcomes |
+| `models/step5_frozen.jld2`, `models/p2_frozen.jld2`, `models/p3_frozen.jld2` | The frozen Phase 1, 2 and 3 models (two families each) |
 | `data/koi_cumulative.csv` | NASA Exoplanet Archive cumulative KOI table (as downloaded) |
 
 ## Reproducing
@@ -170,7 +202,10 @@ julia --project=. -t auto sweeps/cv_baselines.jl      # Phase 1 CV examples; see
   `sweeps/p2_features.jl`, `sweeps/p2_cv.jl`, `sweeps/p2_cnn.jl` (CNN; slow on a CPU) and `sweeps/p2_m5.jl`
   (calibration, operating points, freeze).
 - Phase 3: `sweeps/p3_download.jl` (small catalogs into `data/catalogs/`), `sweeps/p3_match.jl` (matching + null),
-  `sweeps/p3_cv.jl` and `sweeps/p3_m2.jl` (CV and analysis; `--eb` for the eclipsing-binary variant).
+  `sweeps/p3_cv.jl` and `sweeps/p3_m2.jl` (CV and analysis; `--eb` for the eclipsing-binary variant), then
+  `sweeps/p3_freeze.jl`.
+- Phase 4 (needs the Phase 2 cache): `sweeps/p4_badtimes.jl`, `sweeps/p4_ntfeatures.jl` (and `--nd`),
+  `sweeps/p4_cv.jl`, `sweeps/p4_m2.jl` (`--eph`, `--nd`) and `sweeps/p4_snrmatched.jl`.
 - The sealed-test scripts (`sweeps/step5_test.jl`, `sweeps/p2_test.jl`) are kept for the record; each refuses to
   score the test set a second time.
 
